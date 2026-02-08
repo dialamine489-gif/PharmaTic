@@ -34,5 +34,55 @@
     "garde": true,
     "produits": ["Ventoline", "Doliprane", "Amoxicilline"],
     "distance": "3.2km"
+  },
+  
+  {
+    "id": 1,
+    "nom": "Pharmacie du Croisement",
+    "quartier": "Keur Massar Village",
+    "adresse": "Croisement Keur Massar, Route de Boune",
+    "telephone": "+221338781212",
+    "lat": 14.7818,
+    "lng": -17.3090,
+    "garde": true,
+    "produits": ["Doliprane", "Paracétamol", "Amoxicilline", "Spasfon"],
+    "distance": "100m"
+  },
+  {
+    "id": 2,
+    "nom": "Pharmacie 24",
+    "quartier": "Unité 3",
+    "adresse": "Route principale, Unité 3 Keur Massar",
+    "telephone": "+221338750024",
+    "lat": 14.7890,
+    "lng": -17.3050,
+    "garde": false,
+    "produits": ["Gaviscon", "Doliprane", "Nurofen"],
+    "distance": "1.2km"
+  },
+  {
+    "id": 3,
+    "nom": "Pharmacie Jaxaay 1",
+    "quartier": "Jaxaay",
+    "adresse": "Terminus Jaxaay, Cité Jaxaay",
+    "telephone": "+221338751515",
+    "lat": 14.7725,
+    "lng": -17.2940,
+    "garde": true,
+    "produits": ["Ventoline", "Doliprane", "Efferalgan"],
+    "distance": "2.8km"
+  },
+  {
+    "id": 4,
+    "nom": "Pharmacie Tawfekh",
+    "quartier": "Cité Tawfekh",
+    "adresse": "Entrée Cité Tawfekh",
+    "telephone": "+221338754444",
+    "lat": 14.7780,
+    "lng": -17.2850,
+    "garde": false,
+    "produits": ["Smecta", "Doliprane", "Vogalène"],
+    "distance": "3.5km"
   }
+
 ]
