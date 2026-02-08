@@ -83,6 +83,19 @@
     "garde": false,
     "produits": ["Smecta", "Doliprane", "Vogalène"],
     "distance": "3.5km"
-  }
+  },
+  {
+  "id": 1,
+  "nom": "Pharmacie du Croisement",
+  "quartier": "Keur Massar Village",
+  "ouverture": "08:00",
+  "fermeture": "00:00",
+  "garde": true,
+  "produits": ["Doliprane", "Paracétamol"],
+  "telephone": "+221338781212",
+  "lat": 14.7818,
+  "lng": -17.3090,
+  "distance": "100m"
+}
 
 ]
