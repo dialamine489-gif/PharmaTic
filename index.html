@@ -17,7 +17,7 @@
         body { font-family: 'Inter', sans-serif; }
         #map { height: 350px; width: 100%; z-index: 1; }
         .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
-        .suggestions-list { position: absolute; z-index: 6000; width: 100%; background: white; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 200px; overflow-y: auto; }
+        .suggestions-list { position: absolute; z-index: 6000; width: 100%; background: white; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 250px; overflow-y: auto; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -31,17 +31,17 @@
 
     <main class="container mx-auto mt-4 p-4">
         <div class="bg-white p-5 rounded-3xl shadow-sm mb-6 border border-slate-100 relative">
-            <p class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest">1. Quel médicament cherchez-vous ?</p>
+            <p class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest">1. Que cherchez-vous ?</p>
             <div class="relative">
-                <input type="text" id="searchBar" oninput="gererSuggestions()" placeholder="Ex: Doliprane, Amoxicilline..." 
+                <input type="text" id="searchBar" oninput="gererSuggestions()" placeholder="Médicament, accessoire, lait..." 
                     class="bg-slate-50 border-none p-4 rounded-2xl w-full focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-bold">
                 <div id="suggestions" class="suggestions-list hidden mt-1 border border-slate-100"></div>
             </div>
 
             <div class="mt-4">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">2. Filtrer par quartier (Optionnel)</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">2. Votre zone</p>
                 <select id="filterQuartier" onchange="rechercher()" class="w-full bg-slate-50 border-none text-slate-600 text-xs rounded-xl p-3 outline-none font-bold">
-                    <option value="tous">Toutes les pharmacies de Keur Massar</option>
+                    <option value="tous">Tout Keur Massar</option>
                     <option value="Keur Massar Village">Village</option>
                     <option value="Unité 3">Unité 3</option>
                     <option value="Jaxaay">Jaxaay</option>
@@ -70,11 +70,10 @@
     </main>
 
     <script>
-        // DICTIONNAIRE DE MÉDICAMENTS
         const dictionnaireMedicaments = [
-            "Doliprane 500mg", "Doliprane 1000mg", "Efferalgan", "Paracétamol", "Amoxicilline", 
-            "Spasfon", "Gaviscon", "Ventoline", "Nurofen", "Augmentin", "Clamoxyl", "Vogalène",
-            "Météospasmyl", "Dafalgan", "Aspegic", "Lasilix", "Kardegic", "Imodium"
+            "Doliprane", "Efferalgan", "Paracétamol", "Amoxicilline", "Augmentin", 
+            "Spasfon", "Gaviscon", "Ventoline", "Nurofen", "Lasilix", "Kardegic", 
+            "Vitamine C", "Magéos", "Glucophage", "Diamicron", "Amlor"
         ];
 
         let map = L.map('map', { zoomControl: false }).setView([14.7815, -17.3095], 13);
@@ -87,24 +86,32 @@
             const valeur = input.value.toLowerCase();
             list.innerHTML = '';
             
-            if (valeur.length < 1) { list.classList.add('hidden'); rechercher(); return; }
+            // On rafraîchit la liste des pharmacies en temps réel pendant la frappe
+            rechercher();
+
+            if (valeur.length < 1) { 
+                list.classList.add('hidden'); 
+                return; 
+            }
 
             const filtres = dictionnaireMedicaments.filter(m => m.toLowerCase().includes(valeur));
             
-            filtres.forEach(m => {
-                const item = document.createElement('div');
-                item.className = 'p-4 hover:bg-blue-50 cursor-pointer text-sm font-bold text-slate-700 border-b border-slate-50';
-                item.innerText = m;
-                item.onclick = () => {
-                    input.value = m;
-                    list.classList.add('hidden');
-                    rechercher(); // On lance la recherche dès qu'on clique sur un médicament
-                };
-                list.appendChild(item);
-            });
-
-            list.classList.remove('hidden');
-            rechercher();
+            if (filtres.length > 0) {
+                filtres.forEach(m => {
+                    const item = document.createElement('div');
+                    item.className = 'p-4 hover:bg-blue-50 cursor-pointer text-sm font-bold text-slate-700 border-b border-slate-100';
+                    item.innerText = m;
+                    item.onclick = () => {
+                        input.value = m;
+                        list.classList.add('hidden');
+                        rechercher();
+                    };
+                    list.appendChild(item);
+                });
+                list.classList.remove('hidden');
+            } else {
+                list.classList.add('hidden');
+            }
         }
 
         function verifierOuverture(hOuv, hFer) {
@@ -125,14 +132,12 @@
         function toggleMap() {
             const container = document.getElementById('mapContainer');
             container.classList.toggle('hidden');
-            document.getElementById('mapBtnText').innerText = container.classList.contains('hidden') ? "Carte" : "Masquer Carte";
             if (!container.classList.contains('hidden')) setTimeout(() => { map.invalidateSize(); }, 200);
         }
 
         function toggleListe() {
             const container = document.getElementById('listContainer');
             container.classList.toggle('hidden');
-            document.getElementById('listBtnText').innerText = container.classList.contains('hidden') ? "Afficher Liste" : "Liste";
         }
 
         async function rechercher() {
@@ -159,7 +164,7 @@
         }
 
         function afficherCards(data, quartier, container, hasGeo) {
-            const medInput = document.getElementById('searchBar').value.trim() || "ce médicament";
+            const medInput = document.getElementById('searchBar').value.trim() || "ce produit";
             
             data.filter(p => {
                 return quartier === "tous" ? true : p.quartier === quartier;
@@ -170,8 +175,8 @@
                 const msgWA = encodeURIComponent(`🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${medInput}* ?\n\nMerci de me confirmer la disponibilité. 🙏`);
 
                 container.innerHTML += `
-                    <div class="bg-white p-5 rounded-[2rem] card-shadow border border-slate-50 relative overflow-hidden">
-                        ${p.partenaire ? '<div class="absolute top-0 right-0 bg-blue-600 text-white text-[7px] font-bold px-3 py-1 rounded-bl-xl uppercase">Partenaire</div>' : ''}
+                    <div class="bg-white p-5 rounded-[2rem] card-shadow border border-slate-50 relative overflow-hidden card-animate">
+                        ${p.partenaire ? '<div class="absolute top-0 right-0 bg-blue-600 text-white text-[7px] font-bold px-3 py-1 rounded-bl-xl uppercase">Vérifié</div>' : ''}
                         
                         <div class="flex justify-between items-start mb-4">
                             <div>
@@ -182,7 +187,7 @@
                         </div>
 
                         <div class="bg-blue-50/50 p-3 rounded-2xl mb-4 border border-blue-100/50 text-center">
-                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Vérifier stock pour :</p>
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Demander le stock de :</p>
                             <p class="text-sm font-extrabold text-blue-700">"${medInput}"</p>
                         </div>
 
