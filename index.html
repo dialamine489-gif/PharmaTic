@@ -47,16 +47,13 @@
                         Rechercher
                     </button>
                 </div>
-
-                <div class="flex flex-wrap gap-3 items-center">
-                    <select id="filterQuartier" onchange="rechercher()" class="flex-grow bg-slate-50 border-none text-slate-600 text-xs rounded-xl p-3 outline-none font-bold">
-                        <option value="tous">Tous les quartiers</option>
-                        <option value="Keur Massar Village">Village</option>
-                        <option value="Unité 3">Unité 3</option>
-                        <option value="Jaxaay">Jaxaay</option>
-                        <option value="Cité Tawfekh">Tawfekh</option>
-                    </select>
-                </div>
+                <select id="filterQuartier" onchange="rechercher()" class="flex-grow bg-slate-50 border-none text-slate-600 text-xs rounded-xl p-3 outline-none font-bold">
+                    <option value="tous">Tous les quartiers</option>
+                    <option value="Keur Massar Village">Village</option>
+                    <option value="Unité 3">Unité 3</option>
+                    <option value="Jaxaay">Jaxaay</option>
+                    <option value="Cité Tawfekh">Tawfekh</option>
+                </select>
             </div>
         </div>
 
@@ -82,7 +79,7 @@
         <div class="bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] max-w-md w-full p-8 shadow-2xl relative modal-active">
             <button onclick="fermerDetails()" class="absolute top-6 right-6 text-slate-300 hover:text-slate-500 text-2xl">&times;</button>
             <div id="modalContent"></div>
-            <button onclick="fermerDetails()" class="w-full mt-8 bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-slate-800 transition shadow-lg">Continuer</button>
+            <button onclick="fermerDetails()" class="w-full mt-8 bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-slate-800 transition shadow-lg">Fermer</button>
         </div>
     </div>
 
@@ -99,22 +96,12 @@
             return hFer < hOuv ? (hm >= hOuv || hm <= hFer) : (hm >= hOuv && hm <= hFer);
         }
 
-        // --- FONCTION SUGGESTIONS RESTAURÉE ---
-        function afficherSuggestions() {
-            const input = document.getElementById('searchBar');
-            const list = document.getElementById('autocomplete-list');
-            const valeur = input.value.toLowerCase();
-            list.innerHTML = '';
-            if (!valeur) { list.classList.add('hidden'); return; }
-            const suggs = listeSuggestions.filter(m => m.toLowerCase().includes(valeur));
-            suggs.forEach(s => {
-                const item = document.createElement('div');
-                item.className = 'p-4 hover:bg-slate-50 cursor-pointer text-sm font-semibold text-slate-600 border-b border-slate-50';
-                item.innerText = s;
-                item.onclick = () => { input.value = s; list.classList.add('hidden'); rechercher(); };
-                list.appendChild(item);
-            });
-            list.classList.toggle('hidden', suggs.length === 0);
+        function calculerDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         }
 
         function toggleMap() {
@@ -142,10 +129,27 @@
             }
         }
 
+        function afficherSuggestions() {
+            const input = document.getElementById('searchBar');
+            const list = document.getElementById('autocomplete-list');
+            const valeur = input.value.toLowerCase();
+            list.innerHTML = '';
+            if (!valeur) { list.classList.add('hidden'); return; }
+            const suggs = listeSuggestions.filter(m => m.toLowerCase().includes(valeur));
+            suggs.forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'p-4 hover:bg-slate-50 cursor-pointer text-sm font-semibold text-slate-600 border-b border-slate-50';
+                item.innerText = s;
+                item.onclick = () => { input.value = s; list.classList.add('hidden'); rechercher(); };
+                list.appendChild(item);
+            });
+            list.classList.toggle('hidden', suggs.length === 0);
+        }
+
         async function rechercher() {
             try {
                 const response = await fetch('src/data/pharmacies.json');
-                const pharmacies = await response.json();
+                let pharmacies = await response.json();
                 const query = document.getElementById('searchBar').value.toLowerCase();
                 const quartierSel = document.getElementById('filterQuartier').value;
                 const container = document.getElementById('results');
@@ -154,38 +158,16 @@
                 markers.forEach(m => map.removeLayer(m));
                 markers = [];
 
-                const filtered = pharmacies.filter(p => {
-                    const matchText = query === "" || p.nom.toLowerCase().includes(query) || p.produits.some(prod => prod.toLowerCase().includes(query));
-                    const matchQuartier = quartierSel === "tous" ? true : p.quartier === quartierSel;
-                    return matchText && matchQuartier;
-                });
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    const uLat = pos.coords.latitude;
+                    const uLon = pos.coords.longitude;
 
-                filtered.forEach(p => {
-                    const ouverte = verifierOuverture(p.ouverture, p.fermeture);
-                    const msgWA = encodeURIComponent(`🏥 *${p.nom}*\n📍 ${p.quartier}\n🕒 État: ${ouverte ? 'OUVERT' : 'FERMÉ'}\nLien: https://dialamine489-gif.github.io/PharmaTic/`);
-
-                    container.innerHTML += `
-                        <div class="bg-white p-5 rounded-[2rem] card-shadow border border-slate-50">
-                            <div class="flex justify-between items-start mb-4">
-                                <div><h3 class="font-bold text-slate-800 leading-tight">${p.nom}</h3><p class="text-[10px] font-bold text-blue-500 uppercase mt-1 tracking-wider">${p.quartier}</p></div>
-                                <div class="flex flex-col gap-1 items-end">
-                                    ${p.garde ? '<span class="text-[8px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-black">GARDE</span>' : ''}
-                                    <span class="text-[8px] ${ouverte ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-500'} px-2 py-0.5 rounded-full font-black uppercase">${ouverte ? 'Ouvert' : 'Fermé'}</span>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 mb-4">
-                                <a href="tel:${p.telephone}" class="flex items-center justify-center gap-2 bg-slate-50 text-slate-700 font-bold py-3 rounded-2xl text-[11px] border border-slate-100">Appeler</a>
-                                <a href="https://wa.me/?text=${msgWA}" target="_blank" class="flex items-center justify-center gap-2 bg-emerald-500 text-white font-bold py-3 rounded-2xl text-[11px]">WhatsApp</a>
-                            </div>
-                            <div class="flex justify-between items-center bg-slate-50/50 p-3 rounded-2xl">
-                                <span class="text-slate-400 font-bold text-[10px]">📍 ${p.distance}</span>
-                                <button onclick="voirDetails(${p.id})" class="text-[10px] font-extrabold text-blue-600 uppercase">Détails →</button>
-                            </div>
-                        </div>`;
-                    if (p.lat && p.lng) {
-                        let marker = L.marker([p.lat, p.lng]).addTo(map).bindPopup(`<b>${p.nom}</b>`);
-                        markers.push(marker);
-                    }
+                    pharmacies.forEach(p => { p.dist = p.lat ? calculerDistance(uLat, uLon, p.lat, p.lng) : 999; });
+                    pharmacies.sort((a, b) => a.dist - b.dist);
+                    
+                    afficherCards(pharmacies, query, quartierSel, container, true);
+                }, () => {
+                    afficherCards(pharmacies, query, quartierSel, container, false);
                 });
 
                 document.getElementById('listContainer').classList.remove('hidden');
@@ -193,14 +175,45 @@
             } catch (e) { console.error(e); }
         }
 
+        function afficherCards(data, query, quartier, container, hasGeo) {
+            data.filter(p => {
+                const matchText = query === "" || p.nom.toLowerCase().includes(query) || p.produits.some(pr => pr.toLowerCase().includes(query));
+                const matchQuartier = quartier === "tous" ? true : p.quartier === quartier;
+                return matchText && matchQuartier;
+            }).forEach(p => {
+                const ouverte = verifierOuverture(p.ouverture, p.fermeture);
+                const dText = hasGeo ? (p.dist < 1 ? Math.round(p.dist * 1000) + "m" : p.dist.toFixed(1) + "km") : p.distance;
+                const msgWA = encodeURIComponent(`🏥 *${p.nom}*\n📍 ${p.quartier}\n🕒 État: ${ouverte ? 'OUVERT' : 'FERMÉ'}\nLien: https://dialamine489-gif.github.io/PharmaTic/`);
+
+                container.innerHTML += `
+                    <div class="bg-white p-5 rounded-[2rem] card-shadow border border-slate-50 card-animate">
+                        <div class="flex justify-between items-start mb-4">
+                            <div><h3 class="font-bold text-slate-800 leading-tight">${p.nom}</h3><p class="text-[10px] font-bold text-blue-500 uppercase mt-1 tracking-wider">${p.quartier}</p></div>
+                            <div class="flex flex-col gap-1 items-end">
+                                ${p.garde ? '<span class="text-[8px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-black">GARDE</span>' : ''}
+                                <span class="text-[8px] ${ouverte ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-500'} px-2 py-0.5 rounded-full font-black uppercase">${ouverte ? 'Ouvert' : 'Fermé'}</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <a href="tel:${p.telephone}" class="flex items-center justify-center gap-2 bg-slate-50 text-slate-700 font-bold py-3 rounded-2xl text-[11px] border border-slate-100">Appeler</a>
+                            <a href="https://wa.me/?text=${msgWA}" target="_blank" class="flex items-center justify-center gap-2 bg-emerald-500 text-white font-bold py-3 rounded-2xl text-[11px]">WhatsApp</a>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-50/50 p-3 rounded-2xl">
+                            <span class="text-blue-600 font-bold text-[10px]">📍 ${dText} ${hasGeo ? 'de vous' : ''}</span>
+                            <button onclick="voirDetails(${p.id})" class="text-[10px] font-extrabold text-blue-600 uppercase">Détails →</button>
+                        </div>
+                    </div>`;
+                if (p.lat && p.lng) markers.push(L.marker([p.lat, p.lng]).addTo(map).bindPopup(`<b>${p.nom}</b>`));
+            });
+        }
+
         async function voirDetails(id) {
-            const resp = await fetch('src/data/pharmacies.json');
-            const phs = await resp.json();
+            const r = await fetch('src/data/pharmacies.json');
+            const phs = await r.json();
             const p = phs.find(x => x.id === id);
-            const content = document.getElementById('modalContent');
-            content.innerHTML = `
+            document.getElementById('modalContent').innerHTML = `
                 <div class="text-left"><span class="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-2 block">${p.quartier}</span><h2 class="text-3xl font-extrabold text-slate-900 leading-none mb-2">${p.nom}</h2><p class="text-slate-400 text-sm font-medium mb-8">${p.adresse}</p></div>
-                <div><h4 class="text-[10px] font-black text-slate-300 uppercase mb-3 tracking-widest text-left">Produits disponibles</h4><div class="flex flex-wrap gap-2 text-left">${p.produits.map(prod => `<span class="bg-slate-50 border border-slate-100 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600">${prod}</span>`).join('')}</div></div>`;
+                <div><h4 class="text-[10px] font-black text-slate-300 uppercase mb-3 tracking-widest">Produits disponibles</h4><div class="flex flex-wrap gap-2">${p.produits.map(pr => `<span class="bg-slate-50 border border-slate-100 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600">${pr}</span>`).join('')}</div></div>`;
             document.getElementById('detailsModal').classList.remove('hidden');
         }
 
