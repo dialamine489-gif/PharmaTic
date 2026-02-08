@@ -16,19 +16,17 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
         
-        /* FIX CRITIQUE : Hauteur explicite et stable */
+        /* FIX CARTE : Hauteur forcée pour éviter le fond gris */
         #map { 
             height: 380px !important; 
             width: 100%; 
             z-index: 1; 
-            background: #f1f5f9; /* Couleur de chargement */
+            background: #f1f5f9; 
         }
 
         .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
         .suggestions-list { position: absolute; z-index: 6000; width: 100%; background: white; border-radius: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-height: 250px; overflow-y: auto; border: 1px solid #e2e8f0; }
         
-        /* Transition douce pour la carte */
-        #mapContainer { transition: all 0.3s ease-in-out; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -61,6 +59,7 @@
                     <option value="Unité 3">Unité 3</option>
                     <option value="Unité 6">Unité 6</option>
                     <option value="Jaxaay">Jaxaay</option>
+                    <option value="Cité Ainoumadi">Ainoumadi</option>
                 </select>
             </div>
         </div>
@@ -83,32 +82,25 @@
         </div>
     </main>
 
-    <div id="detailsModal" class="hidden fixed inset-0 bg-slate-900/60 z-[9999] backdrop-blur-sm flex items-end justify-center">
-        <div class="bg-white rounded-t-[2.5rem] w-full max-w-md p-8 shadow-2xl relative">
+    <div id="detailsModal" class="hidden fixed inset-0 bg-slate-900/60 z-[9999] backdrop-blur-sm flex items-end justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] max-w-md w-full p-8 shadow-2xl relative">
             <button onclick="fermerDetails()" class="absolute top-6 right-6 text-slate-300 text-2xl">&times;</button>
             <div id="modalContent"></div>
-            <button onclick="fermerDetails()" class="w-full mt-8 bg-slate-900 text-white font-bold py-4 rounded-2xl">Fermer</button>
+            <button onclick="fermerDetails()" class="w-full mt-8 bg-slate-900 text-white font-bold py-4 rounded-2xl shadow-lg">Fermer</button>
         </div>
     </div>
 
     <script>
         const dictionnaireMedicaments = ["Doliprane 500mg", "Doliprane 1000mg", "Efferalgan", "Amoxicilline", "Augmentin", "Spasfon", "Gaviscon", "Ventoline", "Smecta"];
         
-        // Initialisation Carte centrée Keur Massar
-        let map = L.map('map', { zoomControl: false }).setView([14.7815, -17.3095], 13);
-        
-        // Utilisation d'un serveur de tuiles robuste
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
+        // Initialisation Carte sur Keur Massar
+        let map = L.map('map', { zoomControl: false }).setView([14.7865, -17.3117], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         let markers = [];
 
-        // FIX : Observateur pour réparer la carte dès qu'elle devient visible
+        // --- FIX CARTE GRISE (ResizeObserver) ---
         const resizeObserver = new ResizeObserver(() => {
-            if (map) {
-                map.invalidateSize();
-            }
+            if (map) { map.invalidateSize(); }
         });
         resizeObserver.observe(document.getElementById('map'));
 
@@ -116,12 +108,8 @@
             const container = document.getElementById('mapContainer');
             const isHidden = container.classList.toggle('hidden');
             document.getElementById('mapBtnText').innerText = isHidden ? "Carte" : "Masquer Carte";
-            
             if (!isHidden) {
-                // Forcer le rendu des tuiles après l'affichage
-                setTimeout(() => {
-                    map.invalidateSize();
-                }, 100);
+                setTimeout(() => { map.invalidateSize(); }, 200);
             }
         }
 
@@ -136,14 +124,13 @@
             const list = document.getElementById('suggestions');
             const valeur = input.value.toLowerCase();
             list.innerHTML = '';
-            
             rechercher();
 
             const filtres = dictionnaireMedicaments.filter(m => m.toLowerCase().includes(valeur));
             if (valeur.length > 0 && filtres.length > 0) {
                 filtres.forEach(m => {
                     const item = document.createElement('div');
-                    item.className = 'p-4 hover:bg-blue-50 cursor-pointer text-sm font-bold text-slate-700';
+                    item.className = 'p-4 hover:bg-blue-50 cursor-pointer text-sm font-bold text-slate-700 border-b border-slate-50';
                     item.innerText = m;
                     item.onclick = () => { input.value = m; list.classList.add('hidden'); rechercher(); };
                     list.appendChild(item);
@@ -156,10 +143,10 @@
 
         function calculerDistance(lat1, lon1, lat2, lon2) {
             const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+            const dLat = (lat2-lat1) * Math.PI/180;
+            const dLon = (lon2-lon1) * Math.PI/180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
         }
 
         async function rechercher() {
@@ -182,33 +169,47 @@
                 }, () => {
                     afficherCards(pharmacies, quartierSel, container, false);
                 });
-            } catch (e) { console.error("Erreur chargement JSON", e); }
+            } catch (e) { console.error("Erreur JSON", e); }
         }
 
         function afficherCards(data, quartier, container, hasGeo) {
-            const medInput = document.getElementById('searchBar').value || "ce produit";
+            const medInput = document.getElementById('searchBar').value.trim() || "ce produit";
+            
             data.filter(p => quartier === "tous" || p.quartier === quartier).forEach(p => {
                 const dText = hasGeo ? (p.dist < 1 ? Math.round(p.dist * 1000) + "m" : p.dist.toFixed(1) + "km") : "Dist. inconnue";
                 const cleanPhone = p.telephone.replace(/\D/g, '');
                 
+                // RE-FIX : Message automatique WhatsApp
+                const msgWA = encodeURIComponent(`🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${medInput}* ?\n\nMerci de me confirmer la disponibilité. 🙏`);
+
                 container.innerHTML += `
                     <div class="bg-white p-5 rounded-[2rem] card-shadow border border-slate-100">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-slate-800">${p.nom}</h3>
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold text-slate-800 leading-tight">${p.nom}</h3>
+                                <p class="text-[10px] font-bold text-blue-500 uppercase mt-1 tracking-wider">${p.quartier}</p>
+                            </div>
                             <span class="text-[8px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-black uppercase">Ouvert</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 mb-4">
-                            <a href="tel:${p.telephone}" class="bg-slate-50 text-center font-bold py-3 rounded-2xl text-[11px]">Appeler</a>
-                            <a href="https://wa.me/${cleanPhone}" class="bg-emerald-500 text-white text-center font-bold py-3 rounded-2xl text-[11px]">WhatsApp</a>
+
+                        <div class="bg-blue-50/50 p-3 rounded-2xl mb-4 border border-blue-100/50 text-center">
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Vérifier stock de :</p>
+                            <p class="text-sm font-extrabold text-blue-700 uppercase">"${medInput}"</p>
                         </div>
-                        <div class="flex justify-between items-center text-[10px] text-blue-600 font-bold">
-                            <span>📍 ${dText}</span>
-                            <button onclick="voirDetails(${p.id})" class="uppercase underline">Détails</button>
+
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <a href="tel:${p.telephone}" class="flex items-center justify-center bg-slate-50 text-slate-700 font-bold py-3 rounded-2xl text-[11px] border border-slate-100">Appeler</a>
+                            <a href="https://wa.me/${cleanPhone}?text=${msgWA}" target="_blank" class="flex items-center justify-center bg-emerald-500 text-white font-bold py-3 rounded-2xl text-[11px]">WhatsApp</a>
+                        </div>
+                        
+                        <div class="flex justify-between items-center bg-slate-50/50 p-2 px-4 rounded-xl">
+                            <span class="text-blue-600 font-bold text-[10px]">📍 À ${dText}</span>
+                            <button onclick="voirDetails(${p.id})" class="text-[9px] font-black text-blue-600 uppercase underline">Détails</button>
                         </div>
                     </div>`;
                 
                 if (p.lat && p.lng) {
-                    let m = L.marker([p.lat, p.lng]).addTo(map).bindPopup(p.nom);
+                    let m = L.marker([p.lat, p.lng]).addTo(map).bindPopup(`<b>${p.nom}</b>`);
                     markers.push(m);
                 }
             });
@@ -218,7 +219,13 @@
             const r = await fetch('src/data/pharmacies.json');
             const phs = await r.json();
             const p = phs.find(x => x.id === id);
-            document.getElementById('modalContent').innerHTML = `<h2 class="text-2xl font-black">${p.nom}</h2><p class="text-slate-500">${p.quartier}</p>`;
+            document.getElementById('modalContent').innerHTML = `
+                <h2 class="text-2xl font-black text-slate-900 mb-1">${p.nom}</h2>
+                <p class="text-blue-600 text-xs font-bold uppercase mb-4">${p.quartier}</p>
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <p class="text-[9px] font-black text-slate-400 uppercase mb-2">Horaires</p>
+                    <p class="text-sm font-bold text-slate-700">08:00 - 23:00</p>
+                </div>`;
             document.getElementById('detailsModal').classList.remove('hidden');
         }
 
@@ -226,7 +233,6 @@
 
         window.onload = () => {
             rechercher();
-            // Petit hack supplémentaire pour être sûr
             setTimeout(() => { map.invalidateSize(); }, 500);
         };
     </script>
