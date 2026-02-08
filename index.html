@@ -26,7 +26,7 @@
 
     <nav class="bg-blue-700 p-4 text-white shadow-lg sticky top-0 z-[5000]">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-extrabold tracking-tighter uppercase italic">PharmaTic</h1>
+            <h1 class="text-xl font-extrabold tracking-tighter uppercase italic text-white">PharmaTic</h1>
             <span class="text-[9px] bg-white/20 px-2 py-1 rounded-md border border-white/10 font-bold uppercase tracking-widest">Keur Massar</span>
         </div>
     </nav>
@@ -86,25 +86,22 @@
     </div>
 
     <script>
+        // --- CONFIGURATION ---
         const dictionnaireMedicaments = ["Doliprane 500mg", "Doliprane 1000mg", "Efferalgan", "Amoxicilline", "Augmentin", "Spasfon", "Gaviscon", "Ventoline", "Nurofen", "Lasilix", "Kardegic", "Vitamine C", "Smecta"];
-        let map = L.map('map', { zoomControl: false }).setView([14.7815, -17.3095], 13);
+        
+        // Initialisation Carte (Centrée Keur Massar)
+        let map = L.map('map', { zoomControl: false }).setView([14.7865, -17.3117], 13);
         L.tileLayer('https://{s}.tile.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
         let markers = [];
 
+        // --- LOGIQUE SUGGESTIONS ---
         function gererSuggestions() {
             const input = document.getElementById('searchBar');
             const list = document.getElementById('suggestions');
-            const listContainer = document.getElementById('listContainer');
-            const listBtnText = document.getElementById('listBtnText');
             const valeur = input.value.toLowerCase();
-            
             list.innerHTML = '';
-            
-            // RÉOUVERTURE AUTOMATIQUE : On affiche la liste dès qu'on interagit avec la recherche
-            listContainer.classList.remove('hidden');
-            listBtnText.innerText = "Liste";
 
-            rechercher();
+            rechercher(); // Mise à jour des résultats en temps réel
 
             const motsAMontrer = valeur.length < 1 
                 ? dictionnaireMedicaments.slice(0, 5) 
@@ -128,33 +125,16 @@
             }
         }
 
-        // Fermer suggestions si on clique ailleurs
-        document.addEventListener('click', (e) => {
-            if (!document.getElementById('searchBar').contains(e.target)) {
-                document.getElementById('suggestions').classList.add('hidden');
-            }
-        });
-
-        function verifierOuverture(hOuv, hFer) {
-            if (!hOuv || !hFer) return false;
-            const maintenant = new Date();
-            const hm = maintenant.getHours().toString().padStart(2, '0') + ":" + maintenant.getMinutes().toString().padStart(2, '0');
-            return hFer < hOuv ? (hm >= hOuv || hm <= hFer) : (hm >= hOuv && hm <= hFer);
-        }
-
-        function calculerDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
-        }
-
+        // --- GESTION AFFICHAGE ---
         function toggleMap() {
             const container = document.getElementById('mapContainer');
             container.classList.toggle('hidden');
             document.getElementById('mapBtnText').innerText = container.classList.contains('hidden') ? "Carte" : "Masquer Carte";
-            if (!container.classList.contains('hidden')) setTimeout(() => { map.invalidateSize(); }, 200);
+            
+            // Correction Carte Grise
+            if (!container.classList.contains('hidden')) {
+                setTimeout(() => { map.invalidateSize(); }, 250);
+            }
         }
 
         function toggleListe() {
@@ -163,8 +143,25 @@
             document.getElementById('listBtnText').innerText = container.classList.contains('hidden') ? "Afficher Liste" : "Liste";
         }
 
+        // --- LOGIQUE RECHERCHE & DISTANCE ---
+        function verifierOuverture(hOuv, hFer) {
+            if (!hOuv || !hFer) return false;
+            const maintenant = new Date();
+            const hm = maintenant.getHours().toString().padStart(2, '0') + ":" + maintenant.getMinutes().toString().padStart(2, '0');
+            return hFer < hOuv ? (hm >= hOuv || hm <= hFer) : (hm >= hOuv && hm <= hFer);
+        }
+
+        function calculerDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+        }
+
         async function rechercher() {
             try {
+                // Charge ton fichier JSON
                 const response = await fetch('src/data/pharmacies.json');
                 let pharmacies = await response.json();
                 const quartierSel = document.getElementById('filterQuartier').value;
@@ -183,48 +180,48 @@
                 }, () => {
                     afficherCards(pharmacies, quartierSel, container, false);
                 });
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Erreur JSON :", e); }
         }
 
         function afficherCards(data, quartier, container, hasGeo) {
             const medInput = document.getElementById('searchBar').value.trim() || "ce produit";
             
-            data.filter(p => {
-                return quartier === "tous" || p.quartier === quartier;
-            }).forEach(p => {
+            data.filter(p => quartier === "tous" || p.quartier === quartier).forEach(p => {
                 const ouverte = verifierOuverture(p.ouverture, p.fermeture);
-                const dText = hasGeo ? (p.dist < 1 ? Math.round(p.dist * 1000) + "m" : p.dist.toFixed(1) + "km") : "Dist. inconnue";
+                const dText = hasGeo ? (p.dist < 1 ? Math.round(p.dist * 1000) + "m" : p.dist.toFixed(1) + "km") : "N/A";
                 const cleanPhone = p.telephone.replace(/\D/g, '');
-                const msgWA = encodeURIComponent(`🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${medInput}* ?\n\nMerci de me confirmer la disponibilité. 🙏`);
+                const msgWA = encodeURIComponent(`🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${medInput}* ?`);
 
                 container.innerHTML += `
-                    <div class="bg-white p-5 rounded-[2rem] card-shadow border border-slate-50 relative overflow-hidden">
-                        ${p.partenaire ? '<div class="absolute top-0 right-0 bg-blue-600 text-white text-[7px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-tighter">Vérifié</div>' : ''}
-                        
+                    <div class="bg-white p-5 rounded-[2rem] card-shadow border border-slate-50 relative">
                         <div class="flex justify-between items-start mb-4">
                             <div>
                                 <h3 class="font-bold text-slate-800 leading-tight">${p.nom}</h3>
-                                <p class="text-[10px] font-bold text-blue-500 uppercase mt-1 tracking-wider">${p.quartier}</p>
+                                <p class="text-[10px] font-bold text-blue-500 uppercase mt-1">${p.quartier}</p>
                             </div>
                             <span class="text-[8px] ${ouverte ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-500'} px-2 py-0.5 rounded-full font-black uppercase">${ouverte ? 'Ouvert' : 'Fermé'}</span>
                         </div>
 
                         <div class="bg-blue-50/50 p-3 rounded-2xl mb-4 border border-blue-100/50 text-center">
-                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Vérifier stock de :</p>
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Disponibilité :</p>
                             <p class="text-sm font-extrabold text-blue-700 uppercase tracking-tighter">"${medInput}"</p>
                         </div>
 
                         <div class="grid grid-cols-2 gap-2 mb-4">
                             <a href="tel:${p.telephone}" class="flex items-center justify-center bg-slate-50 text-slate-700 font-bold py-3 rounded-2xl text-[11px] border border-slate-100">Appeler</a>
-                            <a href="https://wa.me/${cleanPhone}?text=${msgWA}" target="_blank" class="flex items-center justify-center bg-emerald-500 text-white font-bold py-3 rounded-2xl text-[11px] shadow-sm">WhatsApp</a>
+                            <a href="https://wa.me/${cleanPhone}?text=${msgWA}" target="_blank" class="flex items-center justify-center bg-emerald-500 text-white font-bold py-3 rounded-2xl text-[11px]">WhatsApp</a>
                         </div>
                         
                         <div class="flex justify-between items-center bg-slate-50/50 p-2 px-4 rounded-xl">
                             <span class="text-blue-600 font-bold text-[10px]">📍 À ${dText}</span>
-                            <button onclick="voirDetails(${p.id})" class="text-[9px] font-black text-blue-600 uppercase underline decoration-2 underline-offset-4">Détails</button>
+                            <button onclick="voirDetails(${p.id})" class="text-[9px] font-black text-blue-600 uppercase underline">Détails</button>
                         </div>
                     </div>`;
-                if (p.lat && p.lng) markers.push(L.marker([p.lat, p.lng]).addTo(map).bindPopup(`<b>${p.nom}</b>`));
+
+                if (p.lat && p.lng) {
+                    let m = L.marker([p.lat, p.lng]).addTo(map).bindPopup(`<b>${p.nom}</b>`);
+                    markers.push(m);
+                }
             });
         }
 
@@ -234,12 +231,11 @@
             const p = phs.find(x => x.id === id);
             document.getElementById('modalContent').innerHTML = `
                 <div class="text-left">
-                    <span class="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-2 block">${p.quartier}</span>
-                    <h2 class="text-2xl font-extrabold text-slate-900 leading-none mb-2">${p.nom}</h2>
-                    <p class="text-slate-500 text-sm font-medium mb-6">${p.adresse || 'Keur Massar, Dakar'}</p>
-                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                        <p class="text-[9px] font-black text-slate-400 uppercase mb-2">Horaires standards</p>
-                        <p class="text-sm font-bold text-slate-700">${p.ouverture} - ${p.fermeture}</p>
+                    <h2 class="text-2xl font-extrabold text-slate-900">${p.nom}</h2>
+                    <p class="text-slate-500 text-sm mb-6">${p.adresse || 'Keur Massar, Dakar'}</p>
+                    <div class="bg-slate-50 p-4 rounded-2xl border">
+                        <p class="text-[9px] font-black text-slate-400 uppercase">Horaires</p>
+                        <p class="text-sm font-bold">${p.ouverture} - ${p.fermeture}</p>
                     </div>
                 </div>`;
             document.getElementById('detailsModal').classList.remove('hidden');
@@ -247,6 +243,7 @@
 
         function fermerDetails() { document.getElementById('detailsModal').classList.add('hidden'); }
 
+        // Lancement au chargement
         window.onload = rechercher;
     </script>
 </body>
