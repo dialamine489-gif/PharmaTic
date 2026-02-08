@@ -13,78 +13,69 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; }
         #map { height: 350px; width: 100%; z-index: 1; }
-        .card-animate { transition: all 0.3s ease; }
-        .card-animate:hover { transform: translateY(-5px); box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1); }
-        .modal-active { animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+        
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
+        .card-animate { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-animate:active { transform: scale(0.98); }
+        
+        .modal-active { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        /* Custom scrollbar pour les suggestions */
-        #autocomplete-list::-webkit-scrollbar { width: 5px; }
-        #autocomplete-list::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-gray-50 font-sans text-gray-900">
+<body class="bg-slate-50 text-slate-900">
 
-    <nav class="bg-blue-700 p-4 text-white shadow-xl sticky top-0 z-[5000]">
+    <nav class="bg-blue-700 p-4 text-white shadow-lg sticky top-0 z-[5000]">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-black tracking-tighter uppercase italic">PharmaTic</h1>
-            <span class="text-[10px] bg-blue-800 px-3 py-1 rounded-full border border-blue-400 font-mono uppercase">Keur Massar Pro</span>
+            <h1 class="text-xl font-extrabold tracking-tighter uppercase italic">PharmaTic</h1>
+            <span class="text-[9px] bg-white/20 px-2 py-1 rounded-md backdrop-blur-sm border border-white/10 font-bold uppercase tracking-widest">Keur Massar Pro</span>
         </div>
     </nav>
 
-    <main class="container mx-auto mt-6 p-4">
-        <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 border border-gray-200">
+    <main class="container mx-auto mt-4 p-4">
+        <div class="bg-white p-5 rounded-3xl shadow-sm mb-6 border border-slate-100">
             <div class="flex flex-col gap-4">
-                <div class="flex flex-col md:flex-row gap-2 relative">
-                    <div class="relative flex-grow">
-                        <input type="text" id="searchBar" oninput="afficherSuggestions()" placeholder="Médicament, Pharmacie ou Quartier..." 
-                            class="border-2 border-gray-100 p-4 rounded-xl w-full focus:border-blue-500 outline-none transition-all">
-                        <div id="autocomplete-list" class="absolute z-[10000] w-full bg-white shadow-2xl rounded-b-xl border border-gray-100 hidden mt-1 max-h-60 overflow-y-auto"></div>
-                    </div>
-                    <button onclick="rechercher()" class="bg-blue-600 text-white px-10 py-4 rounded-xl font-bold hover:bg-blue-700 active:scale-95 transition-all">
-                        Rechercher
-                    </button>
+                <div class="relative">
+                    <input type="text" id="searchBar" oninput="afficherSuggestions()" placeholder="Médicament, Pharmacie..." 
+                        class="bg-slate-50 border-none p-4 rounded-2xl w-full focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-700 placeholder:text-slate-400 font-medium">
+                    <div id="autocomplete-list" class="absolute z-[10000] w-full bg-white shadow-xl rounded-2xl border border-slate-100 hidden mt-2 max-h-64 overflow-y-auto"></div>
                 </div>
 
-                <div class="flex flex-wrap gap-4 justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
-                    <div class="flex flex-wrap gap-4 items-center">
-                        <select id="filterQuartier" onchange="rechercher()" class="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg p-2.5 outline-none font-semibold">
-                            <option value="tous">Tous les quartiers</option>
-                            <option value="Keur Massar Village">Keur Massar Village</option>
-                            <option value="Unité 3">Unité 3</option>
-                            <option value="Jaxaay">Jaxaay</option>
-                            <option value="Cité Tawfekh">Cité Tawfekh</option>
-                            <option value="Gendarmerie">Gendarmerie</option>
-                        </select>
+                <div class="flex flex-wrap gap-3 items-center">
+                    <select id="filterQuartier" onchange="rechercher()" class="flex-grow bg-slate-50 border-none text-slate-600 text-xs rounded-xl p-3 outline-none font-bold">
+                        <option value="tous">Tous les quartiers</option>
+                        <option value="Keur Massar Village">Village</option>
+                        <option value="Unité 3">Unité 3</option>
+                        <option value="Jaxaay">Jaxaay</option>
+                        <option value="Cité Tawfekh">Tawfekh</option>
+                    </select>
 
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="checkbox" id="filterGarde" onchange="rechercher()" class="mr-2 w-5 h-5 text-blue-600 rounded">
-                            <span class="text-sm font-bold text-gray-600">De garde</span>
-                        </label>
-                    </div>
-
-                    <button onclick="toggleMap()" id="mapBtn" class="bg-white border-2 border-blue-600 text-blue-600 font-bold px-4 py-2 rounded-full shadow-sm hover:bg-blue-50 transition-all flex items-center gap-2 text-xs">
-                        <span>🗺️</span> <span id="mapBtnText">Afficher la carte</span>
+                    <button onclick="toggleMap()" id="mapBtn" class="bg-blue-50 text-blue-600 font-bold px-4 py-3 rounded-xl transition-all flex items-center gap-2 text-xs">
+                        <span>🗺️</span> <span id="mapBtnText">Carte</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <div id="mapContainer" class="hidden mb-8">
-            <div id="map" class="rounded-2xl shadow-inner border-4 border-white overflow-hidden"></div>
+        <div id="mapContainer" class="hidden mb-6">
+            <div id="map" class="rounded-3xl shadow-inner border-4 border-white overflow-hidden"></div>
         </div>
 
-        <div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </main>
 
-    <div id="detailsModal" class="hidden fixed inset-0 bg-black bg-opacity-60 z-[9999] flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative modal-active">
-            <button onclick="fermerDetails()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+    <div id="detailsModal" class="hidden fixed inset-0 bg-slate-900/60 z-[9999] backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] max-w-md w-full p-8 shadow-2xl relative modal-active">
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 sm:hidden"></div>
+            <button onclick="fermerDetails()" class="absolute top-6 right-6 text-slate-300 hover:text-slate-500 text-2xl">&times;</button>
             <div id="modalContent"></div>
-            <button onclick="fermerDetails()" class="w-full mt-6 bg-blue-50 text-blue-600 font-bold py-3 rounded-xl hover:bg-blue-100 transition">Fermer</button>
+            <button onclick="fermerDetails()" class="w-full mt-8 bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-slate-800 transition shadow-lg">Continuer</button>
         </div>
     </div>
 
@@ -93,32 +84,22 @@
         function verifierOuverture(hOuv, hFer) {
             if (!hOuv || !hFer) return false;
             const maintenant = new Date();
-            const heureMinute = maintenant.getHours().toString().padStart(2, '0') + ":" + maintenant.getMinutes().toString().padStart(2, '0');
-            if (hFer < hOuv) {
-                return heureMinute >= hOuv || heureMinute <= hFer;
-            }
-            return heureMinute >= hOuv && heureMinute <= hFer;
+            const hm = maintenant.getHours().toString().padStart(2, '0') + ":" + maintenant.getMinutes().toString().padStart(2, '0');
+            return hFer < hOuv ? (hm >= hOuv || hm <= hFer) : (hm >= hOuv && hm <= hFer);
         }
 
         // --- INITIALISATION ---
-        const listeSuggestions = ["Doliprane", "Efferalgan", "Spasfon", "Gaviscon", "Ventoline", "Pharmacie Jaxaay", "Pharmacie du Croisement"];
-        let map = L.map('map').setView([14.7815, -17.3095], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        const listeSuggestions = ["Doliprane", "Efferalgan", "Spasfon", "Gaviscon", "Ventoline", "Pharmacie Jaxaay"];
+        let map = L.map('map', { zoomControl: false }).setView([14.7815, -17.3095], 13);
+        L.tileLayer('https://{s}.tile.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
         let markers = [];
 
         window.onload = rechercher;
 
         function toggleMap() {
             const container = document.getElementById('mapContainer');
-            const btnText = document.getElementById('mapBtnText');
-            if (container.classList.contains('hidden')) {
-                container.classList.remove('hidden');
-                btnText.innerText = "Masquer la carte";
-                setTimeout(() => { map.invalidateSize(); }, 200);
-            } else {
-                container.classList.add('hidden');
-                btnText.innerText = "Afficher la carte";
-            }
+            container.classList.toggle('hidden');
+            if (!container.classList.contains('hidden')) setTimeout(() => { map.invalidateSize(); }, 200);
         }
 
         function afficherSuggestions() {
@@ -127,15 +108,15 @@
             const valeur = input.value.toLowerCase();
             list.innerHTML = '';
             if (!valeur) { list.classList.add('hidden'); return; }
-            const suggestions = listeSuggestions.filter(m => m.toLowerCase().includes(valeur));
-            suggestions.forEach(s => {
+            const suggs = listeSuggestions.filter(m => m.toLowerCase().includes(valeur));
+            suggs.forEach(s => {
                 const item = document.createElement('div');
-                item.className = 'p-4 hover:bg-blue-50 cursor-pointer border-b border-gray-50 text-sm font-semibold text-gray-700';
+                item.className = 'p-4 hover:bg-slate-50 cursor-pointer text-sm font-semibold text-slate-600 border-b border-slate-50';
                 item.innerText = s;
                 item.onclick = () => { input.value = s; list.classList.add('hidden'); rechercher(); };
                 list.appendChild(item);
             });
-            list.classList.toggle('hidden', suggestions.length === 0);
+            list.classList.toggle('hidden', suggs.length === 0);
         }
 
         async function rechercher() {
@@ -143,7 +124,6 @@
                 const response = await fetch('src/data/pharmacies.json');
                 const pharmacies = await response.json();
                 const query = document.getElementById('searchBar').value.toLowerCase();
-                const gardeOnly = document.getElementById('filterGarde').checked;
                 const quartierSel = document.getElementById('filterQuartier').value;
                 const container = document.getElementById('results');
 
@@ -152,52 +132,42 @@
                 markers = [];
 
                 const filtered = pharmacies.filter(p => {
-                    const matchText = query === "" || p.nom.toLowerCase().includes(query) || p.quartier.toLowerCase().includes(query) || p.produits.some(prod => prod.toLowerCase().includes(query));
-                    const matchGarde = gardeOnly ? p.garde : true;
+                    const matchText = query === "" || p.nom.toLowerCase().includes(query) || p.produits.some(prod => prod.toLowerCase().includes(query));
                     const matchQuartier = quartierSel === "tous" ? true : p.quartier === quartierSel;
-                    return matchText && matchGarde && matchQuartier;
+                    return matchText && matchQuartier;
                 });
 
                 filtered.forEach(p => {
-                    const estOuverte = verifierOuverture(p.ouverture, p.fermeture);
-                    const badgeHoraire = estOuverte 
-                        ? '<span class="text-[9px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-black uppercase">OUVERT</span>' 
-                        : '<span class="text-[9px] bg-red-100 text-red-700 px-2 py-1 rounded-full font-black uppercase">FERMÉ</span>';
-
-                    // Préparation message WhatsApp
-                    const msgWA = encodeURIComponent(`*PharmaTic - Keur Massar*\n\n🏥 *${p.nom}*\n📍 ${p.quartier}\n📞 Tél: ${p.telephone}\n🕒 État: ${estOuverte ? 'OUVERT ✅' : 'FERMÉ ❌'}\n\nTrouvez vos médicaments ici : https://dialamine489-gif.github.io/PharmaTic/`);
+                    const ouverte = verifierOuverture(p.ouverture, p.fermeture);
+                    const msgWA = encodeURIComponent(`*PharmaTic*\n🏥 *${p.nom}*\n📍 ${p.quartier}\n🕒 État: ${ouverte ? 'OUVERT' : 'FERMÉ'}\nLien: https://dialamine489-gif.github.io/PharmaTic/`);
 
                     container.innerHTML += `
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border-t-4 ${p.garde ? 'border-green-500' : 'border-blue-500'} card-animate flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-start mb-2">
-                                    <h3 class="font-bold text-lg text-gray-800">${p.nom}</h3>
-                                    <div class="flex flex-col gap-1 items-end">
-                                        ${p.garde ? '<span class="text-[9px] bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-black">GARDE</span>' : ''}
-                                        ${badgeHoraire}
-                                    </div>
+                        <div class="bg-white p-5 rounded-[2rem] card-shadow card-animate border border-slate-50">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="max-w-[70%]">
+                                    <h3 class="font-bold text-slate-800 leading-tight">${p.nom}</h3>
+                                    <p class="text-[10px] font-bold text-blue-500 uppercase mt-1 tracking-wider">${p.quartier}</p>
                                 </div>
-                                <p class="text-blue-600 text-xs font-bold mb-4">${p.quartier}</p>
-                                
-                                <div class="flex flex-col gap-2 mb-4">
-                                    <a href="tel:${p.telephone}" class="flex items-center justify-center gap-2 w-full bg-blue-50 text-blue-700 font-bold py-3 rounded-xl text-sm hover:bg-blue-100 transition border border-blue-100">
-                                        📞 Appeler
-                                    </a>
-                                    <a href="https://wa.me/?text=${msgWA}" target="_blank" class="flex items-center justify-center gap-2 w-full bg-green-500 text-white font-bold py-3 rounded-xl text-sm hover:bg-green-600 transition shadow-sm">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                                        WhatsApp
-                                    </a>
+                                <div class="flex flex-col gap-1 items-end">
+                                    ${p.garde ? '<span class="text-[8px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-black">GARDE</span>' : ''}
+                                    <span class="text-[8px] ${ouverte ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-500'} px-2 py-0.5 rounded-full font-black uppercase">${ouverte ? 'Ouvert' : 'Fermé'}</span>
                                 </div>
                             </div>
-                            <div class="flex justify-between items-center pt-4 border-t border-gray-50">
-                                <span class="text-blue-700 font-black text-xs uppercase">📍 ${p.distance}</span>
-                                <button onclick="voirDetails(${p.id})" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-3 py-2 rounded-lg hover:bg-blue-100">DÉTAILS →</button>
+                            
+                            <div class="grid grid-cols-2 gap-2 mb-4">
+                                <a href="tel:${p.telephone}" class="flex items-center justify-center gap-2 bg-slate-50 text-slate-700 font-bold py-3 rounded-2xl text-[11px] hover:bg-slate-100 transition border border-slate-100">
+                                    📞 Appeler
+                                </a>
+                                <a href="https://wa.me/?text=${msgWA}" target="_blank" class="flex items-center justify-center gap-2 bg-emerald-500 text-white font-bold py-3 rounded-2xl text-[11px] hover:bg-emerald-600 transition shadow-sm">
+                                    WhatsApp
+                                </a>
+                            </div>
+
+                            <div class="flex justify-between items-center bg-slate-50/50 p-3 rounded-2xl">
+                                <span class="text-slate-400 font-bold text-[10px]">📍 ${p.distance}</span>
+                                <button onclick="voirDetails(${p.id})" class="text-[10px] font-extrabold text-blue-600 uppercase tracking-tighter">Détails →</button>
                             </div>
                         </div>`;
-                    if (p.lat && p.lng) {
-                        let marker = L.marker([p.lat, p.lng]).addTo(map).bindPopup(`<b>${p.nom}</b><br>${estOuverte ? 'Ouvert' : 'Fermé'}`);
-                        markers.push(marker);
-                    }
                 });
             } catch (e) { console.error(e); }
         }
@@ -206,26 +176,25 @@
             const response = await fetch('src/data/pharmacies.json');
             const pharmacies = await response.json();
             const p = pharmacies.find(pharma => pharma.id === id);
-            const modal = document.getElementById('detailsModal');
             const content = document.getElementById('modalContent');
             content.innerHTML = `
-                <div class="text-center mb-6">
-                    <span class="bg-blue-100 text-blue-700 text-[10px] px-3 py-1 rounded-full font-bold uppercase">${p.quartier}</span>
-                    <h2 class="text-2xl font-black text-gray-800 mt-2">${p.nom}</h2>
-                    <p class="text-gray-500 text-sm mt-1">Horaires : ${p.ouverture} - ${p.fermeture}</p>
+                <div class="text-left">
+                    <span class="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-2 block">${p.quartier}</span>
+                    <h2 class="text-3xl font-extrabold text-slate-900 leading-none mb-2">${p.nom}</h2>
+                    <p class="text-slate-400 text-sm font-medium mb-8">${p.adresse}</p>
                 </div>
-                <div class="bg-gray-50 p-4 rounded-2xl">
-                    <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Produits disponibles</h4>
-                    <div class="flex flex-wrap gap-2">${p.produits.map(prod => `<span class="bg-white border border-gray-200 px-3 py-1 rounded-lg text-xs font-medium">${prod}</span>`).join('')}</div>
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-[10px] font-black text-slate-300 uppercase mb-3 tracking-widest">En stock actuellement</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${p.produits.map(prod => `<span class="bg-slate-50 border border-slate-100 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600">${prod}</span>`).join('')}
+                        </div>
+                    </div>
                 </div>`;
-            modal.classList.remove('hidden');
+            document.getElementById('detailsModal').classList.remove('hidden');
         }
 
         function fermerDetails() { document.getElementById('detailsModal').classList.add('hidden'); }
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then(() => console.log("PWA OK"));
-        }
     </script>
 </body>
 </html>
