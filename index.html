@@ -33,7 +33,7 @@
 
     <main class="container mx-auto mt-4 p-4">
         <div class="bg-white p-5 rounded-3xl shadow-sm mb-6 border border-slate-100 relative">
-            <p class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest uppercase">1. Quel produit cherchez-vous ?</p>
+            <p class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest">1. Que cherchez-vous ?</p>
             <div class="relative">
                 <input type="text" id="searchBar" 
                     oninput="gererSuggestions()" 
@@ -45,14 +45,15 @@
             </div>
 
             <div class="mt-4">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest uppercase">2. Filtrer par zone</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">2. Votre zone</p>
                 <select id="filterQuartier" onchange="rechercher()" class="w-full bg-slate-50 border-none text-slate-600 text-xs rounded-xl p-3 outline-none font-bold">
                     <option value="tous">Tout Keur Massar</option>
                     <option value="Keur Massar Village">Village</option>
                     <option value="Unité 3">Unité 3</option>
                     <option value="Unité 6">Unité 6</option>
+                    <option value="Unité 14">Unité 14</option>
                     <option value="Jaxaay">Jaxaay</option>
-                    <option value="Cité Tawfekh">Tawfekh</option>
+                    <option value="Darou Missette">Darou Missette</option>
                     <option value="Cité Ainoumadi">Ainoumadi</option>
                 </select>
             </div>
@@ -85,26 +86,26 @@
     </div>
 
     <script>
-        const dictionnaireMedicaments = [
-            "Doliprane 500mg", "Doliprane 1000mg", "Efferalgan", "Amoxicilline", "Augmentin", 
-            "Spasfon", "Gaviscon", "Ventoline", "Nurofen", "Lasilix", "Kardegic", 
-            "Vitamine C", "Magéos", "Glucophage", "Diamicron", "Amlor", "Smecta"
-        ];
-
+        const dictionnaireMedicaments = ["Doliprane 500mg", "Doliprane 1000mg", "Efferalgan", "Amoxicilline", "Augmentin", "Spasfon", "Gaviscon", "Ventoline", "Nurofen", "Lasilix", "Kardegic", "Vitamine C", "Smecta"];
         let map = L.map('map', { zoomControl: false }).setView([14.7815, -17.3095], 13);
         L.tileLayer('https://{s}.tile.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
         let markers = [];
 
-        // Gestion automatique du dictionnaire
         function gererSuggestions() {
             const input = document.getElementById('searchBar');
             const list = document.getElementById('suggestions');
+            const listContainer = document.getElementById('listContainer');
+            const listBtnText = document.getElementById('listBtnText');
             const valeur = input.value.toLowerCase();
+            
             list.innerHTML = '';
             
+            // RÉOUVERTURE AUTOMATIQUE : On affiche la liste dès qu'on interagit avec la recherche
+            listContainer.classList.remove('hidden');
+            listBtnText.innerText = "Liste";
+
             rechercher();
 
-            // Si vide, on montre les suggestions populaires
             const motsAMontrer = valeur.length < 1 
                 ? dictionnaireMedicaments.slice(0, 5) 
                 : dictionnaireMedicaments.filter(m => m.toLowerCase().includes(valeur));
@@ -112,7 +113,7 @@
             if (motsAMontrer.length > 0) {
                 motsAMontrer.forEach(m => {
                     const item = document.createElement('div');
-                    item.className = 'p-4 hover:bg-blue-50 cursor-pointer text-sm font-bold text-slate-700 border-b border-slate-50 transition-colors';
+                    item.className = 'p-4 hover:bg-blue-50 cursor-pointer text-sm font-bold text-slate-700 border-b border-slate-50';
                     item.innerText = m;
                     item.onclick = () => {
                         input.value = m;
@@ -127,7 +128,7 @@
             }
         }
 
-        // Fermer la liste si on clique ailleurs
+        // Fermer suggestions si on clique ailleurs
         document.addEventListener('click', (e) => {
             if (!document.getElementById('searchBar').contains(e.target)) {
                 document.getElementById('suggestions').classList.add('hidden');
@@ -152,14 +153,14 @@
         function toggleMap() {
             const container = document.getElementById('mapContainer');
             container.classList.toggle('hidden');
-            if (!container.classList.contains('hidden')) {
-                document.getElementById('mapBtnText').innerText = "Masquer Carte";
-                setTimeout(() => { map.invalidateSize(); }, 200);
-            } else { document.getElementById('mapBtnText').innerText = "Carte"; }
+            document.getElementById('mapBtnText').innerText = container.classList.contains('hidden') ? "Carte" : "Masquer Carte";
+            if (!container.classList.contains('hidden')) setTimeout(() => { map.invalidateSize(); }, 200);
         }
 
         function toggleListe() {
-            document.getElementById('listContainer').classList.toggle('hidden');
+            const container = document.getElementById('listContainer');
+            container.classList.toggle('hidden');
+            document.getElementById('listBtnText').innerText = container.classList.contains('hidden') ? "Afficher Liste" : "Liste";
         }
 
         async function rechercher() {
