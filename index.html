@@ -18,6 +18,8 @@
         #map { height: 350px; width: 100%; z-index: 1; }
         .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
         .suggestions-list { position: absolute; z-index: 6000; width: 100%; background: white; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 250px; overflow-y: auto; }
+        .modal-active { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -52,10 +54,10 @@
         </div>
 
         <div class="grid grid-cols-2 gap-3 mb-6">
-            <button onclick="toggleMap()" id="mapBtn" class="bg-blue-50 text-blue-600 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-sm shadow-sm active:scale-95">
+            <button onclick="toggleMap()" id="mapBtn" class="bg-blue-50 text-blue-600 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-sm shadow-sm active:scale-95 transition-all">
                 🗺️ <span id="mapBtnText">Carte</span>
             </button>
-            <button onclick="toggleListe()" id="listBtn" class="bg-slate-900 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-sm shadow-lg active:scale-95">
+            <button onclick="toggleListe()" id="listBtn" class="bg-slate-900 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-sm shadow-lg active:scale-95 transition-all">
                 📋 <span id="listBtnText">Liste</span>
             </button>
         </div>
@@ -69,13 +71,16 @@
         </div>
     </main>
 
-    <script>
-        const dictionnaireMedicaments = [
-            "Doliprane", "Efferalgan", "Paracétamol", "Amoxicilline", "Augmentin", 
-            "Spasfon", "Gaviscon", "Ventoline", "Nurofen", "Lasilix", "Kardegic", 
-            "Vitamine C", "Magéos", "Glucophage", "Diamicron", "Amlor"
-        ];
+    <div id="detailsModal" class="hidden fixed inset-0 bg-slate-900/60 z-[9999] backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] max-w-md w-full p-8 shadow-2xl relative modal-active">
+            <button onclick="fermerDetails()" class="absolute top-6 right-6 text-slate-300 hover:text-slate-500 text-2xl">&times;</button>
+            <div id="modalContent"></div>
+            <button onclick="fermerDetails()" class="w-full mt-8 bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-slate-800 transition shadow-lg">Fermer</button>
+        </div>
+    </div>
 
+    <script>
+        const dictionnaireMedicaments = ["Doliprane", "Efferalgan", "Paracétamol", "Amoxicilline", "Augmentin", "Spasfon", "Gaviscon", "Ventoline", "Nurofen", "Lasilix", "Vitamine C"];
         let map = L.map('map', { zoomControl: false }).setView([14.7815, -17.3095], 13);
         L.tileLayer('https://{s}.tile.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
         let markers = [];
@@ -85,33 +90,19 @@
             const list = document.getElementById('suggestions');
             const valeur = input.value.toLowerCase();
             list.innerHTML = '';
-            
-            // On rafraîchit la liste des pharmacies en temps réel pendant la frappe
             rechercher();
-
-            if (valeur.length < 1) { 
-                list.classList.add('hidden'); 
-                return; 
-            }
-
+            if (valeur.length < 1) { list.classList.add('hidden'); return; }
             const filtres = dictionnaireMedicaments.filter(m => m.toLowerCase().includes(valeur));
-            
             if (filtres.length > 0) {
                 filtres.forEach(m => {
                     const item = document.createElement('div');
                     item.className = 'p-4 hover:bg-blue-50 cursor-pointer text-sm font-bold text-slate-700 border-b border-slate-100';
                     item.innerText = m;
-                    item.onclick = () => {
-                        input.value = m;
-                        list.classList.add('hidden');
-                        rechercher();
-                    };
+                    item.onclick = () => { input.value = m; list.classList.add('hidden'); rechercher(); };
                     list.appendChild(item);
                 });
                 list.classList.remove('hidden');
-            } else {
-                list.classList.add('hidden');
-            }
+            } else { list.classList.add('hidden'); }
         }
 
         function verifierOuverture(hOuv, hFer) {
@@ -167,7 +158,8 @@
             const medInput = document.getElementById('searchBar').value.trim() || "ce produit";
             
             data.filter(p => {
-                return quartier === "tous" ? true : p.quartier === quartier;
+                // FILTRE DE QUARTIER CORRIGÉ
+                return quartier === "tous" || p.quartier === quartier;
             }).forEach(p => {
                 const ouverte = verifierOuverture(p.ouverture, p.fermeture);
                 const dText = hasGeo ? (p.dist < 1 ? Math.round(p.dist * 1000) + "m" : p.dist.toFixed(1) + "km") : "Dist. inconnue";
@@ -175,8 +167,8 @@
                 const msgWA = encodeURIComponent(`🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${medInput}* ?\n\nMerci de me confirmer la disponibilité. 🙏`);
 
                 container.innerHTML += `
-                    <div class="bg-white p-5 rounded-[2rem] card-shadow border border-slate-50 relative overflow-hidden card-animate">
-                        ${p.partenaire ? '<div class="absolute top-0 right-0 bg-blue-600 text-white text-[7px] font-bold px-3 py-1 rounded-bl-xl uppercase">Vérifié</div>' : ''}
+                    <div class="bg-white p-5 rounded-[2rem] card-shadow border border-slate-50 relative overflow-hidden">
+                        ${p.partenaire ? '<div class="absolute top-0 right-0 bg-blue-600 text-white text-[7px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-tighter">Vérifié</div>' : ''}
                         
                         <div class="flex justify-between items-start mb-4">
                             <div>
@@ -196,13 +188,33 @@
                             <a href="https://wa.me/${cleanPhone}?text=${msgWA}" target="_blank" class="flex items-center justify-center bg-emerald-500 text-white font-bold py-3 rounded-2xl text-[11px] shadow-sm">WhatsApp</a>
                         </div>
                         
-                        <div class="flex justify-center items-center bg-slate-50/50 p-2 rounded-xl">
-                            <span class="text-blue-600 font-bold text-[10px]">📍 À ${dText} de vous</span>
+                        <div class="flex justify-between items-center bg-slate-50/50 p-2 px-4 rounded-xl">
+                            <span class="text-blue-600 font-bold text-[10px]">📍 À ${dText}</span>
+                            <button onclick="voirDetails(${p.id})" class="text-[9px] font-black text-blue-600 uppercase underline decoration-2 underline-offset-4">Détails</button>
                         </div>
                     </div>`;
                 if (p.lat && p.lng) markers.push(L.marker([p.lat, p.lng]).addTo(map).bindPopup(`<b>${p.nom}</b>`));
             });
         }
+
+        async function voirDetails(id) {
+            const r = await fetch('src/data/pharmacies.json');
+            const phs = await r.json();
+            const p = phs.find(x => x.id === id);
+            document.getElementById('modalContent').innerHTML = `
+                <div class="text-left">
+                    <span class="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-2 block">${p.quartier}</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900 leading-none mb-2">${p.nom}</h2>
+                    <p class="text-slate-500 text-sm font-medium mb-6">${p.adresse || 'Keur Massar, Dakar'}</p>
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <p class="text-[9px] font-black text-slate-400 uppercase mb-2">Horaires Habituels</p>
+                        <p class="text-sm font-bold text-slate-700">${p.ouverture} - ${p.fermeture}</p>
+                    </div>
+                </div>`;
+            document.getElementById('detailsModal').classList.remove('hidden');
+        }
+
+        function fermerDetails() { document.getElementById('detailsModal').classList.add('hidden'); }
 
         window.onload = rechercher;
     </script>
