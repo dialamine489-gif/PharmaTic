@@ -1,0 +1,18 @@
+{
+  "short_name": "PharmaTic",
+  "name": "PharmaTic - Keur Massar",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/883/883360.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#1d4ed8",
+  "display": "standalone",
+  "scope": "./",
+  "theme_color": "#1d4ed8",
+  "description": "Trouvez vos médicaments à Keur Massar."
+}

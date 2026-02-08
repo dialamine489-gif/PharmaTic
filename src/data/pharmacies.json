@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "nom": "Pharmacie Keur Massar",
+    "quartier": "Keur Massar Village",
+    "adresse": "Près du croisement Keur Massar",
+    "telephone": "+221338781212",
+    "lat": 14.7815,
+    "lng": -17.3095,
+    "garde": true,
+    "produits": ["Doliprane", "Efferalgan", "Spasfon"],
+    "distance": "200m"
+  },
+  {
+    "id": 2,
+    "nom": "Pharmacie de la Gendarmerie",
+    "quartier": "Gendarmerie",
+    "adresse": "En face de la Gendarmerie de Keur Massar",
+    "telephone": "+221338754040",
+    "lat": 14.7850,
+    "lng": -17.3060,
+    "garde": false,
+    "produits": ["Doliprane", "Gaviscon", "Nurofen"],
+    "distance": "1.5km"
+  },
+  {
+    "id": 3,
+    "nom": "Pharmacie Jaxaay",
+    "quartier": "Jaxaay",
+    "adresse": "Entrée de la cité Jaxaay",
+    "telephone": "+221338751010",
+    "lat": 14.7730,
+    "lng": -17.2950,
+    "garde": true,
+    "produits": ["Ventoline", "Doliprane", "Amoxicilline"],
+    "distance": "3.2km"
+  }
+]
