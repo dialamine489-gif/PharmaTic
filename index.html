@@ -17,7 +17,7 @@
         body { font-family: 'Inter', sans-serif; }
         #map { height: 350px; width: 100%; z-index: 1; }
         .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
-        .card-animate { transition: all 0.2s ease-out; }
+        .suggestions-list { position: absolute; z-index: 6000; width: 100%; background: white; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 200px; overflow-y: auto; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -25,18 +25,23 @@
     <nav class="bg-blue-700 p-4 text-white shadow-lg sticky top-0 z-[5000]">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-xl font-extrabold tracking-tighter uppercase italic">PharmaTic</h1>
-            <span class="text-[9px] bg-white/20 px-2 py-1 rounded-md border border-white/10 font-bold uppercase">Keur Massar</span>
+            <span class="text-[9px] bg-white/20 px-2 py-1 rounded-md border border-white/10 font-bold uppercase tracking-widest">Keur Massar</span>
         </div>
     </nav>
 
     <main class="container mx-auto mt-4 p-4">
-        <div class="bg-white p-5 rounded-3xl shadow-sm mb-6 border border-slate-100">
-            <div class="flex flex-col gap-4">
-                <input type="text" id="searchBar" oninput="rechercher()" placeholder="Quel médicament cherchez-vous ?" 
-                    class="bg-slate-50 border-none p-4 rounded-2xl w-full focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-medium">
-                
-                <select id="filterQuartier" onchange="rechercher()" class="bg-slate-50 border-none text-slate-600 text-xs rounded-xl p-3 outline-none font-bold">
-                    <option value="tous">Tous les quartiers de Keur Massar</option>
+        <div class="bg-white p-5 rounded-3xl shadow-sm mb-6 border border-slate-100 relative">
+            <p class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest">1. Quel médicament cherchez-vous ?</p>
+            <div class="relative">
+                <input type="text" id="searchBar" oninput="gererSuggestions()" placeholder="Ex: Doliprane, Amoxicilline..." 
+                    class="bg-slate-50 border-none p-4 rounded-2xl w-full focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-bold">
+                <div id="suggestions" class="suggestions-list hidden mt-1 border border-slate-100"></div>
+            </div>
+
+            <div class="mt-4">
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">2. Filtrer par quartier (Optionnel)</p>
+                <select id="filterQuartier" onchange="rechercher()" class="w-full bg-slate-50 border-none text-slate-600 text-xs rounded-xl p-3 outline-none font-bold">
+                    <option value="tous">Toutes les pharmacies de Keur Massar</option>
                     <option value="Keur Massar Village">Village</option>
                     <option value="Unité 3">Unité 3</option>
                     <option value="Jaxaay">Jaxaay</option>
@@ -65,9 +70,42 @@
     </main>
 
     <script>
+        // DICTIONNAIRE DE MÉDICAMENTS
+        const dictionnaireMedicaments = [
+            "Doliprane 500mg", "Doliprane 1000mg", "Efferalgan", "Paracétamol", "Amoxicilline", 
+            "Spasfon", "Gaviscon", "Ventoline", "Nurofen", "Augmentin", "Clamoxyl", "Vogalène",
+            "Météospasmyl", "Dafalgan", "Aspegic", "Lasilix", "Kardegic", "Imodium"
+        ];
+
         let map = L.map('map', { zoomControl: false }).setView([14.7815, -17.3095], 13);
         L.tileLayer('https://{s}.tile.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
         let markers = [];
+
+        function gererSuggestions() {
+            const input = document.getElementById('searchBar');
+            const list = document.getElementById('suggestions');
+            const valeur = input.value.toLowerCase();
+            list.innerHTML = '';
+            
+            if (valeur.length < 1) { list.classList.add('hidden'); rechercher(); return; }
+
+            const filtres = dictionnaireMedicaments.filter(m => m.toLowerCase().includes(valeur));
+            
+            filtres.forEach(m => {
+                const item = document.createElement('div');
+                item.className = 'p-4 hover:bg-blue-50 cursor-pointer text-sm font-bold text-slate-700 border-b border-slate-50';
+                item.innerText = m;
+                item.onclick = () => {
+                    input.value = m;
+                    list.classList.add('hidden');
+                    rechercher(); // On lance la recherche dès qu'on clique sur un médicament
+                };
+                list.appendChild(item);
+            });
+
+            list.classList.remove('hidden');
+            rechercher();
+        }
 
         function verifierOuverture(hOuv, hFer) {
             if (!hOuv || !hFer) return false;
@@ -87,12 +125,8 @@
         function toggleMap() {
             const container = document.getElementById('mapContainer');
             container.classList.toggle('hidden');
-            if (!container.classList.contains('hidden')) {
-                document.getElementById('mapBtnText').innerText = "Masquer Carte";
-                setTimeout(() => { map.invalidateSize(); }, 200);
-            } else {
-                document.getElementById('mapBtnText').innerText = "Carte";
-            }
+            document.getElementById('mapBtnText').innerText = container.classList.contains('hidden') ? "Carte" : "Masquer Carte";
+            if (!container.classList.contains('hidden')) setTimeout(() => { map.invalidateSize(); }, 200);
         }
 
         function toggleListe() {
@@ -105,7 +139,6 @@
             try {
                 const response = await fetch('src/data/pharmacies.json');
                 let pharmacies = await response.json();
-                const query = document.getElementById('searchBar').value.toLowerCase();
                 const quartierSel = document.getElementById('filterQuartier').value;
                 const container = document.getElementById('results');
 
@@ -118,20 +151,18 @@
                     const uLon = pos.coords.longitude;
                     pharmacies.forEach(p => { p.dist = p.lat ? calculerDistance(uLat, uLon, p.lat, p.lng) : 999; });
                     pharmacies.sort((a, b) => a.dist - b.dist);
-                    afficherCards(pharmacies, query, quartierSel, container, true);
+                    afficherCards(pharmacies, quartierSel, container, true);
                 }, () => {
-                    afficherCards(pharmacies, query, quartierSel, container, false);
+                    afficherCards(pharmacies, quartierSel, container, false);
                 });
             } catch (e) { console.error(e); }
         }
 
-        function afficherCards(data, query, quartier, container, hasGeo) {
+        function afficherCards(data, quartier, container, hasGeo) {
             const medInput = document.getElementById('searchBar').value.trim() || "ce médicament";
             
             data.filter(p => {
-                const matchNom = p.nom.toLowerCase().includes(query);
-                const matchQuartier = quartier === "tous" ? true : p.quartier === quartier;
-                return (query === "" || matchNom) && matchQuartier;
+                return quartier === "tous" ? true : p.quartier === quartier;
             }).forEach(p => {
                 const ouverte = verifierOuverture(p.ouverture, p.fermeture);
                 const dText = hasGeo ? (p.dist < 1 ? Math.round(p.dist * 1000) + "m" : p.dist.toFixed(1) + "km") : "Dist. inconnue";
@@ -139,19 +170,19 @@
                 const msgWA = encodeURIComponent(`🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${medInput}* ?\n\nMerci de me confirmer la disponibilité. 🙏`);
 
                 container.innerHTML += `
-                    <div class="bg-white p-5 rounded-[2rem] card-shadow border border-slate-50 card-animate relative overflow-hidden">
-                        ${p.partenaire ? '<div class="absolute top-0 right-0 bg-blue-600 text-white text-[7px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-tighter">Partenaire</div>' : ''}
+                    <div class="bg-white p-5 rounded-[2rem] card-shadow border border-slate-50 relative overflow-hidden">
+                        ${p.partenaire ? '<div class="absolute top-0 right-0 bg-blue-600 text-white text-[7px] font-bold px-3 py-1 rounded-bl-xl uppercase">Partenaire</div>' : ''}
                         
                         <div class="flex justify-between items-start mb-4">
                             <div>
-                                <h3 class="font-bold text-slate-800 leading-tight">${p.nom} ${p.partenaire ? '✅' : ''}</h3>
+                                <h3 class="font-bold text-slate-800 leading-tight">${p.nom}</h3>
                                 <p class="text-[10px] font-bold text-blue-500 uppercase mt-1 tracking-wider">${p.quartier}</p>
                             </div>
                             <span class="text-[8px] ${ouverte ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-500'} px-2 py-0.5 rounded-full font-black uppercase">${ouverte ? 'Ouvert' : 'Fermé'}</span>
                         </div>
 
                         <div class="bg-blue-50/50 p-3 rounded-2xl mb-4 border border-blue-100/50 text-center">
-                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Demander le stock de :</p>
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Vérifier stock pour :</p>
                             <p class="text-sm font-extrabold text-blue-700">"${medInput}"</p>
                         </div>
 
@@ -168,7 +199,6 @@
             });
         }
 
-        // Charger les pharmacies au démarrage
         window.onload = rechercher;
     </script>
 </body>
