@@ -178,14 +178,15 @@
             const medInput = document.getElementById('searchBar').value || "ce médicament";
             
             data.filter(p => {
-                const matchText = query === "" || p.nom.toLowerCase().includes(query) || p.produits.some(pr => pr.toLowerCase().includes(query));
+                const matchText = query === "" || p.nom.toLowerCase().includes(query) || (p.produits && p.produits.some(pr => pr.toLowerCase().includes(query)));
                 const matchQuartier = quartier === "tous" ? true : p.quartier === quartier;
                 return matchText && matchQuartier;
             }).forEach(p => {
                 const ouverte = verifierOuverture(p.ouverture, p.fermeture);
-                const dText = hasGeo ? (p.dist < 1 ? Math.round(p.dist * 1000) + "m" : p.dist.toFixed(1) + "km") : p.distance;
+                const dText = hasGeo ? (p.dist < 1 ? Math.round(p.dist * 1000) + "m" : p.dist.toFixed(1) + "km") : (p.distance || "N/A");
                 
-                // MESSAGE WHATSAPP INTELLIGENT
+                // Nettoyage du numéro pour WhatsApp
+                const cleanPhone = p.telephone.replace(/\D/g, '');
                 const msgWA = encodeURIComponent(`🏥 *PharmaTic - Demande de Stock*\n\nBonjour *${p.nom}*,\nAvez-vous en stock le médicament suivant : *${medInput}* ?\n\nMerci de me confirmer la disponibilité. 🙏`);
 
                 container.innerHTML += `
@@ -199,7 +200,7 @@
                         </div>
                         <div class="grid grid-cols-2 gap-2 mb-4">
                             <a href="tel:${p.telephone}" class="flex items-center justify-center gap-2 bg-slate-50 text-slate-700 font-bold py-3 rounded-2xl text-[11px] border border-slate-100">Appeler</a>
-                            <a href="https://wa.me/?text=${msgWA}" target="_blank" class="flex items-center justify-center gap-2 bg-emerald-500 text-white font-bold py-3 rounded-2xl text-[11px]">WhatsApp</a>
+                            <a href="https://wa.me/${cleanPhone}?text=${msgWA}" target="_blank" class="flex items-center justify-center gap-2 bg-emerald-500 text-white font-bold py-3 rounded-2xl text-[11px]">WhatsApp</a>
                         </div>
                         <div class="flex justify-between items-center bg-slate-50/50 p-3 rounded-2xl">
                             <span class="text-blue-600 font-bold text-[10px]">📍 ${dText} ${hasGeo ? 'de vous' : ''}</span>
@@ -216,7 +217,7 @@
             const p = phs.find(x => x.id === id);
             document.getElementById('modalContent').innerHTML = `
                 <div class="text-left"><span class="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-2 block">${p.quartier}</span><h2 class="text-3xl font-extrabold text-slate-900 leading-none mb-2">${p.nom}</h2><p class="text-slate-400 text-sm font-medium mb-8">${p.adresse}</p></div>
-                <div><h4 class="text-[10px] font-black text-slate-300 uppercase mb-3 tracking-widest text-left">Produits disponibles</h4><div class="flex flex-wrap gap-2 text-left">${p.produits.map(pr => `<span class="bg-slate-50 border border-slate-100 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600">${pr}</span>`).join('')}</div></div>`;
+                <div><h4 class="text-[10px] font-black text-slate-300 uppercase mb-3 tracking-widest text-left">Produits disponibles</h4><div class="flex flex-wrap gap-2 text-left">${p.produits ? p.produits.map(pr => `<span class="bg-slate-50 border border-slate-100 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600">${pr}</span>`).join('') : '<span class="text-xs italic">Non spécifié</span>'}</div></div>`;
             document.getElementById('detailsModal').classList.remove('hidden');
         }
 
