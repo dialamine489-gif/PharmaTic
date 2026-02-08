@@ -51,17 +51,19 @@
     "lng": -17.3096,
     "produits": ["Paracétamol", "Vitamines"]
   },
+  
   {
     "id": 5,
     "nom": "Pharmacie Dial Diop",
     "quartier": "Keur Massar Est",
     "adresse": "Keur Massar Village",
-    "telephone": "221338374242",
+    "telephone": "221776779440",
     "ouverture": "08:00",
     "fermeture": "23:00",
     "garde": false,
     "lat": 14.7792,
     "lng": -17.3216,
+    "distance": "1.8km",
     "produits": ["Doliprane", "Antibiotiques"]
   }
 ]
