@@ -84,10 +84,10 @@
 
     <script>
         // --- DONNÉES ---
-        const listeMedicamenteuse = ["Doliprane", "Efferalgan", "Spasfon", "Gaviscon", "Ventoline", "Nurofen", "Amoxicilline", "Paracétamol"];
-        let map = L.map('map').setView([14.7815, -17.3095], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        let markers = [];
+        const listeMedicamenteuse = [
+    "Doliprane", "Efferalgan", "Spasfon", "Gaviscon", "Ventoline", 
+    "Pharmacie Jaxaay", "Pharmacie du Croisement", "Pharmacie de la Gendarmerie"
+];
 
         // --- GESTION CARTE (TOGGLE) ---
         function toggleMap() {
@@ -127,24 +127,36 @@
 
         // --- RECHERCHE ---
         async function rechercher() {
-            try {
-                const response = await fetch('src/data/pharmacies.json');
-                const pharmacies = await response.json();
-                const query = document.getElementById('searchBar').value.toLowerCase();
-                const gardeOnly = document.getElementById('filterGarde').checked;
-                const quartierSel = document.getElementById('filterQuartier').value;
-                const container = document.getElementById('results');
+    try {
+        const response = await fetch('src/data/pharmacies.json');
+        const pharmacies = await response.json();
+        const query = document.getElementById('searchBar').value.toLowerCase();
+        const gardeOnly = document.getElementById('filterGarde').checked;
+        const quartierSel = document.getElementById('filterQuartier').value;
+        const container = document.getElementById('results');
 
-                container.innerHTML = '';
-                markers.forEach(m => map.removeLayer(m));
-                markers = [];
+        container.innerHTML = '';
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
 
-                const filtered = pharmacies.filter(p => {
-                    const matchMed = query === "" ? true : p.produits.some(prod => prod.toLowerCase().includes(query));
-                    const matchGarde = gardeOnly ? p.garde : true;
-                    const matchQuartier = quartierSel === "tous" ? true : p.quartier === quartierSel;
-                    return matchMed && matchGarde && matchQuartier;
-                });
+        const filtered = pharmacies.filter(p => {
+            // 1. Recherche par médicament
+            const matchMed = p.produits.some(prod => prod.toLowerCase().includes(query));
+            // 2. Recherche par nom de pharmacie
+            const matchNom = p.nom.toLowerCase().includes(query);
+            // 3. Recherche par quartier (via la barre de texte)
+            const matchQuartierTexte = p.quartier.toLowerCase().includes(query);
+            
+            // Filtres de sélection
+            const matchGarde = gardeOnly ? p.garde : true;
+            const matchQuartierSelect = quartierSel === "tous" ? true : p.quartier === quartierSel;
+
+            // La pharmacie est affichée si elle correspond au texte (médoc OU nom OU quartier) 
+            // ET qu'elle respecte les filtres (garde ET quartier choisi)
+            return (matchMed || matchNom || matchQuartierTexte) && matchGarde && matchQuartierSelect;
+        });
+
+        // ... le reste du code pour afficher les cartes et les marqueurs reste identique
 
                 filtered.forEach(p => {
                     container.innerHTML += `
