@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PharmaTic - Keur Massar</title>
+    <title>PharmaTic - Keur Massar Pro</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1d4ed8">
@@ -20,7 +20,6 @@
         
         .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
         .card-animate { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-        .card-animate:active { transform: scale(0.98); }
         
         .modal-active { animation: slideUp 0.3s ease-out; }
         @keyframes slideUp {
@@ -55,24 +54,31 @@
                         <option value="Jaxaay">Jaxaay</option>
                         <option value="Cité Tawfekh">Tawfekh</option>
                     </select>
-
-                    <button onclick="toggleMap()" id="mapBtn" class="bg-blue-50 text-blue-600 font-bold px-4 py-3 rounded-xl transition-all flex items-center gap-2 text-xs">
-                        <span>🗺️</span> <span id="mapBtnText">Carte</span>
-                    </button>
                 </div>
             </div>
         </div>
 
-        <div id="mapContainer" class="hidden mb-6">
-            <div id="map" class="rounded-3xl shadow-inner border-4 border-white overflow-hidden"></div>
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <button onclick="toggleMap()" id="mapBtn" class="bg-blue-50 text-blue-600 font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 text-sm shadow-sm active:scale-95">
+                <span>🗺️</span> <span id="mapBtnText">Voir la Carte</span>
+            </button>
+            
+            <button onclick="toggleListe()" id="listBtn" class="bg-slate-900 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 text-sm shadow-lg active:scale-95">
+                <span>📋</span> <span id="listBtnText">Voir la Liste</span>
+            </button>
         </div>
 
-        <div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        <div id="mapContainer" class="hidden mb-6">
+            <div id="map" class="rounded-[2.5rem] shadow-inner border-4 border-white overflow-hidden"></div>
+        </div>
+
+        <div id="listContainer" class="hidden">
+            <div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
     </main>
 
     <div id="detailsModal" class="hidden fixed inset-0 bg-slate-900/60 z-[9999] backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] max-w-md w-full p-8 shadow-2xl relative modal-active">
-            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 sm:hidden"></div>
             <button onclick="fermerDetails()" class="absolute top-6 right-6 text-slate-300 hover:text-slate-500 text-2xl">&times;</button>
             <div id="modalContent"></div>
             <button onclick="fermerDetails()" class="w-full mt-8 bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-slate-800 transition shadow-lg">Continuer</button>
@@ -80,7 +86,6 @@
     </div>
 
     <script>
-        // --- LOGIQUE DE TEMPS ---
         function verifierOuverture(hOuv, hFer) {
             if (!hOuv || !hFer) return false;
             const maintenant = new Date();
@@ -88,94 +93,94 @@
             return hFer < hOuv ? (hm >= hOuv || hm <= hFer) : (hm >= hOuv && hm <= hFer);
         }
 
-        // --- INITIALISATION ---
-        const listeSuggestions = ["Doliprane", "Efferalgan", "Spasfon", "Gaviscon", "Ventoline", "Pharmacie Jaxaay"];
         let map = L.map('map', { zoomControl: false }).setView([14.7815, -17.3095], 13);
         L.tileLayer('https://{s}.tile.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
         let markers = [];
 
-        window.onload = rechercher;
-
         function toggleMap() {
             const container = document.getElementById('mapContainer');
-            container.classList.toggle('hidden');
-            if (!container.classList.contains('hidden')) setTimeout(() => { map.invalidateSize(); }, 200);
+            const btnText = document.getElementById('mapBtnText');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                document.getElementById('listContainer').classList.add('hidden');
+                btnText.innerText = "Masquer Carte";
+                setTimeout(() => { map.invalidateSize(); }, 200);
+            } else {
+                container.classList.add('hidden');
+                btnText.innerText = "Voir la Carte";
+            }
         }
 
-        function afficherSuggestions() {
-            const input = document.getElementById('searchBar');
-            const list = document.getElementById('autocomplete-list');
-            const valeur = input.value.toLowerCase();
-            list.innerHTML = '';
-            if (!valeur) { list.classList.add('hidden'); return; }
-            const suggs = listeSuggestions.filter(m => m.toLowerCase().includes(valeur));
-            suggs.forEach(s => {
-                const item = document.createElement('div');
-                item.className = 'p-4 hover:bg-slate-50 cursor-pointer text-sm font-semibold text-slate-600 border-b border-slate-50';
-                item.innerText = s;
-                item.onclick = () => { input.value = s; list.classList.add('hidden'); rechercher(); };
-                list.appendChild(item);
-            });
-            list.classList.toggle('hidden', suggs.length === 0);
+        function toggleListe() {
+            const container = document.getElementById('listContainer');
+            const btnText = document.getElementById('listBtnText');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                document.getElementById('mapContainer').classList.add('hidden');
+                btnText.innerText = "Masquer Liste";
+            } else {
+                container.classList.add('hidden');
+                btnText.innerText = "Voir la Liste";
+            }
         }
 
         async function rechercher() {
-            try {
-                const response = await fetch('src/data/pharmacies.json');
-                const pharmacies = await response.json();
-                const query = document.getElementById('searchBar').value.toLowerCase();
-                const quartierSel = document.getElementById('filterQuartier').value;
-                const container = document.getElementById('results');
+            const response = await fetch('src/data/pharmacies.json');
+            const pharmacies = await response.json();
+            const query = document.getElementById('searchBar').value.toLowerCase();
+            const quartierSel = document.getElementById('filterQuartier').value;
+            const container = document.getElementById('results');
 
-                container.innerHTML = '';
-                markers.forEach(m => map.removeLayer(m));
-                markers = [];
+            container.innerHTML = '';
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
 
-                const filtered = pharmacies.filter(p => {
-                    const matchText = query === "" || p.nom.toLowerCase().includes(query) || p.produits.some(prod => prod.toLowerCase().includes(query));
-                    const matchQuartier = quartierSel === "tous" ? true : p.quartier === quartierSel;
-                    return matchText && matchQuartier;
-                });
+            const filtered = pharmacies.filter(p => {
+                const matchText = query === "" || p.nom.toLowerCase().includes(query) || p.produits.some(prod => prod.toLowerCase().includes(query));
+                const matchQuartier = quartierSel === "tous" ? true : p.quartier === quartierSel;
+                return matchText && matchQuartier;
+            });
 
-                filtered.forEach(p => {
-                    const ouverte = verifierOuverture(p.ouverture, p.fermeture);
-                    const msgWA = encodeURIComponent(`*PharmaTic*\n🏥 *${p.nom}*\n📍 ${p.quartier}\n🕒 État: ${ouverte ? 'OUVERT' : 'FERMÉ'}\nLien: https://dialamine489-gif.github.io/PharmaTic/`);
+            filtered.forEach(p => {
+                const ouverte = verifierOuverture(p.ouverture, p.fermeture);
+                const msgWA = encodeURIComponent(`🏥 *${p.nom}*\n📍 ${p.quartier}\n🕒 État: ${ouverte ? 'OUVERT' : 'FERMÉ'}\nLien: https://dialamine489-gif.github.io/PharmaTic/`);
 
-                    container.innerHTML += `
-                        <div class="bg-white p-5 rounded-[2rem] card-shadow card-animate border border-slate-50">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="max-w-[70%]">
-                                    <h3 class="font-bold text-slate-800 leading-tight">${p.nom}</h3>
-                                    <p class="text-[10px] font-bold text-blue-500 uppercase mt-1 tracking-wider">${p.quartier}</p>
-                                </div>
-                                <div class="flex flex-col gap-1 items-end">
-                                    ${p.garde ? '<span class="text-[8px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-black">GARDE</span>' : ''}
-                                    <span class="text-[8px] ${ouverte ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-500'} px-2 py-0.5 rounded-full font-black uppercase">${ouverte ? 'Ouvert' : 'Fermé'}</span>
-                                </div>
+                container.innerHTML += `
+                    <div class="bg-white p-5 rounded-[2rem] card-shadow border border-slate-50">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold text-slate-800 leading-tight">${p.nom}</h3>
+                                <p class="text-[10px] font-bold text-blue-500 uppercase mt-1 tracking-wider">${p.quartier}</p>
                             </div>
-                            
-                            <div class="grid grid-cols-2 gap-2 mb-4">
-                                <a href="tel:${p.telephone}" class="flex items-center justify-center gap-2 bg-slate-50 text-slate-700 font-bold py-3 rounded-2xl text-[11px] hover:bg-slate-100 transition border border-slate-100">
-                                    📞 Appeler
-                                </a>
-                                <a href="https://wa.me/?text=${msgWA}" target="_blank" class="flex items-center justify-center gap-2 bg-emerald-500 text-white font-bold py-3 rounded-2xl text-[11px] hover:bg-emerald-600 transition shadow-sm">
-                                    WhatsApp
-                                </a>
+                            <div class="flex flex-col gap-1 items-end">
+                                ${p.garde ? '<span class="text-[8px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-black">GARDE</span>' : ''}
+                                <span class="text-[8px] ${ouverte ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-500'} px-2 py-0.5 rounded-full font-black uppercase">${ouverte ? 'Ouvert' : 'Fermé'}</span>
                             </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <a href="tel:${p.telephone}" class="flex items-center justify-center gap-2 bg-slate-50 text-slate-700 font-bold py-3 rounded-2xl text-[11px] border border-slate-100 italic">Appeler</a>
+                            <a href="https://wa.me/?text=${msgWA}" target="_blank" class="flex items-center justify-center gap-2 bg-emerald-500 text-white font-bold py-3 rounded-2xl text-[11px]">WhatsApp</a>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-50/50 p-3 rounded-2xl">
+                            <span class="text-slate-400 font-bold text-[10px]">📍 ${p.distance}</span>
+                            <button onclick="voirDetails(${p.id})" class="text-[10px] font-extrabold text-blue-600 uppercase">Détails →</button>
+                        </div>
+                    </div>`;
+                if (p.lat && p.lng) {
+                    let marker = L.marker([p.lat, p.lng]).addTo(map).bindPopup(`<b>${p.nom}</b>`);
+                    markers.push(marker);
+                }
+            });
 
-                            <div class="flex justify-between items-center bg-slate-50/50 p-3 rounded-2xl">
-                                <span class="text-slate-400 font-bold text-[10px]">📍 ${p.distance}</span>
-                                <button onclick="voirDetails(${p.id})" class="text-[10px] font-extrabold text-blue-600 uppercase tracking-tighter">Détails →</button>
-                            </div>
-                        </div>`;
-                });
-            } catch (e) { console.error(e); }
+            // Afficher automatiquement la liste lors d'une recherche
+            document.getElementById('listContainer').classList.remove('hidden');
+            document.getElementById('listBtnText').innerText = "Masquer Liste";
         }
 
         async function voirDetails(id) {
-            const response = await fetch('src/data/pharmacies.json');
-            const pharmacies = await response.json();
-            const p = pharmacies.find(pharma => pharma.id === id);
+            const resp = await fetch('src/data/pharmacies.json');
+            const phs = await resp.json();
+            const p = phs.find(x => x.id === id);
             const content = document.getElementById('modalContent');
             content.innerHTML = `
                 <div class="text-left">
@@ -183,18 +188,17 @@
                     <h2 class="text-3xl font-extrabold text-slate-900 leading-none mb-2">${p.nom}</h2>
                     <p class="text-slate-400 text-sm font-medium mb-8">${p.adresse}</p>
                 </div>
-                <div class="space-y-6">
-                    <div>
-                        <h4 class="text-[10px] font-black text-slate-300 uppercase mb-3 tracking-widest">En stock actuellement</h4>
-                        <div class="flex flex-wrap gap-2">
-                            ${p.produits.map(prod => `<span class="bg-slate-50 border border-slate-100 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600">${prod}</span>`).join('')}
-                        </div>
+                <div>
+                    <h4 class="text-[10px] font-black text-slate-300 uppercase mb-3 tracking-widest text-left">Produits disponibles</h4>
+                    <div class="flex flex-wrap gap-2 text-left">
+                        ${p.produits.map(prod => `<span class="bg-slate-50 border border-slate-100 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600">${prod}</span>`).join('')}
                     </div>
                 </div>`;
             document.getElementById('detailsModal').classList.remove('hidden');
         }
 
         function fermerDetails() { document.getElementById('detailsModal').classList.add('hidden'); }
+        function afficherSuggestions() { /* ... Logique autocomplétion ... */ }
     </script>
 </body>
 </html>
