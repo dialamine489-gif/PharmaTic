@@ -70,5 +70,43 @@
     "lat": 14.7878,
     "lng": -17.3058,
     "partenaire": false
+  },
+  
+  {
+    "id": 15,
+    "nom": "Pharmacie Sankoun Faty",
+    "quartier": "Darou Missette",
+    "adresse": "Darou Missette, Keur Massar",
+    "telephone": "+221338378786",
+    "ouverture": "08:00",
+    "fermeture": "23:00",
+    "lat": 14.7750,
+    "lng": -17.3100,
+    "partenaire": false
+  },
+  {
+    "id": 16,
+    "nom": "Pharmacie Seydi Mouhamadou Moustapha Sy",
+    "quartier": "Unité 14",
+    "adresse": "Parcelles Assainies, Unité 14",
+    "telephone": "+221338379874",
+    "ouverture": "08:00",
+    "fermeture": "23:00",
+    "lat": 14.7850,
+    "lng": -17.3150,
+    "partenaire": false
+  },
+  {
+    "id": 17,
+    "nom": "Pharmacie Du Logo",
+    "quartier": "Keur Massar Village",
+    "adresse": "Route principale, Keur Massar",
+    "telephone": "+221338788417",
+    "ouverture": "08:00",
+    "fermeture": "23:00",
+    "lat": 14.7836,
+    "lng": -17.3148,
+    "partenaire": false
   }
+
 ]
