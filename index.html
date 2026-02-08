@@ -16,8 +16,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
         #map { height: 350px; width: 100%; z-index: 1; }
-        .card-shadow { box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.05); }
-        .card-animate { transition: all 0.25s ease; }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
+        .card-animate { transition: all 0.2s ease-out; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -25,43 +25,43 @@
     <nav class="bg-blue-700 p-4 text-white shadow-lg sticky top-0 z-[5000]">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-xl font-extrabold tracking-tighter uppercase italic">PharmaTic</h1>
-            <span class="text-[9px] bg-white/20 px-2 py-1 rounded-md font-bold uppercase tracking-widest">Keur Massar</span>
+            <span class="text-[9px] bg-white/20 px-2 py-1 rounded-md border border-white/10 font-bold uppercase">Keur Massar</span>
         </div>
     </nav>
 
     <main class="container mx-auto mt-4 p-4">
-        <div class="bg-white p-5 rounded-[2.5rem] shadow-sm mb-6 border border-slate-100">
+        <div class="bg-white p-5 rounded-3xl shadow-sm mb-6 border border-slate-100">
             <div class="flex flex-col gap-4">
-                <div class="relative">
-                    <input type="text" id="searchBar" placeholder="Quel médicament cherchez-vous ?" 
-                        class="bg-slate-50 border-none p-5 rounded-2xl w-full focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-bold">
-                </div>
-                <div class="flex gap-2">
-                    <select id="filterQuartier" class="flex-grow bg-slate-50 border-none text-slate-600 text-xs rounded-xl p-4 outline-none font-bold">
-                        <option value="tous">Tous les quartiers</option>
-                        <option value="Keur Massar Village">Village</option>
-                        <option value="Unité 3">Unité 3</option>
-                        <option value="Jaxaay">Jaxaay</option>
-                        <option value="Cité Ainoumadi">Ainoumadi</option>
-                    </select>
-                    <button onclick="rechercher()" class="bg-blue-600 text-white px-6 py-4 rounded-xl font-bold hover:bg-blue-700 active:scale-95 transition-all">
-                        Chercher
-                    </button>
-                </div>
+                <input type="text" id="searchBar" oninput="rechercher()" placeholder="Quel médicament cherchez-vous ?" 
+                    class="bg-slate-50 border-none p-4 rounded-2xl w-full focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-medium">
+                
+                <select id="filterQuartier" onchange="rechercher()" class="bg-slate-50 border-none text-slate-600 text-xs rounded-xl p-3 outline-none font-bold">
+                    <option value="tous">Tous les quartiers de Keur Massar</option>
+                    <option value="Keur Massar Village">Village</option>
+                    <option value="Unité 3">Unité 3</option>
+                    <option value="Jaxaay">Jaxaay</option>
+                    <option value="Cité Tawfekh">Tawfekh</option>
+                    <option value="Cité Ainoumadi">Ainoumadi</option>
+                </select>
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3 mb-6">
-            <button onclick="toggleMap()" id="mapBtn" class="bg-white text-blue-600 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-sm shadow-sm border border-blue-50">
+            <button onclick="toggleMap()" id="mapBtn" class="bg-blue-50 text-blue-600 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-sm shadow-sm active:scale-95">
                 🗺️ <span id="mapBtnText">Carte</span>
             </button>
-            <button onclick="toggleListe()" id="listBtn" class="bg-slate-900 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-sm shadow-lg">
+            <button onclick="toggleListe()" id="listBtn" class="bg-slate-900 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-sm shadow-lg active:scale-95">
                 📋 <span id="listBtnText">Liste</span>
             </button>
         </div>
 
-        <div id="mapContainer" class="hidden mb-6"><div id="map" class="rounded-[2.5rem] shadow-inner border-4 border-white overflow-hidden"></div></div>
-        <div id="listContainer" class="hidden"><div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
+        <div id="mapContainer" class="hidden mb-6">
+            <div id="map" class="rounded-[2.5rem] shadow-inner border-4 border-white overflow-hidden"></div>
+        </div>
+
+        <div id="listContainer">
+            <div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
     </main>
 
     <script>
@@ -70,6 +70,7 @@
         let markers = [];
 
         function verifierOuverture(hOuv, hFer) {
+            if (!hOuv || !hFer) return false;
             const maintenant = new Date();
             const hm = maintenant.getHours().toString().padStart(2, '0') + ":" + maintenant.getMinutes().toString().padStart(2, '0');
             return hFer < hOuv ? (hm >= hOuv || hm <= hFer) : (hm >= hOuv && hm <= hFer);
@@ -83,58 +84,92 @@
             return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         }
 
-        function toggleMap() { 
-            document.getElementById('mapContainer').classList.toggle('hidden'); 
-            setTimeout(() => { map.invalidateSize(); }, 200);
+        function toggleMap() {
+            const container = document.getElementById('mapContainer');
+            container.classList.toggle('hidden');
+            if (!container.classList.contains('hidden')) {
+                document.getElementById('mapBtnText').innerText = "Masquer Carte";
+                setTimeout(() => { map.invalidateSize(); }, 200);
+            } else {
+                document.getElementById('mapBtnText').innerText = "Carte";
+            }
         }
-        function toggleListe() { document.getElementById('listContainer').classList.toggle('hidden'); }
+
+        function toggleListe() {
+            const container = document.getElementById('listContainer');
+            container.classList.toggle('hidden');
+            document.getElementById('listBtnText').innerText = container.classList.contains('hidden') ? "Afficher Liste" : "Liste";
+        }
 
         async function rechercher() {
-            const response = await fetch('src/data/pharmacies.json');
-            let pharmacies = await response.json();
-            const query = document.getElementById('searchBar').value;
-            const quartierSel = document.getElementById('filterQuartier').value;
-            const container = document.getElementById('results');
-            container.innerHTML = '';
+            try {
+                const response = await fetch('src/data/pharmacies.json');
+                let pharmacies = await response.json();
+                const query = document.getElementById('searchBar').value.toLowerCase();
+                const quartierSel = document.getElementById('filterQuartier').value;
+                const container = document.getElementById('results');
 
-            navigator.geolocation.getCurrentPosition((pos) => {
-                const uLat = pos.coords.latitude;
-                const uLon = pos.coords.longitude;
-                pharmacies.forEach(p => p.dist = p.lat ? calculerDistance(uLat, uLon, p.lat, p.lng) : 999);
-                pharmacies.sort((a, b) => a.dist - b.dist);
-                afficherCards(pharmacies, query, quartierSel, container, true);
-            }, () => {
-                afficherCards(pharmacies, query, quartierSel, container, false);
-            });
-            document.getElementById('listContainer').classList.remove('hidden');
+                container.innerHTML = '';
+                markers.forEach(m => map.removeLayer(m));
+                markers = [];
+
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    const uLat = pos.coords.latitude;
+                    const uLon = pos.coords.longitude;
+                    pharmacies.forEach(p => { p.dist = p.lat ? calculerDistance(uLat, uLon, p.lat, p.lng) : 999; });
+                    pharmacies.sort((a, b) => a.dist - b.dist);
+                    afficherCards(pharmacies, query, quartierSel, container, true);
+                }, () => {
+                    afficherCards(pharmacies, query, quartierSel, container, false);
+                });
+            } catch (e) { console.error(e); }
         }
 
         function afficherCards(data, query, quartier, container, hasGeo) {
-            const medInput = query || "ce médicament";
+            const medInput = document.getElementById('searchBar').value.trim() || "ce médicament";
             
-            data.filter(p => quartier === "tous" ? true : p.quartier === quartier)
-            .forEach(p => {
+            data.filter(p => {
+                const matchNom = p.nom.toLowerCase().includes(query);
+                const matchQuartier = quartier === "tous" ? true : p.quartier === quartier;
+                return (query === "" || matchNom) && matchQuartier;
+            }).forEach(p => {
                 const ouverte = verifierOuverture(p.ouverture, p.fermeture);
-                const dText = hasGeo ? (p.dist < 1 ? Math.round(p.dist * 1000) + "m" : p.dist.toFixed(1) + "km") : "N/A";
+                const dText = hasGeo ? (p.dist < 1 ? Math.round(p.dist * 1000) + "m" : p.dist.toFixed(1) + "km") : "Dist. inconnue";
                 const cleanPhone = p.telephone.replace(/\D/g, '');
-                const msgWA = encodeURIComponent(`🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${medInput}* ?\n\nMerci. 🙏`);
+                const msgWA = encodeURIComponent(`🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${medInput}* ?\n\nMerci de me confirmer la disponibilité. 🙏`);
 
                 container.innerHTML += `
                     <div class="bg-white p-5 rounded-[2rem] card-shadow border border-slate-50 card-animate relative overflow-hidden">
-                        ${p.partenaire ? '<div class="absolute top-0 right-0 bg-blue-500 text-white text-[7px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-tighter">Vérifié</div>' : ''}
+                        ${p.partenaire ? '<div class="absolute top-0 right-0 bg-blue-600 text-white text-[7px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-tighter">Partenaire</div>' : ''}
+                        
                         <div class="flex justify-between items-start mb-4">
                             <div>
                                 <h3 class="font-bold text-slate-800 leading-tight">${p.nom} ${p.partenaire ? '✅' : ''}</h3>
-                                <p class="text-[10px] font-bold text-blue-500 uppercase mt-1">${p.quartier}</p>
+                                <p class="text-[10px] font-bold text-blue-500 uppercase mt-1 tracking-wider">${p.quartier}</p>
                             </div>
                             <span class="text-[8px] ${ouverte ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-500'} px-2 py-0.5 rounded-full font-black uppercase">${ouverte ? 'Ouvert' : 'Fermé'}</span>
                         </div>
 
-                        <div class="bg-blue-50/50 p-3 rounded-2xl mb-4 border border-blue-100/30">
-                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Vérifier stock de :</p>
-                            <p class="text-xs font-extrabold text-blue-700 italic">"${medInput}"</p>
+                        <div class="bg-blue-50/50 p-3 rounded-2xl mb-4 border border-blue-100/50 text-center">
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Demander le stock de :</p>
+                            <p class="text-sm font-extrabold text-blue-700">"${medInput}"</p>
                         </div>
 
                         <div class="grid grid-cols-2 gap-2 mb-4">
                             <a href="tel:${p.telephone}" class="flex items-center justify-center bg-slate-50 text-slate-700 font-bold py-3 rounded-2xl text-[11px] border border-slate-100">Appeler</a>
-                            <a href="https://wa.me/${cleanPhone}?text=${msgWA}" target="_blank" class="flex items-center justify-center bg-emerald-500 text-white font-bold
+                            <a href="https://wa.me/${cleanPhone}?text=${msgWA}" target="_blank" class="flex items-center justify-center bg-emerald-500 text-white font-bold py-3 rounded-2xl text-[11px] shadow-sm">WhatsApp</a>
+                        </div>
+                        
+                        <div class="flex justify-center items-center bg-slate-50/50 p-2 rounded-xl">
+                            <span class="text-blue-600 font-bold text-[10px]">📍 À ${dText} de vous</span>
+                        </div>
+                    </div>`;
+                if (p.lat && p.lng) markers.push(L.marker([p.lat, p.lng]).addTo(map).bindPopup(`<b>${p.nom}</b>`));
+            });
+        }
+
+        // Charger les pharmacies au démarrage
+        window.onload = rechercher;
+    </script>
+</body>
+</html>
