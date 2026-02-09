@@ -170,7 +170,7 @@
     // Chargement des données
     async function loadData() {
         try {
-            const res = await fetch('data/pharmacies.json'); // Chemin vers ton dossier data
+            const res = await fetch('src/data/pharmacies.json'); // Chemin vers ton dossier data
             pharmacies = await res.json();
             renderList();
         } catch (e) { console.error("Erreur de chargement JSON. Vérifie le dossier src/data/"); }
