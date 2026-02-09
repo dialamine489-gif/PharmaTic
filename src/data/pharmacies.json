@@ -9,7 +9,9 @@
     "fermeture": "23:00",
     "lat": 14.7792,
     "lng": -17.3216,
-    "partenaire": true
+    "partenaire": true,
+    "nuit": true,
+    "dimanche": false
   },
   {
     "id": 2,
@@ -45,7 +47,9 @@
     "fermeture": "23:00",
     "lat": 14.7880,
     "lng": -17.3120,
-    "partenaire": false
+    "partenaire": false,
+     "nuit": true,
+    "dimanche": false
   },
   {
     "id": 5,
@@ -69,7 +73,9 @@
     "fermeture": "22:00",
     "lat": 14.7870,
     "lng": -17.3040,
-    "partenaire": false
+    "partenaire": false,
+     "nuit": true,
+    "dimanche": false
   },
   {
     "id": 7,

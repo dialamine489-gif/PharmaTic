@@ -11,18 +11,15 @@
             --accent: #00ff88;
             --dark-bg: #0f172a;
             --glass: rgba(255, 255, 255, 0.08);
-            --rouge-ferme: #ff4d4d;
+            --rouge-dimanche: #ff4d4d;
+            --violet-nuit: #a855f7;
         }
 
         body {
             font-family: 'Segoe UI', sans-serif;
             background: radial-gradient(circle at top, #1e293b, #0f172a);
-            color: white;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding-bottom: 80px;
+            color: white; margin: 0; height: 100vh;
+            display: flex; flex-direction: column; padding-bottom: 80px;
         }
 
         header { padding: 20px 20px 5px; text-align: center; }
@@ -43,7 +40,6 @@
             padding: 15px; margin-bottom: 15px;
         }
 
-        /* Styles Filtres */
         .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
         .filter-chip {
             padding: 8px 15px; border-radius: 20px; font-size: 0.75rem;
@@ -57,25 +53,20 @@
             border-radius: 12px; padding: 14px; color: white; outline: none; box-sizing: border-box;
         }
 
-        /* Styles Items Pharmacie */
         .pharma-item {
             background: rgba(255,255,255,0.03); border-radius: 15px;
             padding: 15px; margin-bottom: 12px; display: flex;
             justify-content: space-between; align-items: center;
             border: 1px solid rgba(255,255,255,0.05);
         }
-        .garde-tag { color: var(--rouge-ferme); border: 1px solid var(--rouge-ferme); padding: 2px 6px; border-radius: 5px; font-size: 0.6rem; font-weight: bold; text-transform: uppercase; margin-left: 8px; }
+
+        .badge { font-size: 0.55rem; padding: 3px 6px; border-radius: 5px; font-weight: bold; text-transform: uppercase; margin-left: 5px; margin-top: 2px; }
+        .badge-nuit { border: 1px solid var(--violet-nuit); color: var(--violet-nuit); }
+        .badge-dimanche { border: 1px solid var(--rouge-dimanche); color: var(--rouge-dimanche); }
 
         .pharma-actions { display: flex; gap: 15px; font-size: 1.3rem; }
         .pharma-actions a { color: var(--accent); text-decoration: none; }
 
-        .btn-send {
-            background: linear-gradient(to right, #25D366, #128C7E);
-            color: white; border: none; padding: 18px; border-radius: 15px;
-            width: 100%; font-weight: bold; margin-top: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
-
-        /* Bottom Nav */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
@@ -83,7 +74,6 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000;
         }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: rgba(255, 255, 255, 0.6); font-size: 0.65rem; gap: 5px; cursor: pointer; }
-        .nav-item i { font-size: 1.2rem; }
         .nav-item.active { color: var(--accent); }
         #fileInput { display: none; }
     </style>
@@ -92,19 +82,19 @@
 
 <header>
     <h1>PHARMATIC</h1>
-    <p style="font-size: 0.7rem; opacity: 0.5; letter-spacing: 1px;">KEUR MASSAR • PROXIMITÉ SANTÉ</p>
+    <p style="font-size: 0.6rem; opacity: 0.5; letter-spacing: 1px;">KEUR MASSAR • GESTION DES GARDES</p>
 </header>
 
 <div class="content-area">
     <div id="recherche" class="tab-content active">
         <div class="card">
-            <h3 style="margin:0 0 10px 0; font-size: 0.9rem; opacity: 0.8;">Quel médicament cherchez-vous ?</h3>
+            <h3 style="margin:0 0 10px 0; font-size: 0.85rem; opacity: 0.8;">Quel médicament cherchez-vous ?</h3>
             <input type="text" id="searchInput" placeholder="Doliprane, Spasfon..." autocomplete="off">
         </div>
         <div id="selection-box" style="display:none;" class="card">
-            <div id="medSelected" style="color: var(--accent); font-weight: bold; margin-bottom: 20px; text-align:center; font-size: 1.1rem;"></div>
+            <div id="medSelected" style="color: var(--accent); font-weight: bold; margin-bottom: 20px; text-align:center;"></div>
             <select id="pharmacySelect"></select>
-            <button class="btn-send" onclick="sendToWhatsApp()">
+            <button style="background: linear-gradient(to right, #25D366, #128C7E); color:white; border:none; padding:18px; border-radius:15px; width:100%; font-weight:bold; margin-top:15px; cursor:pointer;" onclick="sendToWhatsApp()">
                 <i class="fab fa-whatsapp"></i> DEMANDER DISPONIBILITÉ
             </button>
         </div>
@@ -112,76 +102,39 @@
 
     <div id="pharmacies-list" class="tab-content">
         <div class="filter-bar">
-            <div class="filter-chip active" id="filter-all" onclick="applyFilter('toutes')">Toutes</div>
+            <div class="filter-chip active" id="filter-all" onclick="applyFilter('toutes')">Toutes (26)</div>
             <div class="filter-chip" id="filter-near" onclick="applyFilter('proches')">Les plus proches 📍</div>
         </div>
-        
         <div id="listContainer"></div>
     </div>
 </div>
 
 <nav class="bottom-nav">
-    <div class="nav-item active" id="nav-recherche" onclick="switchTab('recherche')">
-        <i class="fas fa-search"></i>
-        <span>Recherche</span>
-    </div>
-    <div class="nav-item" id="nav-pharma" onclick="switchTab('pharmacies-list')">
-        <i class="fas fa-hospital"></i>
-        <span>Pharmacies</span>
-    </div>
-    <div class="nav-item" onclick="document.getElementById('fileInput').click()">
-        <i class="fas fa-file-medical"></i>
-        <span>Ordonnance</span>
-    </div>
-    <div class="nav-item" onclick="window.open('https://wa.me/221788087878', '_blank')">
-        <i class="fas fa-headset"></i>
-        <span>Aide</span>
-    </div>
+    <div class="nav-item active" id="nav-recherche" onclick="switchTab('recherche')"><i class="fas fa-search"></i><span>Recherche</span></div>
+    <div class="nav-item" id="nav-pharma" onclick="switchTab('pharmacies-list')"><i class="fas fa-hospital"></i><span>Pharmacies</span></div>
+    <div class="nav-item" onclick="document.getElementById('fileInput').click()"><i class="fas fa-file-medical"></i><span>Ordonnance</span></div>
+    <div class="nav-item" onclick="window.open('https://wa.me/221788087878', '_blank')"><i class="fas fa-headset"></i><span>Aide</span></div>
 </nav>
 
-<input type="file" id="fileInput" accept="image/*,.pdf" onchange="handleFile(this)">
+<input type="file" id="fileInput" accept="image/*,.pdf" onchange="handleFile(input)">
 
 <script>
-    // LISTE DES 26 PHARMACIES
-    const pharmacies = [
-        { "nom": "Pharmacie Dial Diop", "quartier": "Unité 5", "tel": "+221338370000", "lat": 14.7792, "lng": -17.3216, "garde": true },
-        { "nom": "Pharmacie Birane LY", "quartier": "Aïnoumady", "tel": "+221788087878", "lat": 14.7695, "lng": -17.3138, "garde": true },
-        { "nom": "Pharmacie Elimane Aly DRAMANE", "quartier": "Unité 3", "tel": "+221338370001", "lat": 14.7820, "lng": -17.3055, "garde": false },
-        { "nom": "Pharmacie Mingue", "quartier": "Fass", "tel": "+221338370002", "lat": 14.7850, "lng": -17.3100, "garde": false },
-        { "nom": "Pharmacie Pape Djibril", "quartier": "Mame Dior", "tel": "+221338370003", "lat": 14.7880, "lng": -17.3120, "garde": false },
-        { "nom": "Pharmacie DIOMA", "quartier": "Aïnoumadi", "tel": "+221338370004", "lat": 14.7870, "lng": -17.3040, "garde": false },
-        { "nom": "Pharmacie du Logo", "quartier": "Kawsara", "tel": "+221338788417", "lat": 14.7836, "lng": -17.3148, "garde": false },
-        { "nom": "Pharmacie Adji Mouhamed", "quartier": "Croisement", "tel": "+221338377526", "lat": 14.7726, "lng": -17.3170, "garde": false },
-        { "nom": "Pharmacie Sankoun Faty", "quartier": "Cité Gendarmerie", "tel": "+221338378786", "lat": 14.7750, "lng": -17.3100, "garde": false },
-        { "nom": "Pharmacie Ainoumadi", "quartier": "Cité Ainoumadi", "tel": "+221338785108", "lat": 14.7878, "lng": -17.3058, "garde": false },
-        { "nom": "Pharmacie Camille Basse", "quartier": "Camille Basse", "tel": "+221330000000", "lat": 14.7900, "lng": -17.3150, "garde": false },
-        { "nom": "Pharmacie EL Abdoul Boutou Kane", "quartier": "Arafat II", "tel": "+221330000000", "lat": 14.7700, "lng": -17.3000, "garde": false },
-        { "nom": "Pharmacie Seydi M. Moustapha SY", "quartier": "Unité 14", "tel": "+221338379874", "lat": 14.7850, "lng": -17.3150, "garde": false },
-        { "nom": "Pharmacie Baye Niasse", "quartier": "Unité 6", "tel": "+221330000000", "lat": 14.7730, "lng": -17.3260, "garde": false },
-        { "nom": "Pharmacie Marie Essenteine Manga", "quartier": "Unité 20", "tel": "+221330000000", "lat": 14.7650, "lng": -17.3080, "garde": false },
-        { "nom": "Pharmacie Mame Cheikh Anta Mbacké", "quartier": "Darou Salam", "tel": "+221330000000", "lat": 14.7920, "lng": -17.3200, "garde": false },
-        { "nom": "Pharmacie Pascale", "quartier": "Unité 15", "tel": "+221330000000", "lat": 14.7800, "lng": -17.3300, "garde": false },
-        { "nom": "Pharmacie Al Amine Mouhammed", "quartier": "Unité 6", "tel": "+221338788929", "lat": 14.7726, "lng": -17.3257, "garde": false },
-        { "nom": "ROND POINT JAXAAY", "quartier": "Jaxaay", "tel": "+221330000000", "lat": 14.7600, "lng": -17.3000, "garde": false },
-        { "nom": "Cheikhna Cheikh Abass Aidara", "quartier": "Darou Salam", "tel": "+221330000000", "lat": 14.7930, "lng": -17.3220, "garde": false },
-        { "nom": "YAYE FATOUMA", "quartier": "Unité 17", "tel": "+221330000000", "lat": 14.7750, "lng": -17.3350, "garde": false },
-        { "nom": "Pharmacie SAN JOSE", "quartier": "Unité 03", "tel": "+221330000000", "lat": 14.7810, "lng": -17.3060, "garde": false },
-        { "nom": "Pharmacie tawhid", "quartier": "Tène-bi", "tel": "+221330000000", "lat": 14.7700, "lng": -17.3400, "garde": false },
-        { "nom": "MAYA MAME ANSOU NIANG", "quartier": "Unité 18", "tel": "+221330000000", "lat": 14.7770, "lng": -17.3380, "garde": false },
-        { "nom": "Pharmacie NA SAGAR NIANDING", "quartier": "Jaxaay 2", "tel": "+221330000000", "lat": 14.7580, "lng": -17.2950, "garde": false },
-        { "nom": "Pharmacie Gendarmerie", "quartier": "Unité 4", "tel": "+221330000000", "lat": 14.7760, "lng": -17.3110, "garde": false }
-    ];
-
+    let pharmacies = [];
     let userCoords = null;
 
+    // CHARGEMENT DU FICHIER JSON
+    async function loadData() {
+        try {
+            const res = await fetch('pharmacies.json');
+            pharmacies = await res.json();
+            renderList();
+        } catch (e) { console.error("Erreur JSON"); }
+    }
+
     function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        
+        document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
-        const navId = tabId === 'recherche' ? 'nav-recherche' : 'nav-pharma';
-        document.getElementById(navId).classList.add('active');
-        
+        document.getElementById(tabId === 'recherche' ? 'nav-recherche' : 'nav-pharma')?.classList.add('active');
         if(tabId === 'pharmacies-list') renderList();
     }
 
@@ -189,7 +142,7 @@
         const R = 6371;
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const a = Math.sin(dLat / 2)**2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2)**2;
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
@@ -197,12 +150,10 @@
         document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
         if(mode === 'proches') {
             document.getElementById('filter-near').classList.add('active');
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    renderList('proches');
-                }, () => alert("Géolocalisation refusée."));
-            }
+            navigator.geolocation.getCurrentPosition(pos => {
+                userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                renderList('proches');
+            });
         } else {
             document.getElementById('filter-all').classList.add('active');
             renderList('toutes');
@@ -218,32 +169,34 @@
         if(filter === 'proches' && userCoords) {
             list.sort((a, b) => a.dist - b.dist);
         } else {
-            // Par défaut : Gardes en haut, puis le reste
-            list.sort((a, b) => b.garde - a.garde);
+            // TRI : NUIT > DIMANCHE > RESTE
+            list.sort((a, b) => (b.nuit - a.nuit) || (b.dimanche - a.dimanche));
         }
 
         list.forEach(p => {
-            const distLabel = p.dist ? `<span class="dist-tag">${p.dist.toFixed(1)}km</span>` : '';
-            const gardeBadge = p.garde ? `<span class="garde-tag">De Garde</span>` : '';
-            const itemStyle = p.garde ? 'border-left: 4px solid var(--rouge-ferme); background: rgba(255, 77, 77, 0.05);' : '';
+            let badges = '';
+            if(p.nuit) badges += `<span class="badge badge-nuit">Nuit 0h-7h</span>`;
+            if(p.dimanche) badges += `<span class="badge badge-dimanche">Garde Dimanche</span>`;
+
+            const itemStyle = p.nuit ? 'border-left: 4px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.05);' : 
+                             (p.dimanche ? 'border-left: 4px solid var(--rouge-dimanche); background: rgba(255, 77, 77, 0.05);' : '');
             
             const div = document.createElement('div');
             div.className = 'pharma-item';
             div.style = itemStyle;
             div.innerHTML = `
                 <div>
-                    <div style="font-weight:bold; font-size:0.95rem; display:flex; align-items:center;">${p.nom} ${gardeBadge}</div>
-                    <div style="font-size:0.75rem; opacity:0.5; margin-top:3px;">${p.quartier} ${distLabel}</div>
+                    <div style="font-weight:bold; font-size:0.9rem; display:flex; flex-wrap:wrap; align-items:center;">${p.nom} ${badges}</div>
+                    <div style="font-size:0.7rem; opacity:0.5; margin-top:2px;">${p.quartier} ${p.dist ? '• '+p.dist.toFixed(1)+'km' : ''}</div>
                 </div>
                 <div class="pharma-actions">
-                    <a href="tel:${p.tel}"><i class="fas fa-phone-alt"></i></a>
+                    <a href="tel:${p.telephone}"><i class="fas fa-phone-alt"></i></a>
                     <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank"><i class="fas fa-directions" style="color:var(--primary);"></i></a>
                 </div>`;
             container.appendChild(div);
         });
     }
 
-    // RECHERCHE MEDICAMENT
     document.getElementById('searchInput').addEventListener('input', (e) => {
         let val = e.target.value;
         if(val.length > 2) {
@@ -251,7 +204,7 @@
             document.getElementById('medSelected').textContent = "📦 " + val;
             const select = document.getElementById('pharmacySelect');
             select.innerHTML = `<option value="" disabled selected>Choisir la pharmacie</option>` + 
-                pharmacies.map(p => `<option value="${p.tel}">${p.nom} (${p.quartier})</option>`).join('');
+                pharmacies.map(p => `<option value="${p.telephone}">${p.nom}</option>`).join('');
         } else { document.getElementById('selection-box').style.display = 'none'; }
     });
 
@@ -262,12 +215,7 @@
         window.open(`https://wa.me/${tel.replace(/\+/g,'')}?text=Bonjour, avez-vous en stock : ${med} ?`, '_blank');
     }
 
-    function handleFile(input) {
-        if (input.files && input.files[0]) {
-            alert("Ordonnance sélectionnée. Redirection WhatsApp pour le devis...");
-            window.open(`https://wa.me/221788087878?text=Bonjour, voici mon ordonnance pour un devis.`, '_blank');
-        }
-    }
+    loadData();
 </script>
 </body>
 </html>
