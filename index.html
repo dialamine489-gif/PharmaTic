@@ -67,6 +67,7 @@
         input[type="text"], select {
             width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
             border-radius: 12px; padding: 14px; color: white; outline: none; box-sizing: border-box; font-size: 1rem;
+            appearance: none; -webkit-appearance: none; /* Retire le style par défaut sur iPhone */
         }
 
         .pharma-item {
@@ -214,22 +215,31 @@
         });
     }
 
+    // --- ICI LA MODIFICATION POUR L'OPTION PAR DÉFAUT ---
     document.getElementById('searchInput').addEventListener('input', (e) => {
         let val = e.target.value;
         if(val.length > 2) {
             document.getElementById('selection-box').style.display = 'block';
             document.getElementById('medSelected').textContent = "📦 " + val;
             const select = document.getElementById('pharmacySelect');
-            let optionsHTML = `<option value="" disabled selected>--- Choisir la pharmacie ---</option>`;
+            
+            // On force l'option par défaut comme premier choix
+            let optionsHTML = `<option value="" disabled selected>Choisir la pharmacie</option>`;
             optionsHTML += pharmacies.map(p => `<option value="${p.tel}">${p.nom} (${p.quartier})</option>`).join('');
+            
             select.innerHTML = optionsHTML;
-        } else { document.getElementById('selection-box').style.display = 'none'; }
+        } else { 
+            document.getElementById('selection-box').style.display = 'none'; 
+        }
     });
 
     function sendToWhatsApp() {
         const select = document.getElementById('pharmacySelect');
         const tel = select.value;
-        if(!tel) { alert("Veuillez d'abord choisir une pharmacie dans la liste."); return; }
+        if(!tel || tel === "") { 
+            alert("Veuillez d'abord choisir une pharmacie dans la liste."); 
+            return; 
+        }
         const med = document.getElementById('searchInput').value;
         const msg = encodeURIComponent(`Bonjour, auriez-vous en stock : ${med} ?`);
         window.open(`https://wa.me/${tel.replace(/\+/g,'')}?text=${msg}`, '_blank');
