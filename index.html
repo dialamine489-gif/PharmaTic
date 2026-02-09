@@ -184,7 +184,7 @@
                 navigator.geolocation.getCurrentPosition(pos => {
                     userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                     renderList('proches');
-                });
+                }, () => alert("La géolocalisation est désactivée."));
             }
         } else {
             document.getElementById('filter-all').classList.add('active');
@@ -215,7 +215,6 @@
         });
     }
 
-    // --- ICI LA MODIFICATION POUR L'OPTION PAR DÉFAUT ---
     document.getElementById('searchInput').addEventListener('input', (e) => {
         let val = e.target.value;
         if(val.length > 2) {
@@ -223,7 +222,6 @@
             document.getElementById('medSelected').textContent = "📦 " + val;
             const select = document.getElementById('pharmacySelect');
             
-            // On force l'option par défaut comme premier choix
             let optionsHTML = `<option value="" disabled selected>Choisir la pharmacie</option>`;
             optionsHTML += pharmacies.map(p => `<option value="${p.tel}">${p.nom} (${p.quartier})</option>`).join('');
             
@@ -242,7 +240,9 @@
         }
         const med = document.getElementById('searchInput').value;
         const msg = encodeURIComponent(`Bonjour, auriez-vous en stock : ${med} ?`);
-        window.open(`https://wa.me/${tel.replace(/\+/g,'')}?text=${msg}`, '_blank');
+        // On nettoie le numéro de téléphone pour WhatsApp
+        const cleanTel = tel.replace(/[\s+]/g, '');
+        window.open(`https://wa.me/${cleanTel}?text=${msg}`, '_blank');
     }
 
     renderList();
