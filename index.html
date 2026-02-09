@@ -8,6 +8,7 @@
     <style>
         :root {
             --vert-pharmacie: #27AE60;
+            --rouge-ferme: #E74C3C;
             --blanc: #FFFFFF;
             --gris-clair: #F4F7F6;
             --bleu-maps: #4285F4;
@@ -69,27 +70,24 @@
             margin-bottom: 20px;
         }
 
-        input[type="text"], select {
-            width: 100%; padding: 14px; border: 2px solid #eee;
-            border-radius: 10px; font-size: 1rem; outline: none; box-sizing: border-box;
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 10px;
         }
 
-        .btn-send {
-            background-color: #25D366; color: white; border: none; padding: 16px;
-            border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px;
-        }
-
-        .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; }
-        .filter-chip {
-            padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd;
-            background: white; font-size: 0.8rem; cursor: pointer; white-space: nowrap;
-        }
-        .filter-chip.active { background: var(--vert-pharmacie); color: white; border-color: var(--vert-pharmacie); }
+        .open { background: #e8f5e9; color: var(--vert-pharmacie); }
+        .closed { background: #fdeaea; color: var(--rouge-ferme); }
 
         .pharma-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 0; border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
         }
 
         .dist-tag {
@@ -98,17 +96,34 @@
             padding: 2px 6px;
             border-radius: 4px;
             color: #666;
-            margin-left: 5px;
         }
 
         .pharma-actions { display: flex; gap: 15px; font-size: 1.3rem; }
+        
+        /* Styles pour WhatsApp et Recherche */
+        .btn-send {
+            background-color: #25D366; color: white; border: none; padding: 16px;
+            border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px;
+        }
+        input[type="text"], select {
+            width: 100%; padding: 14px; border: 2px solid #eee;
+            border-radius: 10px; font-size: 1rem; outline: none; box-sizing: border-box;
+        }
+        
+        .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; }
+        .filter-chip {
+            padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd;
+            background: white; font-size: 0.8rem; cursor: pointer; white-space: nowrap;
+        }
+        .filter-chip.active { background: var(--vert-pharmacie); color: white; border-color: var(--vert-pharmacie); }
     </style>
 </head>
 <body>
 
 <header>
     <h1 style="margin:0; font-size: 1.4rem;">PharmaTic</h1>
-    <p style="margin:0; font-size: 0.8rem; opacity: 0.9;">Votre santé à Keur Massar</p>
+    <p style="margin:0; font-size: 0.8rem; opacity: 0.9;">Keur Massar - Ouvertures en direct</p>
 </header>
 
 <nav class="top-nav">
@@ -119,16 +134,14 @@
 <div class="content-area">
     <div id="recherche" class="tab-content active">
         <div class="card">
-            <label style="font-weight:bold; display:block; margin-bottom:10px;">1. Quel médicament cherchez-vous ?</label>
+            <label style="font-weight:bold; display:block; margin-bottom:10px;">Quel médicament cherchez-vous ?</label>
             <input type="text" id="searchInput" placeholder="Doliprane, Spasfon..." autocomplete="off">
         </div>
-
         <div id="selection-box" class="card" style="display:none;">
             <div id="medSelected" style="background:#e8f5e9; color:#27AE60; padding:10px; border-radius:8px; margin-bottom:15px; font-weight:bold; text-align:center;"></div>
-            <label style="font-weight:bold; display:block; margin-bottom:10px;">2. Choisir la pharmacie</label>
             <select id="pharmacySelect"></select>
             <button class="btn-send" onclick="sendToWhatsApp()">
-                <i class="fab fa-whatsapp"></i> ENVOYER LA DEMANDE
+                <i class="fab fa-whatsapp"></i> DEMANDER PAR WHATSAPP
             </button>
         </div>
     </div>
@@ -139,13 +152,11 @@
             <div class="filter-chip" onclick="applyFilter('proches', this)">Les plus proches 📍</div>
         </div>
         <div class="card" id="listContainer">
-            <p style="text-align:center; color:#999;">Calcul de votre position...</p>
-        </div>
+            </div>
     </div>
 </div>
 
 <script>
-    // Liste complète des 9 pharmacies mise à jour
     const pharmacies = [
         { "nom": "Pharmacie Dial Diop", "quartier": "Village", "tel": "+221338370000", "lat": 14.7793121, "lng": -17.3212084 },
         { "nom": "Pharmacie Birane Ly", "quartier": "Jaxaay", "tel": "+221788087878", "lat": 14.7695, "lng": -17.3138 },
@@ -161,12 +172,29 @@
     let userCoords = null;
     let selectedMed = "";
 
+    // FONCTION LOGIQUE : Vérifie si ouvert ou fermé
+    function estOuverte() {
+        const maintenant = new Date();
+        const jour = maintenant.getDay(); // 0=Dimanche, 1=Lundi...
+        const heure = maintenant.getHours();
+        const minutes = maintenant.getMinutes();
+        const tempsActuel = heure * 60 + minutes;
+
+        // Horaires : 8h00(480min) - 13h30(810min) et 14h30(870min) - 23h00(1380min)
+        if (jour >= 1 && jour <= 6) { // Lundi à Samedi
+            if ((tempsActuel >= 480 && tempsActuel <= 810) || (tempsActuel >= 870 && tempsActuel <= 1380)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     function getUserLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
                 userCoords = { lat: position.coords.latitude, lng: position.coords.longitude };
                 renderExplorer();
-            }, () => { renderExplorer(); });
+            }, () => renderExplorer());
         }
     }
 
@@ -177,8 +205,7 @@
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                   Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
     function switchTab(tabId) {
@@ -191,11 +218,14 @@
     function renderExplorer(filter = 'toutes') {
         const container = document.getElementById('listContainer');
         container.innerHTML = '';
+        const ouvert = estOuverte();
+        const statusLabel = ouvert ? "Ouvert" : "Fermé";
+        const statusClass = ouvert ? "open" : "closed";
 
-        let list = pharmacies.map(p => {
-            let dist = userCoords ? calculateDistance(userCoords.lat, userCoords.lng, p.lat, p.lng) : null;
-            return { ...p, distance: dist };
-        });
+        let list = pharmacies.map(p => ({
+            ...p,
+            distance: userCoords ? calculateDistance(userCoords.lat, userCoords.lng, p.lat, p.lng) : null
+        }));
 
         if (filter === 'proches' && userCoords) {
             list.sort((a, b) => a.distance - b.distance);
@@ -207,8 +237,10 @@
             div.className = 'pharma-item';
             div.innerHTML = `
                 <div>
-                    <div style="font-weight:bold; font-size:0.95rem;">${p.nom} ${distHTML}</div>
-                    <div style="font-size:0.8rem; color:#888;">${p.quartier}</div>
+                    <div style="font-weight:bold; font-size:0.95rem;">
+                        ${p.nom} <span class="status-badge ${statusClass}">${statusLabel}</span>
+                    </div>
+                    <div style="font-size:0.8rem; color:#888;">${p.quartier} • ${distHTML}</div>
                 </div>
                 <div class="pharma-actions">
                     <a href="tel:${p.tel}" style="color:var(--vert-pharmacie);"><i class="fas fa-phone-alt"></i></a>
@@ -226,11 +258,12 @@
 
     getUserLocation();
 
+    // Recherche simplifiée
     document.getElementById('searchInput').addEventListener('input', (e) => {
         selectedMed = e.target.value;
         if(selectedMed.length > 2) {
             document.getElementById('selection-box').style.display = 'block';
-            document.getElementById('medSelected').textContent = "Médicament : " + selectedMed;
+            document.getElementById('medSelected').textContent = "Demande : " + selectedMed;
             const select = document.getElementById('pharmacySelect');
             select.innerHTML = pharmacies.map(p => `<option value="${p.tel}">${p.nom}</option>`).join('');
         }
