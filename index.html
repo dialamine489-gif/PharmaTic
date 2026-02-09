@@ -116,11 +116,25 @@
 </head>
 <body class="dark-theme">
 
-<header>
-    <img src="icon.jpeg" alt="Logo" class="logo-img">
-    <div style="text-align: left;">
-        <h1 style="margin: 0; font-size: 1.7rem; letter-spacing: 2px; font-weight: 900;">PHARMATIC</h1>
-        <p style="font-size: 0.6rem; opacity: 0.6; margin-top: 5px;">KEUR MASSAR • GESTION DES GARDES</p>
+<header style="display: flex; flex-direction: column; align-items: center; padding: 25px 20px 10px; gap: 15px;">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <img src="icon.jpeg" alt="Logo" style="width: 55px; height: 55px; border-radius: 12px; border: 1px solid var(--accent); box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);">
+        <div style="text-align: left;">
+            <h1 style="margin: 0; font-size: 1.7rem; letter-spacing: 2px; font-weight: 900;">PHARMATIC</h1>
+            <p style="font-size: 0.6rem; opacity: 0.6; margin-top: 5px;">KEUR MASSAR • GESTION DES GARDES</p>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 8px; width: 100%; max-width: 300px; margin-top: 10px;">
+        <button onclick="setTheme('dark')" style="flex: 1; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: #1e293b; color: white; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+            <i class="fas fa-moon"></i> Sombre
+        </button>
+        <button onclick="setTheme('light')" style="flex: 1; padding: 10px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: #f8fafc; color: #1e293b; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+            <i class="fas fa-sun"></i> Clair
+        </button>
+        <button onclick="setTheme('rose')" style="flex: 1; padding: 10px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: #fbcfe8; color: #831843; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+            <i class="fas fa-heart"></i> Rose
+        </button>
     </div>
 </header>
 
