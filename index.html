@@ -138,18 +138,44 @@
     </div>
 </header>
     <div id="recherche" class="tab-content active">
-        <div class="card">
-            <h3 style="margin:0 0 10px 0; font-size: 0.85rem;">Quel médicament cherchez-vous ?</h3>
-            <input type="text" id="searchInput" placeholder="Doliprane, Spasfon..." autocomplete="off">
+    
+    <div id="urgent-guards" class="card" style="border: 1px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1);">
+        <h3 style="margin:0 0 10px 0; font-size: 0.85rem; color: var(--violet-nuit);">
+            <i class="fas fa-moon"></i> En garde actuellement
+        </h3>
+        <div id="guardsContainer" style="font-size: 0.8rem; font-weight: bold;">
+            Chargement des gardes...
         </div>
-        <div id="selection-box" style="display:none;" class="card">
-            <div id="medSelected" style="color: var(--accent); font-weight: bold; margin-bottom: 20px; text-align:center;"></div>
-            <select id="pharmacySelect"></select>
-            <button style="background: linear-gradient(to right, #25D366, #128C7E); color:white; border:none; padding:18px; border-radius:15px; width:100%; font-weight:bold; margin-top:15px; cursor:pointer;" onclick="sendToWhatsApp()">
-                <i class="fab fa-whatsapp"></i> DEMANDER DISPONIBILITÉ
+    </div>
+
+    <div class="card">
+        <h3 style="margin:0 0 10px 0; font-size: 0.85rem;">Chercher un médicament</h3>
+        <input type="text" id="searchInput" placeholder="Doliprane, Spasfon..." autocomplete="off">
+    </div>
+
+    <div class="card" id="ordonnance-section">
+        <h3 style="margin:0 0 10px 0; font-size: 0.85rem;">Demande de devis par ordonnance</h3>
+        <button onclick="document.getElementById('fileInput').click()" style="background: var(--glass); color: var(--text-color); border: 1px dashed var(--accent); padding: 15px; border-radius: 12px; width: 100%; cursor: pointer;">
+            <i class="fas fa-camera"></i> Prendre en photo l'ordonnance
+        </button>
+        
+        <div id="ordonnance-upload-zone" style="display:none; margin-top: 15px;">
+            <p style="font-size: 0.75rem; color: var(--accent); text-align: center; font-weight: bold;">✅ Ordonnance chargée</p>
+            <select id="pharmaOrdonnanceSelect" style="margin-top: 10px;"></select>
+            <button onclick="sendOrdonnance()" style="background: linear-gradient(to right, #25D366, #128C7E); color:white; border:none; padding:15px; border-radius:12px; width:100%; font-weight:bold; margin-top:10px; cursor: pointer;">
+                ENVOYER À CETTE PHARMACIE
             </button>
         </div>
     </div>
+
+    <div id="selection-box" style="display:none;" class="card">
+        <div id="medSelected" style="color: var(--accent); font-weight: bold; margin-bottom: 20px; text-align:center;"></div>
+        <select id="pharmacySelect"></select>
+        <button style="background: linear-gradient(to right, #25D366, #128C7E); color:white; border:none; padding:18px; border-radius:15px; width:100%; font-weight:bold; margin-top:15px; cursor: pointer;" onclick="sendToWhatsApp()">
+            DEMANDER DISPONIBILITÉ
+        </button>
+    </div>
+</div>
 
     <div id="pharmacies-list" class="tab-content">
         <div class="filter-bar" style="display:flex; gap:10px; margin-bottom:15px;">
