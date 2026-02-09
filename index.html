@@ -127,7 +127,7 @@
 
     async function loadData() {
         try {
-            const res = await fetch('data/pharmacies.json');
+            const res = await fetch('src/data/pharmacies.json');
             pharmacies = await res.json();
             renderList();
             updateGuardsDisplay();
