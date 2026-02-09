@@ -17,7 +17,7 @@
             font-family: 'Segoe UI', sans-serif;
             background-color: var(--gris-clair);
             margin: 0;
-            padding-bottom: 80px;
+            padding-bottom: 90px;
         }
 
         header {
@@ -27,12 +27,19 @@
             text-align: center;
         }
 
-        .search-container {
+        /* Zone de recherche */
+        .search-wrapper {
             padding: 15px;
             position: sticky;
             top: 0;
             background: var(--gris-clair);
-            z-index: 10;
+            z-index: 100;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
         }
 
         input[type="text"] {
@@ -41,11 +48,36 @@
             border: 1px solid #ddd;
             border-radius: 25px;
             box-sizing: border-box;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
+        /* Dictionnaire de suggestions */
+        #suggestions {
+            position: absolute;
+            top: 50px;
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .suggestion-item:hover { background-color: #f9f9f9; }
+
+        /* Cartes Pharmacies */
         .pharmacy-card {
             background: var(--blanc);
-            margin: 10px 15px;
+            margin: 12px 15px;
             padding: 15px;
             border-radius: 12px;
             box-shadow: 0 3px 10px rgba(0,0,0,0.05);
@@ -59,41 +91,28 @@
         }
 
         .info h3 { margin: 0; color: var(--vert-fonce); font-size: 1.1rem; }
-        .info p { margin: 3px 0; font-size: 0.85rem; color: #666; }
+        .info p { margin: 4px 0; font-size: 0.85rem; color: #666; }
 
-        .actions { display: flex; gap: 8px; margin-top: 10px; }
+        .actions { display: flex; gap: 10px; margin-top: 10px; }
         
         .btn-action {
-            width: 40px;
-            height: 40px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             text-decoration: none;
             color: white;
+            transition: transform 0.2s;
         }
 
+        .btn-action:active { transform: scale(0.9); }
         .btn-call { background-color: var(--vert-pharmacie); }
         .btn-whatsapp { background-color: #25D366; }
         .btn-map { background-color: #3498db; }
 
-        .meds-section {
-            margin-top: 12px;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
-        }
-
-        .med-tag {
-            display: inline-block;
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 0.75rem;
-            margin: 2px;
-        }
-
+        /* Navigation Basse */
         .nav-bar {
             position: fixed;
             bottom: 0;
@@ -101,24 +120,27 @@
             background: white;
             display: flex;
             justify-content: space-around;
-            padding: 10px 0;
+            padding: 12px 0;
             border-top: 1px solid #ddd;
         }
 
         .nav-item { text-align: center; color: #999; text-decoration: none; font-size: 0.7rem; }
         .nav-item.active { color: var(--vert-pharmacie); }
-        .nav-item i { display: block; font-size: 1.2rem; }
+        .nav-item i { display: block; font-size: 1.3rem; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
 <header>
     <h1 style="margin:0;">PharmaTic</h1>
-    <p style="margin:5px 0 0; font-size: 0.9rem;">Keur Massar - Liste des Pharmacies</p>
+    <p style="margin:5px 0 0; font-size: 0.85rem; opacity: 0.9;">Votre santé à Keur Massar</p>
 </header>
 
-<div class="search-container">
-    <input type="text" id="searchInput" placeholder="Chercher un médicament ou une pharmacie...">
+<div class="search-wrapper">
+    <div class="input-group">
+        <input type="text" id="searchInput" placeholder="Rechercher un médicament..." autocomplete="off">
+        <div id="suggestions"></div>
+    </div>
 </div>
 
 <div id="pharmacyList"></div>
@@ -131,58 +153,96 @@
 </nav>
 
 <script>
-    const pharmacies = [
-        { "id": 1, "nom": "Pharmacie Dial Diop", "quartier": "Keur Massar Village", "adresse": "Près du rond-point", "telephone": "+221338370000", "ouverture": "08:00", "fermeture": "23:00", "lat": 14.7792, "lng": -17.3216 },
-        { "id": 10, "nom": "Pharmacie Elimane Aly Dramane", "quartier": "Keur Massar Village", "adresse": "32/34 Route de Keur Massar", "telephone": "+221800002020", "ouverture": "08:00", "fermeture": "22:30", "lat": 14.7825, "lng": -17.3050 },
-        { "id": 11, "nom": "Pharmacie Al Amine Mouhamed", "quartier": "Unité 6", "adresse": "Route de Malika, Parcelles Assainies", "telephone": "+221338788929", "ouverture": "08:00", "fermeture": "23:00", "lat": 14.7726, "lng": -17.3257 },
-        { "id": 12, "nom": "Pharmacie Birane Ly", "quartier": "Jaxaay", "adresse": "Route de Jaxaay", "telephone": "+221788087878", "ouverture": "08:30", "fermeture": "22:30", "lat": 14.7695, "lng": -17.3138 },
-        { "id": 13, "nom": "Pharmacie Adji Mohamed", "quartier": "Keur Massar", "adresse": "Près de l'axe principal", "telephone": "+221338377526", "ouverture": "08:00", "fermeture": "23:00", "lat": 14.7726, "lng": -17.3170 },
-        { "id": 14, "nom": "Pharmacie Ainoumadi", "quartier": "Cité Ainoumadi", "adresse": "1048 Cité Ainoumadi", "telephone": "+221338785108", "ouverture": "08:00", "fermeture": "22:00", "lat": 14.7878, "lng": -17.3058 },
-        { "id": 15, "nom": "Pharmacie Sankoun Faty", "quartier": "Darou Missette", "adresse": "Darou Missette, Keur Massar", "telephone": "+221338378786", "ouverture": "08:00", "fermeture": "23:00", "lat": 14.7750, "lng": -17.3100 },
-        { "id": 16, "nom": "Pharmacie Seydi Mouhamadou Moustapha Sy", "quartier": "Unité 14", "adresse": "Parcelles Assainies, Unité 14", "telephone": "+221338379874", "ouverture": "08:00", "fermeture": "23:00", "lat": 14.7850, "lng": -17.3150 },
-        { "id": 17, "nom": "Pharmacie Du Logo", "quartier": "Keur Massar Village", "adresse": "Route principale, Keur Massar", "telephone": "+221338788417", "ouverture": "08:00", "fermeture": "23:00", "lat": 14.7836, "lng": -17.3148 }
+    // Dictionnaire pour les suggestions
+    const dictionnaireMeds = [
+        "Paracétamol", "Doliprane", "Amoxicilline", "Efferalgan", "Spasfon", 
+        "Ibuprofène", "Gaviscon", "Sirop Toux", "Vitamine C", "Augmentin"
     ];
 
+    // Données issues de votre JSON
+    const pharmacies = [
+        { "id": 1, "nom": "Pharmacie Dial Diop", "quartier": "Keur Massar Village", "telephone": "+221338370000", "lat": 14.7792, "lng": -17.3216 },
+        { "id": 10, "nom": "Pharmacie Elimane Aly Dramane", "quartier": "Keur Massar Village", "telephone": "+221800002020", "lat": 14.7825, "lng": -17.3050 },
+        { "id": 11, "nom": "Pharmacie Al Amine Mouhamed", "quartier": "Unité 6", "telephone": "+221338788929", "lat": 14.7726, "lng": -17.3257 },
+        { "id": 12, "nom": "Pharmacie Birane Ly", "quartier": "Jaxaay", "telephone": "+221788087878", "lat": 14.7695, "lng": -17.3138 },
+        { "id": 13, "nom": "Pharmacie Adji Mohamed", "quartier": "Keur Massar", "telephone": "+221338377526", "lat": 14.7726, "lng": -17.3170 },
+        { "id": 14, "nom": "Pharmacie Ainoumadi", "quartier": "Cité Ainoumadi", "telephone": "+221338785108", "lat": 14.7878, "lng": -17.3058 },
+        { "id": 15, "nom": "Pharmacie Sankoun Faty", "quartier": "Darou Missette", "telephone": "+221338378786", "lat": 14.7750, "lng": -17.3100 },
+        { "id": 16, "nom": "Pharmacie Seydi Mouhamadou Moustapha Sy", "quartier": "Unité 14", "telephone": "+221338379874", "lat": 14.7850, "lng": -17.3150 },
+        { "id": 17, "nom": "Pharmacie Du Logo", "quartier": "Keur Massar Village", "telephone": "+221338788417", "lat": 14.7836, "lng": -17.3148 }
+    ];
+
+    const searchInput = document.getElementById('searchInput');
+    const suggestionsBox = document.getElementById('suggestions');
     const listContainer = document.getElementById('pharmacyList');
 
-    function displayPharmacies(data) {
+    function displayPharmacies() {
+        const query = searchInput.value.trim();
         listContainer.innerHTML = '';
-        data.forEach(p => {
+        
+        pharmacies.forEach(p => {
             const card = document.createElement('div');
             card.className = 'pharmacy-card';
+            
+            // Le message WhatsApp prend la valeur de la recherche, même si elle n'est pas dans le dictionnaire
+            const textMessage = query 
+                ? `Bonjour, avez-vous du ${query} disponible ?` 
+                : "Bonjour, je souhaite vérifier la disponibilité d'un médicament.";
+            
+            const whatsappUrl = `https://wa.me/${p.telephone.replace(/\D/g,'')}?text=${encodeURIComponent(textMessage)}`;
+
             card.innerHTML = `
                 <div class="card-header">
                     <div class="info">
                         <h3>${p.nom}</h3>
-                        <p><strong><i class="fas fa-map-marker-alt"></i> ${p.quartier}</strong></p>
-                        <p><i class="fas fa-clock"></i> ${p.ouverture} - ${p.fermeture}</p>
-                        <p style="font-size:0.75rem;">${p.adresse}</p>
+                        <p><i class="fas fa-map-marker-alt"></i> ${p.quartier}</p>
                     </div>
                     <div class="actions">
                         <a href="tel:${p.telephone}" class="btn-action btn-call"><i class="fas fa-phone"></i></a>
-                        <a href="https://wa.me/${p.telephone.replace('+', '')}?text=Bonjour, je souhaite vérifier la disponibilité d'un médicament." class="btn-action btn-whatsapp"><i class="fab fa-whatsapp"></i></a>
+                        <a href="${whatsappUrl}" class="btn-action btn-whatsapp"><i class="fab fa-whatsapp"></i></a>
                         <a href="https://www.google.com/maps?q=${p.lat},${p.lng}" target="_blank" class="btn-action btn-map"><i class="fas fa-location-arrow"></i></a>
                     </div>
-                </div>
-                <div class="meds-section">
-                    <span class="med-tag">Paracétamol</span>
-                    <span class="med-tag">Amoxicilline</span>
                 </div>
             `;
             listContainer.appendChild(card);
         });
     }
 
-    displayPharmacies(pharmacies);
-
-    document.getElementById('searchInput').addEventListener('keyup', function() {
+    searchInput.addEventListener('input', function() {
         const val = this.value.toLowerCase();
-        const filtered = pharmacies.filter(p => 
-            p.nom.toLowerCase().includes(val) || 
-            p.quartier.toLowerCase().includes(val)
-        );
-        displayPharmacies(filtered);
+        suggestionsBox.innerHTML = '';
+        
+        if (val.length > 0) {
+            const matches = dictionnaireMeds.filter(m => m.toLowerCase().includes(val));
+            if (matches.length > 0) {
+                suggestionsBox.style.display = 'block';
+                matches.forEach(match => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.textContent = match;
+                    div.onclick = () => {
+                        searchInput.value = match;
+                        suggestionsBox.style.display = 'none';
+                        displayPharmacies();
+                    };
+                    suggestionsBox.appendChild(div);
+                });
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        } else {
+            suggestionsBox.style.display = 'none';
+        }
+        displayPharmacies();
     });
+
+    // Cacher les suggestions au clic extérieur
+    document.addEventListener('click', (e) => {
+        if (e.target !== searchInput) suggestionsBox.style.display = 'none';
+    });
+
+    // Initialisation
+    displayPharmacies();
 </script>
 
 </body>
