@@ -125,7 +125,7 @@
     // CHARGEMENT DU FICHIER JSON
     async function loadData() {
         try {
-            const res = await fetch('pharmacies.json');
+            const res = await fetch('src/data/pharmacies.json');
             pharmacies = await res.json();
             renderList();
         } catch (e) { console.error("Erreur JSON"); }
