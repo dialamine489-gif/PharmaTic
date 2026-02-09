@@ -56,38 +56,38 @@
             padding: 15px; margin-bottom: 15px;
         }
 
-        /* --- STYLE FILTRES --- */
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
         .filter-chip {
             padding: 8px 15px; border-radius: 20px; font-size: 0.75rem;
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            color: white; cursor: pointer; transition: 0.3s;
+            color: white; cursor: pointer; transition: 0.3s; white-space: nowrap;
         }
         .filter-chip.active { background: rgba(0, 255, 136, 0.2); border-color: var(--accent); color: var(--accent); }
 
         input[type="text"], select {
-            width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 12px; padding: 12px; color: white; outline: none; box-sizing: border-box;
+            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px; padding: 14px; color: white; outline: none; box-sizing: border-box; font-size: 1rem;
         }
 
         .pharma-item {
             background: rgba(255,255,255,0.03); border-radius: 15px;
-            padding: 12px; margin-bottom: 10px; display: flex;
+            padding: 15px; margin-bottom: 12px; display: flex;
             justify-content: space-between; align-items: center;
             border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .status-badge { font-size: 0.6rem; padding: 2px 7px; border-radius: 6px; font-weight: bold; margin-left: 8px; }
+        .status-badge { font-size: 0.65rem; padding: 3px 8px; border-radius: 8px; font-weight: bold; margin-left: 8px; }
         .open { background: rgba(0, 255, 136, 0.15); color: var(--accent); }
         .dist-tag { font-size: 0.7rem; color: var(--primary); margin-left: 5px; font-weight: bold; }
 
-        .pharma-actions { display: flex; gap: 15px; font-size: 1.2rem; }
-        .pharma-actions a { color: var(--accent); }
+        .pharma-actions { display: flex; gap: 15px; font-size: 1.3rem; }
+        .pharma-actions a { color: var(--accent); text-decoration: none; }
         
         .btn-send {
             background: linear-gradient(to right, #25D366, #128C7E);
-            color: white; border: none; padding: 15px; border-radius: 12px;
+            color: white; border: none; padding: 18px; border-radius: 15px;
             width: 100%; font-weight: bold; margin-top: 15px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
     </style>
 </head>
@@ -95,7 +95,7 @@
 
 <header>
     <h1>PHARMATIC</h1>
-    <p style="font-size: 0.7rem; opacity: 0.5;">KEUR MASSAR • PROXIMITÉ SANTÉ</p>
+    <p style="font-size: 0.7rem; opacity: 0.5; letter-spacing: 1px;">KEUR MASSAR • PROXIMITÉ SANTÉ</p>
 </header>
 
 <nav class="top-nav">
@@ -106,11 +106,11 @@
 <div class="content-area">
     <div id="recherche" class="tab-content active">
         <div class="card">
-            <h3 style="margin:0 0 10px 0; font-size: 0.85rem;">Quel médicament cherchez-vous ?</h3>
-            <input type="text" id="searchInput" placeholder="Doliprane, Spasfon...">
+            <h3 style="margin:0 0 10px 0; font-size: 0.9rem; opacity: 0.8;">Quel médicament cherchez-vous ?</h3>
+            <input type="text" id="searchInput" placeholder="Doliprane, Spasfon..." autocomplete="off">
         </div>
         <div id="selection-box" style="display:none;" class="card">
-            <div id="medSelected" style="color: var(--accent); font-weight: bold; margin-bottom: 10px; text-align:center;"></div>
+            <div id="medSelected" style="color: var(--accent); font-weight: bold; margin-bottom: 20px; text-align:center; font-size: 1.1rem;"></div>
             <select id="pharmacySelect"></select>
             <button class="btn-send" onclick="sendToWhatsApp()">
                 <i class="fab fa-whatsapp"></i> DEMANDER DISPONIBILITÉ
@@ -194,15 +194,8 @@
     function renderList(filter = 'toutes') {
         const container = document.getElementById('listContainer');
         container.innerHTML = '';
-        
-        let list = pharmacies.map(p => ({
-            ...p,
-            dist: userCoords ? calculateDistance(userCoords.lat, userCoords.lng, p.lat, p.lng) : null
-        }));
-
-        if(filter === 'proches' && userCoords) {
-            list.sort((a, b) => a.dist - b.dist);
-        }
+        let list = pharmacies.map(p => ({ ...p, dist: userCoords ? calculateDistance(userCoords.lat, userCoords.lng, p.lat, p.lng) : null }));
+        if(filter === 'proches' && userCoords) list.sort((a, b) => a.dist - b.dist);
 
         list.forEach(p => {
             const distLabel = p.dist ? `<span class="dist-tag">${p.dist.toFixed(1)}km</span>` : '';
@@ -210,16 +203,13 @@
             div.className = 'pharma-item';
             div.innerHTML = `
                 <div>
-                    <div style="font-weight:bold; display:flex; align-items:center; font-size:0.9rem;">
-                        ${p.nom} <span class="status-badge open">Ouvert</span>
-                    </div>
-                    <div style="font-size:0.7rem; opacity:0.5; margin-top:3px;">${p.quartier} ${distLabel}</div>
+                    <div style="font-weight:bold; display:flex; align-items:center; font-size:0.95rem;">${p.nom} <span class="status-badge open">Ouvert</span></div>
+                    <div style="font-size:0.75rem; opacity:0.5; margin-top:3px;">${p.quartier} ${distLabel}</div>
                 </div>
                 <div class="pharma-actions">
                     <a href="tel:${p.tel}"><i class="fas fa-phone-alt"></i></a>
-                    <a href="https://www.google.com/maps?q=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-directions"></i></a>
-                </div>
-            `;
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-directions"></i></a>
+                </div>`;
             container.appendChild(div);
         });
     }
@@ -230,12 +220,16 @@
             document.getElementById('selection-box').style.display = 'block';
             document.getElementById('medSelected').textContent = "📦 " + val;
             const select = document.getElementById('pharmacySelect');
-            select.innerHTML = pharmacies.map(p => `<option value="${p.tel}">${p.nom}</option>`).join('');
+            let optionsHTML = `<option value="" disabled selected>--- Choisir la pharmacie ---</option>`;
+            optionsHTML += pharmacies.map(p => `<option value="${p.tel}">${p.nom} (${p.quartier})</option>`).join('');
+            select.innerHTML = optionsHTML;
         } else { document.getElementById('selection-box').style.display = 'none'; }
     });
 
     function sendToWhatsApp() {
-        const tel = document.getElementById('pharmacySelect').value;
+        const select = document.getElementById('pharmacySelect');
+        const tel = select.value;
+        if(!tel) { alert("Veuillez d'abord choisir une pharmacie dans la liste."); return; }
         const med = document.getElementById('searchInput').value;
         const msg = encodeURIComponent(`Bonjour, auriez-vous en stock : ${med} ?`);
         window.open(`https://wa.me/${tel.replace(/\+/g,'')}?text=${msg}`, '_blank');
