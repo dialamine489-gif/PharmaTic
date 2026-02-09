@@ -38,30 +38,8 @@
 
         .card { background: var(--card); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; margin-bottom: 15px; }
 
-        /* Correction Alignement Filtres */
-        .filter-bar {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-
-        .filter-chip {
-            flex: 1;
-            max-width: 160px;
-            height: 42px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: inherit;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+        .filter-bar { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 15px; }
+        .filter-chip { flex: 1; max-width: 160px; height: 42px; display: flex; justify-content: center; align-items: center; border-radius: 20px; font-size: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: inherit; cursor: pointer; transition: 0.3s; }
         .filter-chip.active { background: rgba(0, 255, 136, 0.2); border-color: var(--accent); color: var(--accent); }
 
         input[type="text"], select { width: 100%; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 14px; color: inherit; outline: none; box-sizing: border-box; }
@@ -73,7 +51,7 @@
         .badge-dimanche { border: 1px solid var(--rouge-dimanche); color: var(--rouge-dimanche); }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.65rem; gap: 5px; cursor: pointer; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.65rem; gap: 5px; cursor: pointer; text-decoration: none; }
         .nav-item.active { color: var(--accent); }
         
         #fileInput { display: none; }
@@ -101,7 +79,7 @@
     <div id="recherche" class="tab-content active">
         <div class="card" style="border: 1px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1);">
             <h3 style="margin:0 0 10px 0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-moon"></i> En garde actuellement</h3>
-            <div id="guardsContainer" style="font-size: 0.8rem; font-weight: bold;">Vérification des créneaux...</div>
+            <div id="guardsContainer" style="font-size: 0.8rem; font-weight: bold;">Chargement...</div>
         </div>
 
         <div class="card">
@@ -138,7 +116,7 @@
 <nav class="bottom-nav">
     <div class="nav-item active" id="nav-recherche" onclick="switchTab('recherche')"><i class="fas fa-search"></i><span>Recherche</span></div>
     <div class="nav-item" id="nav-pharma" onclick="switchTab('pharmacies-list')"><i class="fas fa-hospital"></i><span>Pharmacies</span></div>
-    <div class="nav-item" onclick="window.open('https://wa.me/221788087878', '_blank')"><i class="fas fa-headset"></i><span>Aide</span></div>
+    <a href="https://wa.me/221776779440" target="_blank" class="nav-item"><i class="fas fa-headset"></i><span>Aide</span></a>
 </nav>
 
 <input type="file" id="fileInput" accept="image/*,.pdf" onchange="handleFile(this)">
@@ -149,23 +127,18 @@
 
     async function loadData() {
         try {
-            // Assure-toi que le fichier est bien dans src/data/
-            const res = await fetch('src/data/pharmacies.json');
+            const res = await fetch('data/pharmacies.json');
             pharmacies = await res.json();
             renderList();
             updateGuardsDisplay();
-        } catch (e) { console.error("Erreur de chargement JSON"); }
+        } catch (e) { console.error("Erreur JSON"); }
     }
 
     function updateGuardsDisplay() {
         const container = document.getElementById('guardsContainer');
-        const now = new Date();
-        const hour = now.getHours();
-        
-        // Configuration des gardes : Nuit (23h-7h) / Dimanche (0)
+        const hour = new Date().getHours();
         const isNight = (hour >= 23 || hour < 7);
-        const isSunday = (now.getDay() === 0);
-
+        const isSunday = (new Date().getDay() === 0);
         let active = pharmacies.filter(p => (isNight && p.nuit) || (isSunday && p.dimanche));
         
         if (active.length > 0) {
@@ -185,10 +158,12 @@
     }
 
     function switchTab(tabId) {
-        document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        document.getElementById(tabId === 'recherche' ? 'nav-recherche' : 'nav-pharma')?.classList.add('active');
-        if(tabId === 'pharmacies-list') renderList();
+        if(tabId === 'recherche' || tabId === 'pharmacies-list') {
+            document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById(tabId === 'recherche' ? 'nav-recherche' : 'nav-pharma')?.classList.add('active');
+            if(tabId === 'pharmacies-list') renderList();
+        }
     }
 
     function renderList(filter = 'toutes') {
@@ -199,7 +174,19 @@
         if(filter === 'proches' && userCoords) list.sort((a, b) => a.dist - b.dist);
         else list.sort((a, b) => (b.nuit - a.nuit) || (b.dimanche - a.dimanche));
 
+        let currentSection = "";
         list.forEach(p => {
+            if (filter !== 'proches') {
+                let sectionName = p.nuit ? "🌙 En garde de nuit" : (p.dimanche ? "☀️ Garde du Dimanche" : "🏥 Autres pharmacies");
+                if (sectionName !== currentSection) {
+                    currentSection = sectionName;
+                    const header = document.createElement('div');
+                    header.style = "font-size: 0.7rem; font-weight: bold; opacity: 0.7; margin: 15px 0 10px 5px; text-transform: uppercase; color: var(--accent);";
+                    header.innerHTML = currentSection;
+                    container.appendChild(header);
+                }
+            }
+
             let badges = p.nuit ? '<span class="badge badge-nuit">Nuit</span>' : '';
             if(p.dimanche) badges += '<span class="badge badge-dimanche">Dimanche</span>';
             const div = document.createElement('div');
@@ -238,8 +225,8 @@
 
     function sendOrdonnance() {
         const tel = document.getElementById('pharmaOrdonnanceSelect').value;
-        if(!tel) return alert("Veuillez choisir une pharmacie.");
-        window.open(`https://wa.me/${tel.replace(/\+/g,'')}?text=Bonjour, je souhaite vous envoyer une photo de mon ordonnance pour un devis via l'application PharmaTic.`, '_blank');
+        if(!tel) return alert("Choisissez une pharmacie.");
+        window.open(`https://wa.me/${tel.replace(/\+/g,'')}?text=Bonjour, je souhaite vous envoyer une photo de mon ordonnance pour un devis via PharmaTic.`, '_blank');
     }
 
     document.getElementById('searchInput').addEventListener('input', (e) => {
