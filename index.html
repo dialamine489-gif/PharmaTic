@@ -8,7 +8,6 @@
     <style>
         :root {
             --vert-pharmacie: #27AE60;
-            --vert-fonce: #1E8449;
             --blanc: #FFFFFF;
             --gris-clair: #F4F7F6;
         }
@@ -17,244 +16,214 @@
             font-family: 'Segoe UI', sans-serif;
             background-color: var(--gris-clair);
             margin: 0;
-            padding-bottom: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         header {
             background-color: var(--vert-pharmacie);
             color: white;
-            padding: 1rem;
+            padding: 1.5rem;
             text-align: center;
-        }
-
-        .search-wrapper {
-            padding: 15px;
-            position: sticky;
-            top: 0;
-            background: var(--gris-clair);
-            z-index: 100;
-        }
-
-        input[type="text"] {
             width: 100%;
-            padding: 12px 20px;
-            border: 1px solid #ddd;
-            border-radius: 25px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .step-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1rem;
             box-sizing: border-box;
             outline: none;
-            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: var(--vert-pharmacie);
         }
 
         #suggestions {
             background: white;
             border-radius: 10px;
-            margin-top: 5px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             display: none;
+            margin-top: 5px;
         }
 
         .suggestion-item {
-            padding: 12px 20px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-        }
-
-        #status-msg {
-            padding: 0 20px 10px 20px;
-            color: var(--vert-fonce);
-            font-weight: bold;
-            display: none;
-            font-size: 0.9rem;
-        }
-
-        /* Style des cartes réduites */
-        .pharmacy-card {
-            background: var(--blanc);
-            margin: 8px 15px;
             padding: 12px;
-            border-radius: 12px;
-            border-left: 5px solid #ccc;
-            overflow: hidden;
-        }
-
-        .pharmacy-card.highlight {
-            border-left-color: var(--vert-pharmacie);
-            background-color: #f0fff4;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
             cursor: pointer;
         }
 
-        .info h3 { margin: 0; font-size: 1rem; color: #333; }
-        
-        .badge-proche {
-            background: var(--vert-pharmacie);
-            color: white;
-            font-size: 0.6rem;
-            padding: 2px 6px;
-            border-radius: 5px;
-            margin-left: 8px;
-            vertical-align: middle;
+        #step-2 {
+            display: none; /* Apparaît après sélection médicament */
+            animation: slideUp 0.4s ease-out;
         }
 
-        /* Détails cachés */
-        .card-details {
-            display: none;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #eee;
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
-        .btn-send-wa {
+        .btn-send {
             background-color: #25D366;
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 25px;
+            padding: 16px;
+            border-radius: 12px;
             width: 100%;
             font-weight: bold;
-            text-decoration: none;
+            font-size: 1.1rem;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            margin-top: 10px;
         }
 
-        .nav-bar {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: white;
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0;
-            border-top: 1px solid #ddd;
+        .med-badge {
+            display: inline-block;
+            background: #e8f5e9;
+            color: var(--vert-pharmacie);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
         }
-
-        .nav-item { text-align: center; color: #999; text-decoration: none; font-size: 0.7rem; }
-        .nav-item.active { color: var(--vert-pharmacie); }
-        .nav-item i { display: block; font-size: 1.3rem; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1 style="margin:0; font-size: 1.5rem;">PharmaTic</h1>
-    <p style="margin:0; font-size: 0.8rem; opacity: 0.9;">Votre santé à Keur Massar</p>
+    <h1 style="margin:0;">PharmaTic</h1>
+    <p style="margin:0; opacity: 0.8;">Toutes les pharmacies de Keur Massar</p>
 </header>
 
-<div class="search-wrapper">
-    <input type="text" id="searchInput" placeholder="Nom du médicament..." autocomplete="off">
-    <div id="suggestions"></div>
+<div class="container">
+    <div class="step-card">
+        <label><i class="fas fa-pills"></i> 1. Quel médicament cherchez-vous ?</label>
+        <input type="text" id="searchInput" placeholder="Ex: Doliprane..." autocomplete="off">
+        <div id="suggestions"></div>
+    </div>
+
+    <div id="step-2" class="step-card">
+        <div class="med-badge" id="displayMed"></div>
+        
+        <label><i class="fas fa-hospital"></i> 2. Choisissez une pharmacie</label>
+        <select id="pharmacySelect">
+            <option value="" disabled selected>Cliquez pour choisir...</option>
+            </select>
+
+        <p style="font-size: 0.8rem; color: #7f8c8d; margin: 15px 0;">
+            En cliquant sur envoyer, vous ouvrirez une discussion WhatsApp avec la pharmacie sélectionnée.
+        </p>
+
+        <button class="btn-send" onclick="sendToWhatsApp()">
+            <i class="fab fa-whatsapp"></i> ENVOYER LA DEMANDE
+        </button>
+    </div>
 </div>
 
-<p id="status-msg">👇 Cliquez sur une pharmacie pour envoyer :</p>
-
-<div id="pharmacyList"></div>
-
-<nav class="nav-bar">
-    <a href="#" class="nav-item active"><i class="fas fa-home"></i>Accueil</a>
-    <a href="#" class="nav-item"><i class="fas fa-map-marked-alt"></i>Carte</a>
-    <a href="#" class="nav-item"><i class="fas fa-user"></i>Profil</a>
-</nav>
-
 <script>
-    const dictionnaireMeds = ["Novomix 30", "Doliprane", "Paracétamol", "Amoxicilline", "Efferalgan"];
+    const dictionnaireMeds = ["Doliprane", "Paracétamol", "Amoxicilline", "Efferalgan", "Novomix 30", "Spasfon", "Gaviscon"];
 
-    // On définit Birane Ly comme la plus proche par défaut
+    // Vos données issues de pharmacies.json
     const pharmacies = [
-        { "nom": "Pharmacie Birane Ly", "quartier": "Jaxaay", "tel": "+221788087878", "proche": true },
-        { "nom": "Pharmacie Dial Diop", "quartier": "Keur Massar Village", "tel": "+221338370000", "proche": false },
-        { "nom": "Pharmacie Elimane Aly Dramane", "quartier": "Keur Massar Village", "tel": "+221800002020", "proche": false }
+        { "nom": "Pharmacie Dial Diop", "quartier": "Keur Massar Village", "tel": "+221338370000" },
+        { "nom": "Pharmacie Elimane Aly Dramane", "quartier": "Keur Massar Village", "tel": "+221800002020" },
+        { "nom": "Pharmacie Al Amine Mouhamed", "quartier": "Unité 6", "tel": "+221338751212" },
+        { "nom": "Pharmacie Birane Ly", "quartier": "Jaxaay", "tel": "+221788087878" },
+        { "nom": "Pharmacie Adji Mohamed", "quartier": "Keur Massar", "tel": "+221338370000" },
+        { "nom": "Pharmacie Ainoumadi", "quartier": "Ainoumadi", "tel": "+221338370001" },
+        { "nom": "Pharmacie Sankoun Faty", "quartier": "Keur Massar", "tel": "+221338370002" },
+        { "nom": "Pharmacie Seydi Mouhamadou Moustapha Sy", "quartier": "Keur Massar", "tel": "+221338370003" },
+        { "nom": "Pharmacie Du Logo", "quartier": "Keur Massar", "tel": "+221338370004" }
     ];
 
     const searchInput = document.getElementById('searchInput');
     const suggestionsBox = document.getElementById('suggestions');
-    const statusMsg = document.getElementById('status-msg');
-    const listContainer = document.getElementById('pharmacyList');
+    const step2 = document.getElementById('step-2');
+    const pharmacySelect = document.getElementById('pharmacySelect');
+    const displayMed = document.getElementById('displayMed');
 
     let selectedMed = "";
 
-    function renderList() {
-        listContainer.innerHTML = '';
-        pharmacies.forEach(p => {
-            const card = document.createElement('div');
-            card.className = `pharmacy-card ${p.proche && selectedMed ? 'highlight' : ''}`;
-            
-            const message = `🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${selectedMed || '...'}* ?\n\nMerci de me confirmer la disponibilité. 🙏`;
-            const waUrl = `https://wa.me/${p.tel.replace(/\D/g,'')}?text=${encodeURIComponent(message)}`;
-
-            card.innerHTML = `
-                <div class="card-header" onclick="toggleCard(this)">
-                    <div class="info">
-                        <h3>${p.nom} ${p.proche ? '<span class="badge-proche">PLUS PROCHE</span>' : ''}</h3>
-                        <p style="font-size:0.75rem; color:#666; margin:0;">${p.quartier}</p>
-                    </div>
-                    <i class="fas fa-chevron-down" style="color:#bbb"></i>
-                </div>
-                <div class="card-details">
-                    <a href="${waUrl}" class="btn-send-wa">
-                        <i class="fab fa-whatsapp"></i> ENVOYER SUR WHATSAPP
-                    </a>
-                </div>
-            `;
-            listContainer.appendChild(card);
-        });
-    }
-
-    function toggleCard(el) {
-        const details = el.nextElementSibling;
-        const icon = el.querySelector('.fas');
-        const isOpen = details.style.display === 'block';
-
-        // Fermer les autres
-        document.querySelectorAll('.card-details').forEach(d => d.style.display = 'none');
-        document.querySelectorAll('.fa-chevron-up').forEach(i => i.classList.replace('fa-chevron-up', 'fa-chevron-down'));
-
-        if (!isOpen) {
-            details.style.display = 'block';
-            icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
-        }
-    }
-
+    // Autocomplete
     searchInput.addEventListener('input', function() {
         const val = this.value;
         suggestionsBox.innerHTML = '';
         if (val.length > 0) {
             const matches = dictionnaireMeds.filter(m => m.toLowerCase().includes(val.toLowerCase()));
-            suggestionsBox.style.display = matches.length > 0 ? 'block' : 'none';
-            matches.forEach(m => {
-                const div = document.createElement('div');
-                div.className = 'suggestion-item';
-                div.textContent = m;
-                div.onclick = () => {
-                    searchInput.value = m;
-                    selectedMed = m;
-                    finishSearch();
-                };
-                suggestionsBox.appendChild(div);
-            });
+            if(matches.length > 0) {
+                suggestionsBox.style.display = 'block';
+                matches.forEach(m => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.textContent = m;
+                    div.onclick = () => selectMedicine(m);
+                    suggestionsBox.appendChild(div);
+                });
+            }
+        } else {
+            suggestionsBox.style.display = 'none';
         }
     });
 
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            selectedMed = searchInput.value;
-            finishSearch();
-        }
-    });
-
-    function finishSearch() {
+    function selectMedicine(med) {
+        selectedMed = med;
+        searchInput.value = med;
+        displayMed.innerHTML = `<i class="fas fa-check-circle"></i> Médicament : ${med}`;
         suggestionsBox.style.display = 'none';
-        statusMsg.style.display = 'block';
-        renderList();
+        
+        // Remplir le select
+        pharmacySelect.innerHTML = '<option value="" disabled selected>Cliquez pour choisir...</option>';
+        pharmacies.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.tel;
+            opt.textContent = `${p.nom} (${p.quartier})`;
+            pharmacySelect.appendChild(opt);
+        });
+
+        step2.style.display = 'block';
     }
 
-    renderList();
+    function sendToWhatsApp() {
+        const tel = pharmacySelect.value;
+        if (!tel) {
+            alert("Veuillez choisir une pharmacie.");
+            return;
+        }
+
+        const message = `🏥 *PharmaTic*\n\nBonjour,\nAvez-vous en stock le médicament : *${selectedMed}* ?\n\nMerci.`;
+        const url = `https://wa.me/${tel.replace(/\D/g,'')}?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank');
+    }
 </script>
 </body>
 </html>
