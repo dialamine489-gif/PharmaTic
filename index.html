@@ -7,16 +7,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #00f2fe; /* Bleu néon */
-            --secondary: #4facfe; /* Bleu profond */
-            --accent: #00ff88; /* Vert médical brillant */
-            --dark-bg: #0f172a; /* Fond sombre moderne */
-            --glass: rgba(255, 255, 255, 0.1);
+            --primary: #00f2fe;
+            --accent: #00ff88;
+            --dark-bg: #0f172a;
+            --glass: rgba(255, 255, 255, 0.08);
+            --rouge-ferme: #ff4d4d;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at top, #1e293b, #0f172a);
             color: white;
             margin: 0;
             height: 100vh;
@@ -25,28 +25,29 @@
         }
 
         header {
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
-            padding: 25px 20px;
+            padding: 30px 20px 10px;
             text-align: center;
         }
 
         header h1 {
             margin: 0;
-            font-size: 1.8rem;
-            letter-spacing: 2px;
+            font-size: 2rem;
+            letter-spacing: 3px;
             background: linear-gradient(to right, var(--accent), var(--primary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-transform: uppercase;
+            font-weight: 900;
         }
 
         .top-nav {
             display: flex;
-            margin: 0 20px;
+            margin: 10px 20px;
             background: var(--glass);
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 5px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .nav-tab {
@@ -54,16 +55,17 @@
             padding: 12px;
             text-align: center;
             border-radius: 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: 0.3s;
+            font-size: 0.85rem;
+            font-weight: bold;
             cursor: pointer;
+            transition: 0.3s;
+            color: rgba(255,255,255,0.6);
         }
 
         .nav-tab.active {
             background: var(--accent);
             color: var(--dark-bg);
-            box-shadow: 0 0 15px var(--accent);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
         }
 
         .content-area {
@@ -72,7 +74,9 @@
             overflow-y: auto;
         }
 
-        /* --- EFFET GLASSMORPHISM --- */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
         .card {
             background: var(--glass);
             backdrop-filter: blur(15px);
@@ -82,24 +86,19 @@
             margin-bottom: 20px;
         }
 
-        input[type="text"] {
+        input[type="text"], select {
             width: 100%;
-            background: rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.2);
             border: 1px solid rgba(255,255,255,0.2);
             border-radius: 12px;
             padding: 15px;
             color: white;
             font-size: 1rem;
             outline: none;
-            transition: 0.3s;
+            box-sizing: border-box;
         }
 
-        input[type="text"]:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-        }
-
-        /* --- LISTE PHARMACIES --- */
+        /* --- LISTE DES PHARMACIES --- */
         .pharma-item {
             background: rgba(255,255,255,0.03);
             border-radius: 15px;
@@ -108,94 +107,100 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 4px solid transparent;
-            transition: 0.3s;
-        }
-
-        .pharma-item:hover {
-            background: rgba(255,255,255,0.08);
-            border-left-color: var(--accent);
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         .status-badge {
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             padding: 3px 8px;
             border-radius: 8px;
             font-weight: bold;
+            margin-left: 10px;
+            white-space: nowrap;
         }
 
-        .open { background: rgba(0, 255, 136, 0.2); color: var(--accent); }
-        .closed { background: rgba(231, 76, 60, 0.2); color: #ff4d4d; }
+        .open { background: rgba(0, 255, 136, 0.15); color: var(--accent); }
+        .closed { background: rgba(255, 77, 77, 0.15); color: var(--rouge-ferme); }
 
-        .pharma-actions a {
-            font-size: 1.4rem;
-            margin-left: 15px;
-            transition: 0.3s;
-        }
-
-        .pharma-actions .fa-phone-alt { color: var(--accent); }
-        .pharma-actions .fa-directions { color: var(--secondary); }
+        .pharma-actions { display: flex; gap: 15px; font-size: 1.3rem; }
+        .pharma-actions a { color: var(--accent); text-decoration: none; }
+        .btn-maps { color: var(--primary) !important; }
 
         .btn-send {
             background: linear-gradient(to right, #25D366, #128C7E);
-            color: white;
-            border: none;
-            padding: 18px;
-            border-radius: 15px;
-            width: 100%;
-            font-weight: bold;
-            margin-top: 15px;
-            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+            color: white; border: none; padding: 18px; border-radius: 15px;
+            width: 100%; font-weight: bold; margin-top: 15px; cursor: pointer;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>PharmaTic</h1>
-    <p style="font-size: 0.8rem; opacity: 0.7;">Technologie au service de votre santé</p>
+    <h1>PHARMATIC</h1>
+    <p style="font-size: 0.75rem; opacity: 0.6; letter-spacing: 1px;">Technologie au service de votre santé</p>
 </header>
 
 <nav class="top-nav">
-    <div class="nav-tab active" id="tab-search" onclick="switchTab('recherche')">RECHERCHE</div>
-    <div class="nav-tab" id="tab-explore" onclick="switchTab('explorer')">LISTE</div>
+    <div class="nav-tab active" id="btn-recherche" onclick="switchTab('recherche')">RECHERCHE</div>
+    <div class="nav-tab" id="btn-liste" onclick="switchTab('explorer')">LISTE</div>
 </nav>
 
 <div class="content-area">
     <div id="recherche" class="tab-content active">
         <div class="card">
-            <h3 style="margin-top:0; font-size: 1rem;">Rechercher un médicament</h3>
+            <h3 style="margin:0 0 15px 0; font-size: 0.9rem; opacity: 0.8;">Rechercher un médicament</h3>
             <input type="text" id="searchInput" placeholder="Ex: Doliprane, Amoxicilline...">
         </div>
-        <div id="selection-box" style="display:none;">
-            <div class="card">
-                <div id="medSelected" style="color: var(--accent); font-weight: bold; margin-bottom: 10px;"></div>
-                <select id="pharmacySelect" style="width:100%; padding:12px; border-radius:10px; background:#1e293b; color:white; border:1px solid #334155;"></select>
-                <button class="btn-send" onclick="sendToWhatsApp()">
-                    <i class="fab fa-whatsapp"></i> CONTACTER LA PHARMACIE
-                </button>
-            </div>
+        <div id="selection-box" style="display:none;" class="card">
+            <div id="medSelected" style="color: var(--accent); font-weight: bold; margin-bottom: 15px; text-align:center;"></div>
+            <select id="pharmacySelect"></select>
+            <button class="btn-send" onclick="sendToWhatsApp()">
+                <i class="fab fa-whatsapp"></i> DEMANDER PAR WHATSAPP
+            </button>
         </div>
     </div>
 
-    <div id="explorer" class="tab-content" style="display:none;">
-        <div id="listContainer"></div>
+    <div id="explorer" class="tab-content">
+        <div id="listContainer">
+            </div>
     </div>
 </div>
 
 <script>
-    // Utilise la liste des 26 pharmacies du message précédent ici
     const pharmacies = [
-        { "nom": "Pharmacie Dial Diop", "quartier": "Unité 5", "tel": "+221338370000", "lat": 14.7792, "lng": -17.3216 },
-        { "nom": "Pharmacie Elimane Aly DRAMANE", "quartier": "Unité 3", "tel": "+221338370001", "lat": 14.7820, "lng": -17.3055 },
-        // ... (ajoute les autres ici)
+        { "id": 1, "nom": "Pharmacie Dial Diop", "quartier": "Unité 5", "tel": "+221338370000", "lat": 14.7792, "lng": -17.3216 },
+        { "id": 2, "nom": "Pharmacie Elimane Aly DRAMANE", "quartier": "Unité 3", "tel": "+221338370001", "lat": 14.7820, "lng": -17.3055 },
+        { "id": 3, "nom": "Pharmacie Mingue", "quartier": "Fass", "tel": "+221338370002", "lat": 14.7850, "lng": -17.3100 },
+        { "id": 4, "nom": "Pharmacie Pape Djibril", "quartier": "Mame Dior", "tel": "+221338370003", "lat": 14.7880, "lng": -17.3120 },
+        { "id": 5, "nom": "Pharmacie Birane LY", "quartier": "Aïnoumady", "tel": "+221788087878", "lat": 14.7695, "lng": -17.3138 },
+        { "id": 6, "nom": "Pharmacie DIOMA", "quartier": "Aïnoumadi", "tel": "+221338370004", "lat": 14.7870, "lng": -17.3040 },
+        { "id": 7, "nom": "Pharmacie du Logo", "quartier": "Kawsara", "tel": "+221338788417", "lat": 14.7836, "lng": -17.3148 },
+        { "id": 8, "nom": "Pharmacie Adji Mouhamed", "quartier": "Croisement", "tel": "+221338377526", "lat": 14.7726, "lng": -17.3170 },
+        { "id": 9, "nom": "Pharmacie Sankoun Faty", "quartier": "Cité Gendarmerie", "tel": "+221338378786", "lat": 14.7750, "lng": -17.3100 },
+        { "id": 10, "nom": "Pharmacie Elimane Aly Dramane (PA)", "quartier": "Unité 3", "tel": "+221800002020", "lat": 14.7825, "lng": -17.3050 },
+        { "id": 11, "nom": "Pharmacie Ainoumadi", "quartier": "Cité Ainoumadi", "tel": "+221338785108", "lat": 14.7878, "lng": -17.3058 },
+        { "id": 12, "nom": "Pharmacie Camille Basse", "quartier": "Camille Basse", "tel": "+221330000000", "lat": 14.7900, "lng": -17.3150 },
+        { "id": 13, "nom": "Pharmacie EL Abdoul Boutou Kane", "quartier": "Arafat II", "tel": "+221330000000", "lat": 14.7700, "lng": -17.3000 },
+        { "id": 14, "nom": "Pharmacie Seydi M. Moustapha SY", "quartier": "Unité 14", "tel": "+221338379874", "lat": 14.7850, "lng": -17.3150 },
+        { "id": 15, "nom": "Pharmacie Baye Niasse", "quartier": "Unité 6", "tel": "+221330000000", "lat": 14.7730, "lng": -17.3260 },
+        { "id": 16, "nom": "Pharmacie Marie Essenteine Manga", "quartier": "Unité 20", "tel": "+221330000000", "lat": 14.7650, "lng": -17.3080 },
+        { "id": 17, "nom": "Pharmacie Mame Cheikh Anta Mbacké", "quartier": "Darou Salam", "tel": "+221330000000", "lat": 14.7920, "lng": -17.3200 },
+        { "id": 18, "nom": "Pharmacie Pascale", "quartier": "Unité 15", "tel": "+221330000000", "lat": 14.7800, "lng": -17.3300 },
+        { "id": 19, "nom": "Pharmacie Al Amine Mouhammed", "quartier": "Unité 6", "tel": "+221338788929", "lat": 14.7726, "lng": -17.3257 },
+        { "id": 20, "nom": "ROND POINT JAXAAY", "quartier": "Jaxaay", "tel": "+221330000000", "lat": 14.7600, "lng": -17.3000 },
+        { "id": 21, "nom": "Cheikhna Cheikh Abass Aidara", "quartier": "Darou Salam", "tel": "+221330000000", "lat": 14.7930, "lng": -17.3220 },
+        { "id": 22, "nom": "YAYE FATOUMA", "quartier": "Unité 17", "tel": "+221330000000", "lat": 14.7750, "lng": -17.3350 },
+        { "id": 23, "nom": "Pharmacie SAN JOSE", "quartier": "Unité 03", "tel": "+221330000000", "lat": 14.7810, "lng": -17.3060 },
+        { "id": 24, "nom": "Pharmacie tawhid", "quartier": "Tène-bi", "tel": "+221330000000", "lat": 14.7700, "lng": -17.3400 },
+        { "id": 25, "nom": "MAYA MAME ANSOU NIANG", "quartier": "Unité 18", "tel": "+221330000000", "lat": 14.7770, "lng": -17.3380 },
+        { "id": 26, "nom": "Pharmacie NA SAGAR NIANDING", "quartier": "Jaxaay 2", "tel": "+221330000000", "lat": 14.7580, "lng": -17.2950 }
     ];
 
     function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(tabId).style.display = 'block';
-        event.currentTarget.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+        document.getElementById('btn-' + (tabId === 'recherche' ? 'recherche' : 'liste')).classList.add('active');
         if(tabId === 'explorer') renderList();
     }
 
@@ -207,19 +212,42 @@
             div.className = 'pharma-item';
             div.innerHTML = `
                 <div>
-                    <div style="font-weight:bold;">${p.nom} <span class="status-badge open">Ouvert</span></div>
-                    <div style="font-size:0.75rem; opacity:0.6;">${p.quartier}</div>
+                    <div style="font-weight:bold; display:flex; align-items:center;">
+                        ${p.nom} <span class="status-badge open">Ouvert</span>
+                    </div>
+                    <div style="font-size:0.75rem; opacity:0.5; margin-top:4px;">${p.quartier}</div>
                 </div>
                 <div class="pharma-actions">
                     <a href="tel:${p.tel}"><i class="fas fa-phone-alt"></i></a>
-                    <a href="#"><i class="fas fa-directions"></i></a>
+                    <a href="https://www.google.com/maps?q=${p.lat},${p.lng}" target="_blank" class="btn-maps"><i class="fas fa-directions"></i></a>
                 </div>
             `;
             container.appendChild(div);
         });
     }
 
-    // Garde tes fonctions JavaScript précédentes (WhatsApp, Recherche, etc.)
+    // Gestion de la recherche
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        let val = e.target.value;
+        if(val.length > 2) {
+            document.getElementById('selection-box').style.display = 'block';
+            document.getElementById('medSelected').textContent = "📦 " + val;
+            const select = document.getElementById('pharmacySelect');
+            select.innerHTML = pharmacies.map(p => `<option value="${p.tel}">${p.nom}</option>`).join('');
+        } else {
+            document.getElementById('selection-box').style.display = 'none';
+        }
+    });
+
+    function sendToWhatsApp() {
+        const tel = document.getElementById('pharmacySelect').value;
+        const med = document.getElementById('searchInput').value;
+        const msg = encodeURIComponent(`Bonjour, auriez-vous en stock : ${med} ?`);
+        window.open(`https://wa.me/${tel.replace(/\+/g,'')}?text=${msg}`, '_blank');
+    }
+
+    // Initialisation
+    renderList();
 </script>
 </body>
 </html>
