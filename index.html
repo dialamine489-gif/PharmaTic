@@ -6,28 +6,61 @@
     <title>PharmaTic - Keur Massar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Définition des thèmes via des variables CSS */
         :root {
             --primary: #00f2fe;
             --accent: #00ff88;
-            --dark-bg: #0f172a;
-            --glass: rgba(255, 255, 255, 0.08);
             --rouge-dimanche: #ff4d4d;
             --violet-nuit: #a855f7;
         }
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: radial-gradient(circle at top, #1e293b, #0f172a);
-            color: white; margin: 0; height: 100vh;
-            display: flex; flex-direction: column; padding-bottom: 80px;
+        body.dark-theme {
+            --bg-gradient: radial-gradient(circle at top, #1e293b, #0f172a);
+            --text-color: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --nav-bg: rgba(15, 23, 42, 0.95);
         }
 
-        header { padding: 20px 20px 5px; text-align: center; }
-        header h1 {
-            margin: 0; font-size: 1.8rem; letter-spacing: 2px;
-            background: linear-gradient(to right, var(--accent), var(--primary));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-transform: uppercase; font-weight: 900;
+        body.light-theme {
+            --bg-gradient: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            --text-color: #1e293b;
+            --card-bg: rgba(0, 0, 0, 0.05);
+            --nav-bg: rgba(248, 250, 252, 0.95);
+        }
+
+        body.rose-theme {
+            --bg-gradient: linear-gradient(135deg, #fdf2f8, #fbcfe8);
+            --text-color: #831843;
+            --card-bg: rgba(255, 255, 255, 0.4);
+            --nav-bg: rgba(253, 242, 248, 0.95);
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 80px;
+            transition: all 0.3s ease;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 25px 20px 10px;
+        }
+
+        .logo-img {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
         }
 
         .content-area { flex: 1; padding: 15px; overflow-y: auto; }
@@ -35,66 +68,72 @@
         .tab-content.active { display: block; }
 
         .card {
-            background: var(--glass); backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
-            padding: 15px; margin-bottom: 15px;
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
         }
 
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
         .filter-chip {
             padding: 8px 15px; border-radius: 20px; font-size: 0.75rem;
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            color: white; cursor: pointer; transition: 0.3s; white-space: nowrap;
+            color: var(--text-color); cursor: pointer; transition: 0.3s;
         }
         .filter-chip.active { background: rgba(0, 255, 136, 0.2); border-color: var(--accent); color: var(--accent); }
 
         input[type="text"], select {
-            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 12px; padding: 14px; color: white; outline: none; box-sizing: border-box;
+            width: 100%; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px; padding: 14px; color: var(--text-color); outline: none; box-sizing: border-box;
         }
 
         .pharma-item {
-            background: rgba(255,255,255,0.03); border-radius: 15px;
+            background: var(--card-bg); border-radius: 15px;
             padding: 15px; margin-bottom: 12px; display: flex;
             justify-content: space-between; align-items: center;
             border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .badge { font-size: 0.55rem; padding: 3px 6px; border-radius: 5px; font-weight: bold; text-transform: uppercase; margin-left: 5px; margin-top: 2px; }
+        .badge { font-size: 0.55rem; padding: 3px 6px; border-radius: 5px; font-weight: bold; text-transform: uppercase; margin-left: 5px; }
         .badge-nuit { border: 1px solid var(--violet-nuit); color: var(--violet-nuit); }
         .badge-dimanche { border: 1px solid var(--rouge-dimanche); color: var(--rouge-dimanche); }
 
-        .pharma-actions { display: flex; gap: 15px; font-size: 1.3rem; }
-        .pharma-actions a { color: var(--accent); text-decoration: none; }
-
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+            background: var(--nav-bg); backdrop-filter: blur(10px);
             display: flex; justify-content: space-around; padding: 12px 0;
             border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: rgba(255, 255, 255, 0.6); font-size: 0.65rem; gap: 5px; cursor: pointer; }
+
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.65rem; gap: 5px; cursor: pointer; }
         .nav-item.active { color: var(--accent); }
         #fileInput { display: none; }
+
+        .theme-selector { display: flex; gap: 15px; justify-content: center; margin-bottom: 10px; }
+        .dot { width: 25px; height: 25px; border-radius: 50%; cursor: pointer; border: 2px solid white; }
     </style>
 </head>
-<body>
+<body class="dark-theme">
 
-<header style="display: flex; align-items: center; justify-content: center; gap: 15px; padding: 25px 20px 10px;">
-    <img src="icon.jpeg" alt="Logo" style="width: 55px; height: 55px; border-radius: 12px; border: 1px solid var(--accent); box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);">
-    
+<header>
+    <img src="icon.jpeg" alt="Logo" class="logo-img">
     <div style="text-align: left;">
-        <h1 style="margin: 0; font-size: 1.7rem; letter-spacing: 2px; background: linear-gradient(to right, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; font-weight: 900;">
-            PHARMATIC
-        </h1>
-        <p style="font-size: 0.6rem; opacity: 0.5; letter-spacing: 1px; margin-top: 5px;">KEUR MASSAR • GESTION DES GARDES</p>
+        <h1 style="margin: 0; font-size: 1.7rem; letter-spacing: 2px; font-weight: 900;">PHARMATIC</h1>
+        <p style="font-size: 0.6rem; opacity: 0.6; margin-top: 5px;">KEUR MASSAR • GESTION DES GARDES</p>
     </div>
 </header>
 
 <div class="content-area">
+    <div class="theme-selector">
+        <div class="dot" style="background: #0f172a;" onclick="setTheme('dark')"></div>
+        <div class="dot" style="background: #f8fafc;" onclick="setTheme('light')"></div>
+        <div class="dot" style="background: #fbcfe8;" onclick="setTheme('rose')"></div>
+    </div>
+
     <div id="recherche" class="tab-content active">
         <div class="card">
-            <h3 style="margin:0 0 10px 0; font-size: 0.85rem; opacity: 0.8;">Quel médicament cherchez-vous ?</h3>
+            <h3 style="margin:0 0 10px 0; font-size: 0.85rem;">Quel médicament cherchez-vous ?</h3>
             <input type="text" id="searchInput" placeholder="Doliprane, Spasfon..." autocomplete="off">
         </div>
         <div id="selection-box" style="display:none;" class="card">
@@ -107,7 +146,7 @@
     </div>
 
     <div id="pharmacies-list" class="tab-content">
-        <div class="filter-bar">
+        <div class="filter-bar" style="display:flex; gap:10px; margin-bottom:15px;">
             <div class="filter-chip active" id="filter-all" onclick="applyFilter('toutes')">Toutes (26)</div>
             <div class="filter-chip" id="filter-near" onclick="applyFilter('proches')">Les plus proches 📍</div>
         </div>
@@ -122,19 +161,24 @@
     <div class="nav-item" onclick="window.open('https://wa.me/221788087878', '_blank')"><i class="fas fa-headset"></i><span>Aide</span></div>
 </nav>
 
-<input type="file" id="fileInput" accept="image/*,.pdf" onchange="handleFile(input)">
+<input type="file" id="fileInput" accept="image/*,.pdf" onchange="handleFile(this)">
 
 <script>
     let pharmacies = [];
     let userCoords = null;
 
-    // CHARGEMENT DU FICHIER JSON
+    // Chargement des données
     async function loadData() {
         try {
-            const res = await fetch('src/data/pharmacies.json');
+            const res = await fetch('data/pharmacies.json'); // Chemin vers ton dossier data
             pharmacies = await res.json();
             renderList();
-        } catch (e) { console.error("Erreur JSON"); }
+        } catch (e) { console.error("Erreur de chargement JSON. Vérifie le dossier src/data/"); }
+    }
+
+    function setTheme(theme) {
+        document.body.className = theme + '-theme';
+        localStorage.setItem('pharma-theme', theme);
     }
 
     function switchTab(tabId) {
@@ -142,6 +186,38 @@
         document.getElementById(tabId).classList.add('active');
         document.getElementById(tabId === 'recherche' ? 'nav-recherche' : 'nav-pharma')?.classList.add('active');
         if(tabId === 'pharmacies-list') renderList();
+    }
+
+    function renderList(filter = 'toutes') {
+        const container = document.getElementById('listContainer');
+        container.innerHTML = '';
+        
+        let list = pharmacies.map(p => ({ ...p, dist: userCoords ? calculateDistance(userCoords.lat, userCoords.lng, p.lat, p.lng) : null }));
+        
+        // Tri : Nuit > Dimanche > Reste
+        if(filter !== 'proches') list.sort((a, b) => (b.nuit - a.nuit) || (b.dimanche - a.dimanche));
+        else list.sort((a, b) => a.dist - b.dist);
+
+        list.forEach(p => {
+            let badges = p.nuit ? '<span class="badge badge-nuit">Nuit 0h-7h</span>' : '';
+            if(p.dimanche) badges += '<span class="badge badge-dimanche">Garde Dimanche</span>';
+
+            const div = document.createElement('div');
+            div.className = 'pharma-item';
+            if(p.nuit) div.style.borderLeft = "4px solid var(--violet-nuit)";
+            else if(p.dimanche) div.style.borderLeft = "4px solid var(--rouge-dimanche)";
+
+            div.innerHTML = `
+                <div>
+                    <div style="font-weight:bold; font-size:0.9rem;">${p.nom} ${badges}</div>
+                    <div style="font-size:0.7rem; opacity:0.6; margin-top:2px;">${p.quartier} ${p.dist ? '• '+p.dist.toFixed(1)+'km' : ''}</div>
+                </div>
+                <div style="display:flex; gap:15px; font-size:1.3rem;">
+                    <a href="tel:${p.telephone}" style="color:inherit;"><i class="fas fa-phone-alt"></i></a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-directions"></i></a>
+                </div>`;
+            container.appendChild(div);
+        });
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -166,43 +242,6 @@
         }
     }
 
-    function renderList(filter = 'toutes') {
-        const container = document.getElementById('listContainer');
-        container.innerHTML = '';
-        
-        let list = pharmacies.map(p => ({ ...p, dist: userCoords ? calculateDistance(userCoords.lat, userCoords.lng, p.lat, p.lng) : null }));
-        
-        if(filter === 'proches' && userCoords) {
-            list.sort((a, b) => a.dist - b.dist);
-        } else {
-            // TRI : NUIT > DIMANCHE > RESTE
-            list.sort((a, b) => (b.nuit - a.nuit) || (b.dimanche - a.dimanche));
-        }
-
-        list.forEach(p => {
-            let badges = '';
-            if(p.nuit) badges += `<span class="badge badge-nuit">Nuit 0h-7h</span>`;
-            if(p.dimanche) badges += `<span class="badge badge-dimanche">Garde Dimanche</span>`;
-
-            const itemStyle = p.nuit ? 'border-left: 4px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.05);' : 
-                             (p.dimanche ? 'border-left: 4px solid var(--rouge-dimanche); background: rgba(255, 77, 77, 0.05);' : '');
-            
-            const div = document.createElement('div');
-            div.className = 'pharma-item';
-            div.style = itemStyle;
-            div.innerHTML = `
-                <div>
-                    <div style="font-weight:bold; font-size:0.9rem; display:flex; flex-wrap:wrap; align-items:center;">${p.nom} ${badges}</div>
-                    <div style="font-size:0.7rem; opacity:0.5; margin-top:2px;">${p.quartier} ${p.dist ? '• '+p.dist.toFixed(1)+'km' : ''}</div>
-                </div>
-                <div class="pharma-actions">
-                    <a href="tel:${p.telephone}"><i class="fas fa-phone-alt"></i></a>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank"><i class="fas fa-directions" style="color:var(--primary);"></i></a>
-                </div>`;
-            container.appendChild(div);
-        });
-    }
-
     document.getElementById('searchInput').addEventListener('input', (e) => {
         let val = e.target.value;
         if(val.length > 2) {
@@ -221,6 +260,15 @@
         window.open(`https://wa.me/${tel.replace(/\+/g,'')}?text=Bonjour, avez-vous en stock : ${med} ?`, '_blank');
     }
 
+    function handleFile(input) {
+        if (input.files && input.files[0]) {
+            alert("Ordonnance sélectionnée. Redirection WhatsApp...");
+            window.open(`https://wa.me/221788087878?text=Bonjour, voici mon ordonnance pour un devis.`, '_blank');
+        }
+    }
+
+    // Initialisation
+    setTheme(localStorage.getItem('pharma-theme') || 'dark');
     loadData();
 </script>
 </body>
