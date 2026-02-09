@@ -23,7 +23,7 @@
         header {
             background-color: var(--vert-pharmacie);
             color: white;
-            padding: 1.5rem 1rem;
+            padding: 1rem;
             text-align: center;
         }
 
@@ -59,48 +59,69 @@
         }
 
         /* Message d'instruction */
-        #instruction {
-            padding: 0 20px;
+        #status-msg {
+            padding: 10px 20px;
             color: var(--vert-fonce);
             font-weight: bold;
             display: none;
-            margin-top: 10px;
+            font-size: 0.9rem;
         }
 
+        /* Cartes Pharmacies Raccourcies */
         .pharmacy-card {
             background: var(--blanc);
-            margin: 12px 15px;
-            padding: 15px;
+            margin: 8px 15px;
+            padding: 12px;
             border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-            border-left: 5px solid var(--vert-pharmacie);
+            border-left: 5px solid #ddd;
+            transition: all 0.3s;
+        }
+
+        .pharmacy-card.selected {
+            border-left-color: var(--vert-pharmacie);
+            background-color: #e8f5e9;
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            cursor: pointer;
         }
 
-        .info h3 { margin: 0; color: var(--vert-fonce); font-size: 1.1rem; }
-        .info p { margin: 4px 0; font-size: 0.85rem; color: #666; }
+        .info h3 { margin: 0; font-size: 1rem; color: #333; }
+        .badge-proche {
+            background: var(--vert-pharmacie);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 5px;
+            margin-left: 5px;
+        }
 
-        .actions { display: flex; gap: 10px; }
-        
-        .btn-action {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
+        /* Détails masqués par défaut */
+        .card-details {
+            display: none;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn-send-wa {
+            background-color: #25D366;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            width: 100%;
+            font-weight: bold;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 10px;
             text-decoration: none;
-            color: white;
         }
-
-        .btn-call { background-color: var(--vert-pharmacie); }
-        .btn-whatsapp { background-color: #25D366; }
-        .btn-map { background-color: #3498db; }
 
         .nav-bar {
             position: fixed;
@@ -121,70 +142,83 @@
 <body>
 
 <header>
-    <h1 style="margin:0;">PharmaTic</h1>
-    <p style="margin:5px 0 0; font-size: 0.85rem;">Votre santé à Keur Massar</p>
+    <h1 style="margin:0; font-size: 1.5rem;">PharmaTic</h1>
 </header>
 
 <div class="search-wrapper">
-    <input type="text" id="searchInput" placeholder="Entrez le nom du médicament..." autocomplete="off">
+    <input type="text" id="searchInput" placeholder="Nom du médicament (ex: Novomix)..." autocomplete="off">
     <div id="suggestions"></div>
-    <p id="instruction">👇 Veuillez choisir une pharmacie pour vérifier la disponibilité :</p>
 </div>
+
+<p id="status-msg">📍 Sélectionnez une pharmacie :</p>
 
 <div id="pharmacyList"></div>
 
 <nav class="nav-bar">
     <a href="#" class="nav-item active"><i class="fas fa-home"></i>Accueil</a>
     <a href="#" class="nav-item"><i class="fas fa-map-marked-alt"></i>Carte</a>
-    <a href="#" class="nav-item"><i class="fas fa-heart"></i>Favoris</a>
     <a href="#" class="nav-item"><i class="fas fa-user"></i>Profil</a>
 </nav>
 
 <script>
-    const dictionnaireMeds = ["Paracétamol", "Doliprane", "Novomix 30", "Amoxicilline", "Efferalgan", "Ibuprofène", "Vitamine C"];
+    const dictionnaireMeds = ["Novomix 30", "Paracétamol", "Doliprane", "Amoxicilline", "Efferalgan"];
 
+    // Liste réduite pour l'exemple
     const pharmacies = [
-        { "nom": "Pharmacie Dial Diop", "quartier": "Keur Massar Village", "telephone": "+221338370000", "lat": 14.7792, "lng": -17.3216 },
-        { "nom": "Pharmacie Birane Ly", "quartier": "Jaxaay", "telephone": "+221788087878", "lat": 14.7695, "lng": -17.3138 },
-        { "nom": "Pharmacie Elimane Aly Dramane", "quartier": "Keur Massar Village", "telephone": "+221800002020", "lat": 14.7825, "lng": -17.3050 },
-        { "nom": "Pharmacie Al Amine Mouhamed", "quartier": "Unité 6", "telephone": "+221338788929", "lat": 14.7726, "lng": -17.3257 }
+        { "id": 12, "nom": "Pharmacie Birane Ly", "quartier": "Jaxaay", "telephone": "+221788087878", "proche": true },
+        { "id": 1, "nom": "Pharmacie Dial Diop", "quartier": "Village", "telephone": "+221338370000", "proche": false },
+        { "id": 17, "nom": "Pharmacie Du Logo", "quartier": "Village", "telephone": "+221338788417", "proche": false }
     ];
 
     const searchInput = document.getElementById('searchInput');
     const suggestionsBox = document.getElementById('suggestions');
-    const instruction = document.getElementById('instruction');
+    const statusMsg = document.getElementById('status-msg');
     const listContainer = document.getElementById('pharmacyList');
 
-    function displayPharmacies(query = "") {
-        listContainer.innerHTML = '';
-        if(query.length > 0) {
-            instruction.style.display = 'block';
-        } else {
-            instruction.style.display = 'none';
-        }
+    let currentMed = "";
 
-        pharmacies.forEach(p => {
+    function renderPharmacies() {
+        listContainer.innerHTML = '';
+        pharmacies.forEach((p, index) => {
             const card = document.createElement('div');
             card.className = 'pharmacy-card';
-            
-            const medicament = query ? `*${query}*` : "un médicament";
-            const textMessage = `🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : ${medicament} ?\n\nMerci de me confirmer la disponibilité. 🙏`;
-            
+            if (p.proche && currentMed) card.classList.add('selected');
+
+            const textMessage = `🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${currentMed || '...'}* ?\n\nMerci de me confirmer la disponibilité. 🙏`;
+            const waLink = `https://wa.me/${p.telephone.replace(/\D/g,'')}?text=${encodeURIComponent(textMessage)}`;
+
             card.innerHTML = `
-                <div class="card-header">
+                <div class="card-header" onclick="toggleCard(this)">
                     <div class="info">
-                        <h3>${p.nom}</h3>
-                        <p><i class="fas fa-map-marker-alt"></i> ${p.quartier}</p>
+                        <h3>${p.nom} ${p.proche ? '<span class="badge-proche">PLUS PROCHE</span>' : ''}</h3>
+                        <p style="font-size:0.7rem; margin:0;">${p.quartier}</p>
                     </div>
-                    <div class="actions">
-                        <a href="tel:${p.telephone}" class="btn-action btn-call"><i class="fas fa-phone"></i></a>
-                        <a href="https://wa.me/${p.telephone.replace(/\D/g,'')}?text=${encodeURIComponent(textMessage)}" class="btn-action btn-whatsapp"><i class="fab fa-whatsapp"></i></a>
-                        <a href="https://www.google.com/maps?q=${p.lat},${p.lng}" target="_blank" class="btn-action btn-map"><i class="fas fa-location-arrow"></i></a>
-                    </div>
+                    <i class="fas fa-chevron-down" style="color:#ccc"></i>
+                </div>
+                <div class="card-details">
+                    <a href="${waLink}" class="btn-send-wa">
+                        <i class="fab fa-whatsapp"></i> ENVOYER LA DEMANDE
+                    </a>
                 </div>
             `;
             listContainer.appendChild(card);
         });
+    }
+
+    function toggleCard(header) {
+        const details = header.nextElementSibling;
+        const icon = header.querySelector('.fas');
+        const isVisible = details.style.display === 'block';
+        
+        // Fermer tous les autres détails
+        document.querySelectorAll('.card-details').forEach(d => d.style.display = 'none');
+        document.querySelectorAll('.fa-chevron-up').forEach(i => i.classList.replace('fa-chevron-up', 'fa-chevron-down'));
+
+        // Ouvrir celui-ci
+        if (!isVisible) {
+            details.style.display = 'block';
+            icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+        }
     }
 
     searchInput.addEventListener('input', function() {
@@ -192,35 +226,34 @@
         suggestionsBox.innerHTML = '';
         if (val.length > 0) {
             const matches = dictionnaireMeds.filter(m => m.toLowerCase().includes(val.toLowerCase()));
-            if (matches.length > 0) {
-                suggestionsBox.style.display = 'block';
-                matches.forEach(match => {
-                    const div = document.createElement('div');
-                    div.className = 'suggestion-item';
-                    div.textContent = match;
-                    div.onclick = () => {
-                        searchInput.value = match;
-                        suggestionsBox.style.display = 'none';
-                        displayPharmacies(match);
-                    };
-                    suggestionsBox.appendChild(div);
-                });
-            }
-        } else {
-            suggestionsBox.style.display = 'none';
-            displayPharmacies("");
+            suggestionsBox.style.display = matches.length > 0 ? 'block' : 'none';
+            matches.forEach(match => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = match;
+                div.onclick = () => {
+                    searchInput.value = match;
+                    validateSearch(match);
+                };
+                suggestionsBox.appendChild(div);
+            });
         }
     });
 
-    // Permet de valider aussi avec la touche "Entrée" pour la saisie libre
-    searchInput.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            suggestionsBox.style.display = 'none';
-            displayPharmacies(this.value);
-        }
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') validateSearch(searchInput.value);
     });
 
-    displayPharmacies("");
+    function validateSearch(med) {
+        currentMed = med;
+        suggestionsBox.style.display = 'none';
+        statusMsg.style.display = 'block';
+        renderPharmacies();
+    }
+
+    // Initialisation
+    renderPharmacies();
 </script>
+
 </body>
 </html>
