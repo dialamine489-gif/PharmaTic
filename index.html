@@ -22,6 +22,7 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
+            padding-bottom: 70px; /* Espace pour la barre basse */
         }
 
         header { padding: 25px 20px 10px; text-align: center; }
@@ -67,7 +68,6 @@
         input[type="text"], select {
             width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
             border-radius: 12px; padding: 14px; color: white; outline: none; box-sizing: border-box; font-size: 1rem;
-            appearance: none; -webkit-appearance: none; /* Retire le style par défaut sur iPhone */
         }
 
         .pharma-item {
@@ -90,6 +90,24 @@
             width: 100%; font-weight: bold; margin-top: 15px; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 10px;
         }
+
+        /* Barre de navigation basse */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-around; padding: 12px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: rgba(255, 255, 255, 0.6); text-decoration: none;
+            font-size: 0.65rem; gap: 5px; cursor: pointer;
+        }
+
+        .nav-item i { font-size: 1.2rem; }
+        .nav-item.active { color: var(--accent); }
+        #fileInput { display: none; }
     </style>
 </head>
 <body>
@@ -98,11 +116,6 @@
     <h1>PHARMATIC</h1>
     <p style="font-size: 0.7rem; opacity: 0.5; letter-spacing: 1px;">KEUR MASSAR • PROXIMITÉ SANTÉ</p>
 </header>
-
-<nav class="top-nav">
-    <div class="nav-tab active" id="btn-recherche" onclick="switchTab('recherche')">RECHERCHE</div>
-    <div class="nav-tab" id="btn-liste" onclick="switchTab('explorer')">LISTE</div>
-</nav>
 
 <div class="content-area">
     <div id="recherche" class="tab-content active">
@@ -126,126 +139,127 @@
         </div>
         <div id="listContainer"></div>
     </div>
+
+    <div id="garde-section" class="tab-content">
+        <div class="card" style="background: rgba(255, 77, 77, 0.1); border-color: var(--rouge-ferme);">
+            <h3 style="margin:0; color: var(--rouge-ferme); font-size: 0.9rem;">
+                <i class="fas fa-moon"></i> Pharmacies de Garde
+            </h3>
+            <p style="font-size: 0.7rem; opacity: 0.8; margin: 5px 0 0 0;">Mise à jour : Semaine du 9 Février 2026</p>
+        </div>
+        <div id="gardeContainer"></div>
+    </div>
 </div>
 
+<nav class="bottom-nav">
+    <div class="nav-item active" id="nav-recherche" onclick="switchTab('recherche')">
+        <i class="fas fa-search"></i>
+        <span>Recherche</span>
+    </div>
+    <div class="nav-item" id="nav-garde" onclick="switchTab('garde')">
+        <i class="fas fa-clock"></i>
+        <span>Gardes</span>
+    </div>
+    <div class="nav-item" onclick="document.getElementById('fileInput').click()">
+        <i class="fas fa-file-medical"></i>
+        <span>Ordonnance</span>
+    </div>
+    <div class="nav-item" onclick="window.open('https://wa.me/221788087878', '_blank')">
+        <i class="fas fa-headset"></i>
+        <span>Aide</span>
+    </div>
+</nav>
+
+<input type="file" id="fileInput" accept="image/*,.pdf" onchange="handleFile(this)">
+
 <script>
+    // Ajoute "garde: true" pour les pharmacies de la semaine
     const pharmacies = [
-        { "nom": "Pharmacie Dial Diop", "quartier": "Unité 5", "tel": "+221338370000", "lat": 14.7792, "lng": -17.3216 },
+        { "nom": "Pharmacie Dial Diop", "quartier": "Unité 5", "tel": "+221338370000", "lat": 14.7792, "lng": -17.3216, "garde": true },
         { "nom": "Pharmacie Elimane Aly DRAMANE", "quartier": "Unité 3", "tel": "+221338370001", "lat": 14.7820, "lng": -17.3055 },
         { "nom": "Pharmacie Mingue", "quartier": "Fass", "tel": "+221338370002", "lat": 14.7850, "lng": -17.3100 },
-        { "nom": "Pharmacie Pape Djibril", "quartier": "Mame Dior", "tel": "+221338370003", "lat": 14.7880, "lng": -17.3120 },
-        { "nom": "Pharmacie Birane LY", "quartier": "Aïnoumady", "tel": "+221788087878", "lat": 14.7695, "lng": -17.3138 },
-        { "nom": "Pharmacie DIOMA", "quartier": "Aïnoumadi", "tel": "+221338370004", "lat": 14.7870, "lng": -17.3040 },
-        { "nom": "Pharmacie du Logo", "quartier": "Kawsara", "tel": "+221338788417", "lat": 14.7836, "lng": -17.3148 },
-        { "nom": "Pharmacie Adji Mouhamed", "quartier": "Croisement", "tel": "+221338377526", "lat": 14.7726, "lng": -17.3170 },
-        { "nom": "Pharmacie Sankoun Faty", "quartier": "Cité Gendarmerie", "tel": "+221338378786", "lat": 14.7750, "lng": -17.3100 },
-        { "nom": "Pharmacie Elimane Aly Dramane (PA)", "quartier": "Unité 3", "tel": "+221800002020", "lat": 14.7825, "lng": -17.3050 },
-        { "nom": "Pharmacie Ainoumadi", "quartier": "Cité Ainoumadi", "tel": "+221338785108", "lat": 14.7878, "lng": -17.3058 },
-        { "nom": "Pharmacie Camille Basse", "quartier": "Camille Basse", "tel": "+221330000000", "lat": 14.7900, "lng": -17.3150 },
-        { "nom": "Pharmacie EL Abdoul Boutou Kane", "quartier": "Arafat II", "tel": "+221330000000", "lat": 14.7700, "lng": -17.3000 },
-        { "nom": "Pharmacie Seydi M. Moustapha SY", "quartier": "Unité 14", "tel": "+221338379874", "lat": 14.7850, "lng": -17.3150 },
-        { "nom": "Pharmacie Baye Niasse", "quartier": "Unité 6", "tel": "+221330000000", "lat": 14.7730, "lng": -17.3260 },
-        { "nom": "Pharmacie Marie Essenteine Manga", "quartier": "Unité 20", "tel": "+221330000000", "lat": 14.7650, "lng": -17.3080 },
-        { "nom": "Pharmacie Mame Cheikh Anta Mbacké", "quartier": "Darou Salam", "tel": "+221330000000", "lat": 14.7920, "lng": -17.3200 },
-        { "nom": "Pharmacie Pascale", "quartier": "Unité 15", "tel": "+221330000000", "lat": 14.7800, "lng": -17.3300 },
-        { "nom": "Pharmacie Al Amine Mouhammed", "quartier": "Unité 6", "tel": "+221338788929", "lat": 14.7726, "lng": -17.3257 },
-        { "nom": "ROND POINT JAXAAY", "quartier": "Jaxaay", "tel": "+221330000000", "lat": 14.7600, "lng": -17.3000 },
-        { "nom": "Cheikhna Cheikh Abass Aidara", "quartier": "Darou Salam", "tel": "+221330000000", "lat": 14.7930, "lng": -17.3220 },
-        { "nom": "YAYE FATOUMA", "quartier": "Unité 17", "tel": "+221330000000", "lat": 14.7750, "lng": -17.3350 },
-        { "nom": "Pharmacie SAN JOSE", "quartier": "Unité 03", "tel": "+221330000000", "lat": 14.7810, "lng": -17.3060 },
-        { "nom": "Pharmacie tawhid", "quartier": "Tène-bi", "tel": "+221330000000", "lat": 14.7700, "lng": -17.3400 },
-        { "nom": "MAYA MAME ANSOU NIANG", "quartier": "Unité 18", "tel": "+221330000000", "lat": 14.7770, "lng": -17.3380 },
-        { "nom": "Pharmacie NA SAGAR NIANDING", "quartier": "Jaxaay 2", "tel": "+221330000000", "lat": 14.7580, "lng": -17.2950 }
+        { "nom": "Pharmacie Birane LY", "quartier": "Aïnoumady", "tel": "+221788087878", "lat": 14.7695, "lng": -17.3138, "garde": true },
+        { "nom": "Pharmacie du Logo", "quartier": "Kawsara", "tel": "+221338788417", "lat": 14.7836, "lng": -17.3148 }
+        // ... Ajoute le reste de ta liste ici
     ];
 
     let userCoords = null;
 
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        document.getElementById('btn-' + (tabId === 'recherche' ? 'recherche' : 'liste')).classList.add('active');
-        if(tabId === 'explorer') renderList();
-    }
-
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
-
-    function applyFilter(mode) {
-        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-        if(mode === 'proches') {
-            document.getElementById('filter-near').classList.add('active');
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    renderList('proches');
-                }, () => alert("La géolocalisation est désactivée."));
-            }
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        
+        if(tabId === 'garde') {
+            document.getElementById('garde-section').classList.add('active');
+            document.getElementById('nav-garde').classList.add('active');
+            renderGarde();
         } else {
-            document.getElementById('filter-all').classList.add('active');
-            renderList('toutes');
+            document.getElementById(tabId).classList.add('active');
+            if(tabId === 'recherche') document.getElementById('nav-recherche').classList.add('active');
+            if(tabId === 'explorer') renderList();
         }
     }
 
-    function renderList(filter = 'toutes') {
-        const container = document.getElementById('listContainer');
+    function renderGarde() {
+        const container = document.getElementById('gardeContainer');
         container.innerHTML = '';
-        let list = pharmacies.map(p => ({ ...p, dist: userCoords ? calculateDistance(userCoords.lat, userCoords.lng, p.lat, p.lng) : null }));
-        if(filter === 'proches' && userCoords) list.sort((a, b) => a.dist - b.dist);
-
-        list.forEach(p => {
-            const distLabel = p.dist ? `<span class="dist-tag">${p.dist.toFixed(1)}km</span>` : '';
+        const listeGarde = pharmacies.filter(p => p.garde === true);
+        
+        listeGarde.forEach(p => {
             const div = document.createElement('div');
             div.className = 'pharma-item';
+            div.style.borderLeft = "4px solid var(--rouge-ferme)";
             div.innerHTML = `
                 <div>
-                    <div style="font-weight:bold; display:flex; align-items:center; font-size:0.95rem;">${p.nom} <span class="status-badge open">Ouvert</span></div>
-                    <div style="font-size:0.75rem; opacity:0.5; margin-top:3px;">${p.quartier} ${distLabel}</div>
+                    <div style="font-weight:bold; font-size:0.95rem;">${p.nom}</div>
+                    <div style="font-size:0.75rem; opacity:0.5;">${p.quartier}</div>
                 </div>
                 <div class="pharma-actions">
-                    <a href="tel:${p.tel}"><i class="fas fa-phone-alt"></i></a>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-directions"></i></a>
+                    <a href="tel:${p.tel}" style="color:var(--rouge-ferme);"><i class="fas fa-phone-alt"></i></a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank"><i class="fas fa-directions"></i></a>
                 </div>`;
             container.appendChild(div);
         });
     }
 
+    function handleFile(input) {
+        if (input.files && input.files[0]) {
+            alert("Fichier reçu ! Envoi de la demande de devis en cours...");
+            window.open(`https://wa.me/221788087878?text=Bonjour, voici mon ordonnance pour un devis.`, '_blank');
+        }
+    }
+
+    // Garde le reste de tes fonctions existantes (calculateDistance, applyFilter, renderList, sendToWhatsApp, etc.)
     document.getElementById('searchInput').addEventListener('input', (e) => {
         let val = e.target.value;
         if(val.length > 2) {
             document.getElementById('selection-box').style.display = 'block';
             document.getElementById('medSelected').textContent = "📦 " + val;
             const select = document.getElementById('pharmacySelect');
-            
             let optionsHTML = `<option value="" disabled selected>Choisir la pharmacie</option>`;
-            optionsHTML += pharmacies.map(p => `<option value="${p.tel}">${p.nom} (${p.quartier})</option>`).join('');
-            
+            optionsHTML += pharmacies.map(p => `<option value="${p.tel}">${p.nom}</option>`).join('');
             select.innerHTML = optionsHTML;
-        } else { 
-            document.getElementById('selection-box').style.display = 'none'; 
-        }
+        } else { document.getElementById('selection-box').style.display = 'none'; }
     });
 
     function sendToWhatsApp() {
-        const select = document.getElementById('pharmacySelect');
-        const tel = select.value;
-        if(!tel || tel === "") { 
-            alert("Veuillez d'abord choisir une pharmacie dans la liste."); 
-            return; 
-        }
+        const tel = document.getElementById('pharmacySelect').value;
+        if(!tel) return alert("Choisissez une pharmacie");
         const med = document.getElementById('searchInput').value;
-        const msg = encodeURIComponent(`Bonjour, auriez-vous en stock : ${med} ?`);
-        // On nettoie le numéro de téléphone pour WhatsApp
-        const cleanTel = tel.replace(/[\s+]/g, '');
-        window.open(`https://wa.me/${cleanTel}?text=${msg}`, '_blank');
+        window.open(`https://wa.me/${tel.replace('+', '')}?text=Bonjour, avez-vous en stock : ${med} ?`, '_blank');
     }
 
-    renderList();
+    function renderList(filter = 'toutes') {
+        const container = document.getElementById('listContainer');
+        container.innerHTML = '';
+        pharmacies.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'pharma-item';
+            div.innerHTML = `<div><div style="font-weight:bold;">${p.nom}</div><div style="font-size:0.75rem; opacity:0.5;">${p.quartier}</div></div>
+            <div class="pharma-actions"><a href="tel:${p.tel}"><i class="fas fa-phone-alt"></i></a></div>`;
+            container.appendChild(div);
+        });
+    }
 </script>
 </body>
 </html>
