@@ -166,58 +166,71 @@
         }
     }
 
-    function renderList(filter = 'toutes') {
-        const container = document.getElementById('listContainer');
-        container.innerHTML = '';
-        
-        // Calcul des distances si la géolocalisation est active
-        let list = pharmacies.map(p => ({ 
-            ...p, 
-            dist: userCoords ? calculateDistance(userCoords.lat, userCoords.lng, p.lat, p.lng) : null 
-        }));
-        
-        // Tri structuré pour regrouper les catégories
-        if(filter === 'proches' && userCoords) {
-            list.sort((a, b) => a.dist - b.dist);
-        } else {
-            list.sort((a, b) => {
-                if (a.nuit !== b.nuit) return b.nuit - a.nuit;
-                if (a.dimanche !== b.dimanche) return b.dimanche - a.dimanche;
-                return a.nom.localeCompare(b.nom);
-            });
-        }
-
-        let currentSection = "";
-        list.forEach(p => {
-            // Affichage des titres de section (uniquement en mode "Toutes")
-            if (filter !== 'proches') {
-                let sectionName = p.nuit ? "🌙 EN GARDE DE NUIT" : (p.dimanche ? "☀️ GARDE DU DIMANCHE" : "🏥 AUTRES PHARMACIES");
-                if (sectionName !== currentSection) {
-                    currentSection = sectionName;
-                    const header = document.createElement('div');
-                    header.style = "font-size: 0.7rem; font-weight: bold; opacity: 0.8; margin: 25px 0 10px 5px; text-transform: uppercase; color: var(--accent); letter-spacing: 1px;";
-                    header.innerHTML = currentSection;
-                    container.appendChild(header);
-                }
-            }
-
-            const div = document.createElement('div');
-            div.className = 'pharma-item';
-            if(p.nuit) div.style.borderLeft = "4px solid var(--violet-nuit)";
-            else if(p.dimanche) div.style.borderLeft = "4px solid var(--rouge-dimanche)";
-
-            div.innerHTML = `
-                <div>
-                    <div style="font-weight:bold; font-size:0.9rem;">${p.nom} ${p.nuit ? '<span class="badge badge-nuit">Nuit</span>' : ''}</div>
-                    <div style="font-size:0.7rem; opacity:0.6;">${p.quartier} ${p.dist ? '• '+p.dist.toFixed(1)+'km' : ''}</div>
-                </div>
-                <div style="display:flex; gap:15px; font-size:1.2rem;">
-                    <a href="tel:${p.telephone}" style="color:inherit;"><i class="fas fa-phone-alt"></i></a>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-directions"></i></a>
-                </div>`;
-            container.appendChild(div);
-        });
+ function renderList(filter = 'toutes') {
+    const container = document.getElementById('listContainer');
+    container.innerHTML = '';
+    
+    // 1. On prépare les données avec les distances
+    let allPharmacies = pharmacies.map(p => ({ 
+        ...p, 
+        dist: userCoords ? calculateDistance(userCoords.lat, userCoords.lng, p.lat, p.lng) : null 
+    }));
+    
+    // 2. Si on filtre par "proches", on affiche une liste simple triée par distance
+    if(filter === 'proches' && userCoords) {
+        allPharmacies.sort((a, b) => a.dist - b.dist);
+        allPharmacies.forEach(p => container.appendChild(createPharmaCard(p)));
+        return; 
     }
+
+    // 3. MODE "TOUTES" : On sépare physiquement les groupes
+    const listNuit = allPharmacies.filter(p => p.nuit);
+    const listDimanche = allPharmacies.filter(p => !p.nuit && p.dimanche);
+    const listAutres = allPharmacies.filter(p => !p.nuit && !p.dimanche);
+
+    // 4. On affiche chaque groupe avec SON titre unique
+    if (listNuit.length > 0) {
+        container.appendChild(createSectionHeader("🌙 EN GARDE DE NUIT"));
+        listNuit.forEach(p => container.appendChild(createPharmaCard(p)));
+    }
+
+    if (listDimanche.length > 0) {
+        container.appendChild(createSectionHeader("☀️ GARDE DU DIMANCHE"));
+        listDimanche.forEach(p => container.appendChild(createPharmaCard(p)));
+    }
+
+    if (listAutres.length > 0) {
+        container.appendChild(createSectionHeader("🏥 AUTRES PHARMACIES"));
+        listAutres.forEach(p => container.appendChild(createPharmaCard(p)));
+    }
+}
+
+// Fonction utilitaire pour créer le titre de section
+function createSectionHeader(text) {
+    const header = document.createElement('div');
+    header.style = "font-size: 0.75rem; font-weight: bold; opacity: 0.8; margin: 25px 0 12px 5px; text-transform: uppercase; color: var(--accent); letter-spacing: 1px; display: flex; align-items: center; gap: 8px;";
+    header.innerHTML = text;
+    return header;
+}
+
+// Fonction utilitaire pour créer la carte pharmacie
+function createPharmaCard(p) {
+    const div = document.createElement('div');
+    div.className = 'pharma-item';
+    if(p.nuit) div.style.borderLeft = "4px solid var(--violet-nuit)";
+    else if(p.dimanche) div.style.borderLeft = "4px solid var(--rouge-dimanche)";
+
+    div.innerHTML = `
+        <div>
+            <div style="font-weight:bold; font-size:0.9rem;">${p.nom} ${p.nuit ? '<span class="badge badge-nuit">Nuit</span>' : ''}</div>
+            <div style="font-size:0.7rem; opacity:0.6;">${p.quartier} ${p.dist ? '• '+p.dist.toFixed(1)+'km' : ''}</div>
+        </div>
+        <div style="display:flex; gap:15px; font-size:1.2rem;">
+            <a href="tel:${p.telephone}" style="color:inherit;"><i class="fas fa-phone-alt"></i></a>
+            <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-directions"></i></a>
+        </div>`;
+    return div;
+}
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
         const R = 6371;
