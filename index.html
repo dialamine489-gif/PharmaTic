@@ -38,7 +38,7 @@
 
         .step-card {
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 20px;
@@ -46,24 +46,20 @@
 
         label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-weight: bold;
             color: #2c3e50;
         }
 
         input[type="text"], select {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             border: 2px solid #eee;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 1rem;
             box-sizing: border-box;
             outline: none;
-            transition: border-color 0.3s;
-        }
-
-        input[type="text"]:focus, select:focus {
-            border-color: var(--vert-pharmacie);
+            background-color: #fff;
         }
 
         #suggestions {
@@ -72,6 +68,9 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             display: none;
             margin-top: 5px;
+            position: absolute;
+            width: calc(100% - 90px);
+            z-index: 100;
         }
 
         .suggestion-item {
@@ -81,20 +80,14 @@
         }
 
         #step-2 {
-            display: none; /* Apparaît après sélection médicament */
-            animation: slideUp 0.4s ease-out;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            display: none; /* Masqué jusqu'à la sélection du médicament */
         }
 
         .btn-send {
             background-color: #25D366;
             color: white;
             border: none;
-            padding: 16px;
+            padding: 18px;
             border-radius: 12px;
             width: 100%;
             font-weight: bold;
@@ -104,17 +97,17 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 20px;
         }
 
-        .med-badge {
-            display: inline-block;
+        .med-selected-info {
             background: #e8f5e9;
-            color: var(--vert-pharmacie);
-            padding: 5px 12px;
-            border-radius: 20px;
+            color: #27AE60;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
             font-weight: bold;
-            margin-bottom: 15px;
+            text-align: center;
         }
     </style>
 </head>
@@ -122,27 +115,25 @@
 
 <header>
     <h1 style="margin:0;">PharmaTic</h1>
-    <p style="margin:0; opacity: 0.8;">Toutes les pharmacies de Keur Massar</p>
+    <p style="margin:0; opacity: 0.8;">Votre santé à Keur Massar</p>
 </header>
 
 <div class="container">
     <div class="step-card">
-        <label><i class="fas fa-pills"></i> 1. Quel médicament cherchez-vous ?</label>
-        <input type="text" id="searchInput" placeholder="Ex: Doliprane..." autocomplete="off">
-        <div id="suggestions"></div>
+        <label>1. Rechercher un médicament</label>
+        <div style="position: relative;">
+            <input type="text" id="searchInput" placeholder="Entrez le nom du médicament..." autocomplete="off">
+            <div id="suggestions"></div>
+        </div>
     </div>
 
     <div id="step-2" class="step-card">
-        <div class="med-badge" id="displayMed"></div>
+        <div class="med-selected-info" id="displayMed"></div>
         
-        <label><i class="fas fa-hospital"></i> 2. Choisissez une pharmacie</label>
+        <label>2. Choisir la pharmacie</label>
         <select id="pharmacySelect">
-            <option value="" disabled selected>Cliquez pour choisir...</option>
+            <option value="" disabled selected>Liste des pharmacies...</option>
             </select>
-
-        <p style="font-size: 0.8rem; color: #7f8c8d; margin: 15px 0;">
-            En cliquant sur envoyer, vous ouvrirez une discussion WhatsApp avec la pharmacie sélectionnée.
-        </p>
 
         <button class="btn-send" onclick="sendToWhatsApp()">
             <i class="fab fa-whatsapp"></i> ENVOYER LA DEMANDE
@@ -151,9 +142,10 @@
 </div>
 
 <script>
-    const dictionnaireMeds = ["Doliprane", "Paracétamol", "Amoxicilline", "Efferalgan", "Novomix 30", "Spasfon", "Gaviscon"];
+    // Médicaments pour le test
+    const dictionnaireMeds = ["Doliprane", "Paracétamol", "Amoxicilline", "Efferalgan", "Novomix 30", "Spasfon"];
 
-    // Vos données issues de pharmacies.json
+    // Liste complète extraite de pharmacies.json
     const pharmacies = [
         { "nom": "Pharmacie Dial Diop", "quartier": "Keur Massar Village", "tel": "+221338370000" },
         { "nom": "Pharmacie Elimane Aly Dramane", "quartier": "Keur Massar Village", "tel": "+221800002020" },
@@ -174,7 +166,7 @@
 
     let selectedMed = "";
 
-    // Autocomplete
+    // Logique de suggestions
     searchInput.addEventListener('input', function() {
         const val = this.value;
         suggestionsBox.innerHTML = '';
@@ -186,7 +178,12 @@
                     const div = document.createElement('div');
                     div.className = 'suggestion-item';
                     div.textContent = m;
-                    div.onclick = () => selectMedicine(m);
+                    div.onclick = () => {
+                        selectedMed = m;
+                        searchInput.value = m;
+                        suggestionsBox.style.display = 'none';
+                        activateStep2();
+                    };
                     suggestionsBox.appendChild(div);
                 });
             }
@@ -195,18 +192,15 @@
         }
     });
 
-    function selectMedicine(med) {
-        selectedMed = med;
-        searchInput.value = med;
-        displayMed.innerHTML = `<i class="fas fa-check-circle"></i> Médicament : ${med}`;
-        suggestionsBox.style.display = 'none';
+    function activateStep2() {
+        displayMed.textContent = "Médicament : " + selectedMed;
         
-        // Remplir le select
-        pharmacySelect.innerHTML = '<option value="" disabled selected>Cliquez pour choisir...</option>';
+        // On remplit le menu déroulant
+        pharmacySelect.innerHTML = '<option value="" disabled selected>Sélectionner une pharmacie...</option>';
         pharmacies.forEach(p => {
             const opt = document.createElement('option');
             opt.value = p.tel;
-            opt.textContent = `${p.nom} (${p.quartier})`;
+            opt.textContent = `${p.nom} - ${p.quartier}`;
             pharmacySelect.appendChild(opt);
         });
 
@@ -216,7 +210,7 @@
     function sendToWhatsApp() {
         const tel = pharmacySelect.value;
         if (!tel) {
-            alert("Veuillez choisir une pharmacie.");
+            alert("Veuillez choisir une pharmacie dans la liste.");
             return;
         }
 
