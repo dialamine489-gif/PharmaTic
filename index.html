@@ -23,7 +23,6 @@
             overflow: hidden;
         }
 
-        /* --- En-tête Fixe --- */
         header {
             background-color: var(--vert-pharmacie);
             color: white;
@@ -32,7 +31,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* --- Navigation par Onglets (Top Nav) --- */
         .top-nav {
             display: flex;
             background: white;
@@ -47,7 +45,6 @@
             color: #777;
             cursor: pointer;
             border-bottom: 3px solid transparent;
-            transition: 0.3s;
         }
 
         .nav-tab.active {
@@ -55,7 +52,6 @@
             border-bottom: 3px solid var(--vert-pharmacie);
         }
 
-        /* --- Zone de Contenu --- */
         .content-area {
             flex: 1;
             overflow-y: auto;
@@ -64,11 +60,8 @@
         }
 
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* --- Styles des Cartes --- */
         .card {
             background: white;
             padding: 20px;
@@ -77,18 +70,10 @@
             margin-bottom: 20px;
         }
 
-        .search-box { position: relative; margin-bottom: 10px; }
         input[type="text"], select {
             width: 100%; padding: 14px; border: 2px solid #eee;
             border-radius: 10px; font-size: 1rem; outline: none; box-sizing: border-box;
         }
-
-        #suggestions {
-            background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: none; position: absolute; width: 100%; z-index: 100;
-        }
-
-        .suggestion-item { padding: 12px; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
 
         .btn-send {
             background-color: #25D366; color: white; border: none; padding: 16px;
@@ -96,7 +81,6 @@
             display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px;
         }
 
-        /* --- Liste Exploration --- */
         .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; }
         .filter-chip {
             padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd;
@@ -108,39 +92,43 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 15px 0; border-bottom: 1px solid #f0f0f0;
         }
-        .pharma-item:last-child { border-bottom: none; }
-        .pharma-actions { display: flex; gap: 15px; font-size: 1.3rem; }
 
+        .dist-tag {
+            font-size: 0.75rem;
+            background: #eee;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #666;
+        }
+
+        .pharma-actions { display: flex; gap: 15px; font-size: 1.3rem; }
     </style>
 </head>
 <body>
 
 <header>
     <h1 style="margin:0; font-size: 1.4rem;">PharmaTic</h1>
-    <p style="margin:0; font-size: 0.8rem; opacity: 0.9;">Votre santé à Keur Massar</p>
+    <p style="margin:0; font-size: 0.8rem; opacity: 0.9;">Keur Massar - Service Santé</p>
 </header>
 
 <nav class="top-nav">
-    <div class="nav-tab active" onclick="switchTab('recherche')">RECHERCHE</div>
-    <div class="nav-tab" onclick="switchTab('explorer')">EXPLORER</div>
+    <div class="nav-tab active" id="tab-search" onclick="switchTab('recherche')">RECHERCHE</div>
+    <div class="nav-tab" id="tab-explore" onclick="switchTab('explorer')">EXPLORER</div>
 </nav>
 
 <div class="content-area">
     <div id="recherche" class="tab-content active">
         <div class="card">
-            <label style="font-weight:bold; display:block; margin-bottom:10px;">1. Médicament</label>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Ex: Doliprane..." autocomplete="off">
-                <div id="suggestions"></div>
-            </div>
+            <label style="font-weight:bold; display:block; margin-bottom:10px;">Quel médicament cherchez-vous ?</label>
+            <input type="text" id="searchInput" placeholder="Doliprane, Spasfon..." autocomplete="off">
         </div>
 
         <div id="selection-box" class="card" style="display:none;">
             <div id="medSelected" style="background:#e8f5e9; color:#27AE60; padding:10px; border-radius:8px; margin-bottom:15px; font-weight:bold; text-align:center;"></div>
-            <label style="font-weight:bold; display:block; margin-bottom:10px;">2. Choisir la pharmacie</label>
+            <label style="font-weight:bold; display:block; margin-bottom:10px;">Choisir la pharmacie</label>
             <select id="pharmacySelect"></select>
             <button class="btn-send" onclick="sendToWhatsApp()">
-                <i class="fab fa-whatsapp"></i> ENVOYER LA DEMANDE
+                <i class="fab fa-whatsapp"></i> DEMANDER PAR WHATSAPP
             </button>
         </div>
     </div>
@@ -148,99 +136,81 @@
     <div id="explorer" class="tab-content">
         <div class="filter-bar">
             <div class="filter-chip active" onclick="applyFilter('toutes', this)">Toutes</div>
-            <div class="filter-chip" onclick="applyFilter('proches', this)">Les plus proches</div>
-            <div class="filter-chip" onclick="applyFilter('village', this)">Village</div>
+            <div class="filter-chip" onclick="applyFilter('proches', this)">Les plus proches 📍</div>
         </div>
         <div class="card" id="listContainer">
-            </div>
+            <p style="text-align:center; color:#999;">Chargement des pharmacies...</p>
+        </div>
     </div>
 </div>
 
 <script>
-    const dictionnaireMeds = ["Doliprane", "Paracétamol", "Amoxicilline", "Efferalgan", "Spasfon", "Novomix 30"];
-    
+    // Ajout des coordonnées GPS (lat/lng) pour le calcul de proximité
     const pharmacies = [
-        { "nom": "Pharmacie Dial Diop", "quartier": "Keur Massar Village", "tel": "+221338370000", "proche": false, "map": "https://goo.gl/maps/xyz1" },
-        { "nom": "Pharmacie Elimane Aly Dramane", "quartier": "Keur Massar Village", "tel": "+221800002020", "proche": false, "map": "https://goo.gl/maps/xyz2" },
-        { "nom": "Pharmacie Al Amine Mouhamed", "quartier": "Unité 6", "tel": "+221338751212", "proche": false, "map": "https://goo.gl/maps/xyz3" },
-        { "nom": "Pharmacie Birane Ly", "quartier": "Jaxaay", "tel": "+221788087878", "proche": true, "map": "https://goo.gl/maps/xyz4" },
-        { "nom": "Pharmacie Adji Mohamed", "quartier": "Keur Massar", "tel": "+221338370000", "proche": false, "map": "https://goo.gl/maps/xyz5" },
-        { "nom": "Pharmacie Ainoumadi", "quartier": "Ainoumadi", "tel": "+221338370001", "proche": false, "map": "https://goo.gl/maps/xyz6" },
-        { "nom": "Pharmacie Sankoun Faty", "quartier": "Keur Massar", "tel": "+221338370002", "proche": false, "map": "https://goo.gl/maps/xyz7" }
+        { "nom": "Pharmacie Dial Diop", "quartier": "Keur Massar Village", "tel": "+221338370000", "lat": 14.7865, "lng": -17.3115, "map": "https://maps.google.com/?q=Pharmacie+Dial+Diop+Keur+Massar" },
+        { "nom": "Pharmacie Birane Ly", "quartier": "Jaxaay", "tel": "+221788087878", "lat": 14.7695, "lng": -17.3138, "map": "https://maps.google.com/?q=Pharmacie+Birane+Ly+Keur+Massar" },
+        { "nom": "Pharmacie Adji Mohamed", "quartier": "Keur Massar", "tel": "+221338377526", "lat": 14.7726, "lng": -17.3170, "map": "https://maps.google.com/?q=Pharmacie+Adji+Mohamed+Keur+Massar" },
+        { "nom": "Pharmacie Elimane Aly Dramane", "quartier": "Keur Massar Village", "tel": "+221800002020", "lat": 14.7778, "lng": -17.3143, "map": "https://maps.google.com/?q=Pharmacie+Elimane+Aly+Dramane+Keur+Massar" },
+        { "nom": "Pharmacie Al Amine Mouhamed", "quartier": "Unité 6", "tel": "+221338788929", "lat": 14.7726, "lng": -17.3257, "map": "https://maps.google.com/?q=Pharmacie+Al+Amine+Mouhamed+Keur+Massar" }
     ];
 
+    let userCoords = null;
     let selectedMed = "";
 
-    // --- NAVIGATION ---
+    // --- GEOLOCALISATION ---
+    function getUserLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(position => {
+                userCoords = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                renderExplorer();
+            });
+        }
+    }
+
+    // Formule mathématique (Haversine) pour calculer la distance entre 2 points GPS
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Rayon de la Terre en km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    // --- UI NAVIGATION ---
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
-        event.currentTarget.classList.add('active');
-        if(tabId === 'explorer') renderExplorer();
+        document.getElementById('tab-' + (tabId === 'recherche' ? 'search' : 'explore')).classList.add('active');
     }
 
-    // --- RECHERCHE ---
-    const searchInput = document.getElementById('searchInput');
-    const suggestionsBox = document.getElementById('suggestions');
-
-    searchInput.addEventListener('input', () => {
-        const val = searchInput.value;
-        suggestionsBox.innerHTML = '';
-        if (val.length > 0) {
-            const matches = dictionnaireMeds.filter(m => m.toLowerCase().includes(val.toLowerCase()));
-            if(matches.length > 0) {
-                suggestionsBox.style.display = 'block';
-                matches.forEach(m => {
-                    const div = document.createElement('div');
-                    div.className = 'suggestion-item';
-                    div.textContent = m;
-                    div.onclick = () => {
-                        selectedMed = m;
-                        searchInput.value = m;
-                        suggestionsBox.style.display = 'none';
-                        document.getElementById('selection-box').style.display = 'block';
-                        document.getElementById('medSelected').textContent = "Demande pour : " + m;
-                        fillSelect();
-                    };
-                    suggestionsBox.appendChild(div);
-                });
-            }
-        } else { suggestionsBox.style.display = 'none'; }
-    });
-
-    function fillSelect() {
-        const select = document.getElementById('pharmacySelect');
-        select.innerHTML = '<option value="" disabled selected>Sélectionner une pharmacie...</option>';
-        pharmacies.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p.tel;
-            opt.textContent = `${p.nom} (${p.quartier})`;
-            select.appendChild(opt);
-        });
-    }
-
-    function sendToWhatsApp() {
-        const tel = document.getElementById('pharmacySelect').value;
-        if(!tel) return alert("Choisissez une pharmacie.");
-        const msg = `🏥 *PharmaTic*\nBonjour, avez-vous en stock : *${selectedMed}* ?`;
-        window.open(`https://wa.me/${tel.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    // --- EXPLORER ---
+    // --- EXPLORER & FILTRES ---
     function renderExplorer(filter = 'toutes') {
         const container = document.getElementById('listContainer');
         container.innerHTML = '';
-        let list = pharmacies;
-        if(filter === 'proches') list = pharmacies.filter(p => p.proche);
-        if(filter === 'village') list = pharmacies.filter(p => p.quartier.includes("Village"));
+
+        let list = pharmacies.map(p => {
+            let dist = userCoords ? calculateDistance(userCoords.lat, userCoords.lng, p.lat, p.lng) : null;
+            return { ...p, distance: dist };
+        });
+
+        if (filter === 'proches' && userCoords) {
+            list.sort((a, b) => a.distance - b.distance);
+        }
 
         list.forEach(p => {
+            const distHTML = p.distance ? `<span class="dist-tag">${p.distance.toFixed(2)} km</span>` : '';
             const div = document.createElement('div');
             div.className = 'pharma-item';
             div.innerHTML = `
                 <div>
-                    <div style="font-weight:bold; font-size:0.95rem;">${p.nom}</div>
+                    <div style="font-weight:bold; font-size:0.95rem;">${p.nom} ${distHTML}</div>
                     <div style="font-size:0.8rem; color:#888;">${p.quartier}</div>
                 </div>
                 <div class="pharma-actions">
@@ -255,6 +225,27 @@
         document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
         renderExplorer(type);
+    }
+
+    // Init
+    getUserLocation();
+    renderExplorer();
+
+    // Logique de recherche (simplifiée pour l'exemple)
+    document.getElementById('searchInput').addEventListener('change', (e) => {
+        selectedMed = e.target.value;
+        if(selectedMed) {
+            document.getElementById('selection-box').style.display = 'block';
+            document.getElementById('medSelected').textContent = "Demande pour : " + selectedMed;
+            const select = document.getElementById('pharmacySelect');
+            select.innerHTML = pharmacies.map(p => `<option value="${p.tel}">${p.nom}</option>`).join('');
+        }
+    });
+
+    function sendToWhatsApp() {
+        const tel = document.getElementById('pharmacySelect').value;
+        const msg = encodeURIComponent(`Bonjour, avez-vous en stock : ${selectedMed} ?`);
+        window.open(`https://wa.me/${tel.replace(/\+/g,'')}?text=${msg}`, '_blank');
     }
 </script>
 </body>
