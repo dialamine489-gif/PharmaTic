@@ -15,7 +15,7 @@
             --violet-nuit: #a855f7;
         }
 
-        /* Thèmes */
+        /* Thèmes de l'application */
         body.dark-theme { --bg: radial-gradient(circle at top, #1e293b, #0f172a); --text: #ffffff; --card: rgba(255,255,255,0.08); --nav: rgba(15, 23, 42, 0.95); }
         body.light-theme { --bg: linear-gradient(135deg, #f8fafc, #e2e8f0); --text: #1e293b; --card: rgba(0,0,0,0.05); --nav: rgba(248, 250, 252, 0.95); }
         body.rose-theme { --bg: linear-gradient(135deg, #fdf2f8, #fbcfe8); --text: #831843; --card: rgba(255, 255, 255, 0.4); --nav: rgba(253, 242, 248, 0.95); }
@@ -79,7 +79,7 @@
     <div id="recherche" class="tab-content active">
         <div class="card" style="border: 1px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1);">
             <h3 style="margin:0 0 10px 0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-moon"></i> En garde actuellement</h3>
-            <div id="guardsContainer" style="font-size: 0.8rem; font-weight: bold;">Chargement...</div>
+            <div id="guardsContainer" style="font-size: 0.8rem; font-weight: bold;">Vérification des données...</div>
         </div>
 
         <div class="card">
@@ -127,11 +127,11 @@
 
     async function loadData() {
         try {
-            const res = await fetch('src/data/pharmacies.json');
+            const res = await fetch('data/pharmacies.json');
             pharmacies = await res.json();
             renderList();
             updateGuardsDisplay();
-        } catch (e) { console.error("Erreur JSON"); }
+        } catch (e) { console.error("Erreur de lecture du JSON"); }
     }
 
     function updateGuardsDisplay() {
@@ -148,7 +148,7 @@
                     <a href="tel:${p.telephone}" style="background:var(--violet-nuit); color:white; padding:5px 12px; border-radius:8px; text-decoration:none; font-size:0.7rem;">Appeler</a>
                 </div>`).join('');
         } else {
-            container.innerHTML = `<div style="opacity:0.6; font-weight:normal; font-size:0.75rem;">Pas de garde active. Reprise à 23h00 ou dimanche.</div>`;
+            container.innerHTML = `<div style="opacity:0.6; font-weight:normal; font-size:0.75rem;">Pas de garde active à cette heure. Reprise à 23h00.</div>`;
         }
     }
 
@@ -166,62 +166,58 @@
         }
     }
 
-   function renderList(filter = 'toutes') {
-    const container = document.getElementById('listContainer');
-    container.innerHTML = '';
-    
-    // 1. On crée la liste avec les distances
-    let list = pharmacies.map(p => ({ 
-        ...p, 
-        dist: userCoords ? calculateDistance(userCoords.lat, userCoords.lng, p.lat, p.lng) : null 
-    }));
-    
-    // 2. LE TRI (C'est ici que ça se joue)
-    if(filter === 'proches' && userCoords) {
-        list.sort((a, b) => a.dist - b.dist);
-    } else {
-        // On trie strictement : d'abord TOUTES les nuits, puis TOUS les dimanches, puis le RESTE
-        list.sort((a, b) => (b.nuit - a.nuit) || (b.dimanche - a.dimanche));
-    }
-
-    let currentSection = "";
-
-    // 3. L'AFFICHAGE
-    list.forEach(p => {
-        if (filter !== 'proches') {
-            // On définit le nom de la section pour CETTE pharmacie
-            let sectionName = p.nuit ? "🌙 EN GARDE DE NUIT" : (p.dimanche ? "☀️ GARDE DU DIMANCHE" : "🏥 AUTRES PHARMACIES");
-
-            // On n'affiche le titre QUE si on change de section
-            if (sectionName !== currentSection) {
-                currentSection = sectionName;
-                const header = document.createElement('div');
-                header.style = "font-size: 0.7rem; font-weight: bold; opacity: 0.8; margin: 20px 0 10px 5px; text-transform: uppercase; color: var(--accent); letter-spacing: 1px; display: flex; align-items: center; gap: 8px;";
-                header.innerHTML = currentSection;
-                container.appendChild(header);
-            }
+    function renderList(filter = 'toutes') {
+        const container = document.getElementById('listContainer');
+        container.innerHTML = '';
+        
+        // Calcul des distances si la géolocalisation est active
+        let list = pharmacies.map(p => ({ 
+            ...p, 
+            dist: userCoords ? calculateDistance(userCoords.lat, userCoords.lng, p.lat, p.lng) : null 
+        }));
+        
+        // Tri structuré pour regrouper les catégories
+        if(filter === 'proches' && userCoords) {
+            list.sort((a, b) => a.dist - b.dist);
+        } else {
+            list.sort((a, b) => {
+                if (a.nuit !== b.nuit) return b.nuit - a.nuit;
+                if (a.dimanche !== b.dimanche) return b.dimanche - a.dimanche;
+                return a.nom.localeCompare(b.nom);
+            });
         }
 
-        // Création de la carte pharmacie
-        const div = document.createElement('div');
-        div.className = 'pharma-item';
-        
-        // Style de bordure
-        if(p.nuit) div.style.borderLeft = "4px solid var(--violet-nuit)";
-        else if(p.dimanche) div.style.borderLeft = "4px solid var(--rouge-dimanche)";
+        let currentSection = "";
+        list.forEach(p => {
+            // Affichage des titres de section (uniquement en mode "Toutes")
+            if (filter !== 'proches') {
+                let sectionName = p.nuit ? "🌙 EN GARDE DE NUIT" : (p.dimanche ? "☀️ GARDE DU DIMANCHE" : "🏥 AUTRES PHARMACIES");
+                if (sectionName !== currentSection) {
+                    currentSection = sectionName;
+                    const header = document.createElement('div');
+                    header.style = "font-size: 0.7rem; font-weight: bold; opacity: 0.8; margin: 25px 0 10px 5px; text-transform: uppercase; color: var(--accent); letter-spacing: 1px;";
+                    header.innerHTML = currentSection;
+                    container.appendChild(header);
+                }
+            }
 
-        div.innerHTML = `
-            <div>
-                <div style="font-weight:bold; font-size:0.9rem;">${p.nom} ${p.nuit ? '<span class="badge badge-nuit">Nuit</span>' : ''}</div>
-                <div style="font-size:0.7rem; opacity:0.6;">${p.quartier} ${p.dist ? '• '+p.dist.toFixed(1)+'km' : ''}</div>
-            </div>
-            <div style="display:flex; gap:15px; font-size:1.2rem;">
-                <a href="tel:${p.telephone}" style="color:inherit;"><i class="fas fa-phone-alt"></i></a>
-                <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-directions"></i></a>
-            </div>`;
-        container.appendChild(div);
-    });
-}
+            const div = document.createElement('div');
+            div.className = 'pharma-item';
+            if(p.nuit) div.style.borderLeft = "4px solid var(--violet-nuit)";
+            else if(p.dimanche) div.style.borderLeft = "4px solid var(--rouge-dimanche)";
+
+            div.innerHTML = `
+                <div>
+                    <div style="font-weight:bold; font-size:0.9rem;">${p.nom} ${p.nuit ? '<span class="badge badge-nuit">Nuit</span>' : ''}</div>
+                    <div style="font-size:0.7rem; opacity:0.6;">${p.quartier} ${p.dist ? '• '+p.dist.toFixed(1)+'km' : ''}</div>
+                </div>
+                <div style="display:flex; gap:15px; font-size:1.2rem;">
+                    <a href="tel:${p.telephone}" style="color:inherit;"><i class="fas fa-phone-alt"></i></a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-directions"></i></a>
+                </div>`;
+            container.appendChild(div);
+        });
+    }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
         const R = 6371;
@@ -235,23 +231,29 @@
         document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
         if(mode === 'proches') {
             document.getElementById('filter-near').classList.add('active');
-            navigator.geolocation.getCurrentPosition(pos => { userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude }; renderList('proches'); });
-        } else { document.getElementById('filter-all').classList.add('active'); renderList('toutes'); }
+            navigator.geolocation.getCurrentPosition(pos => { 
+                userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude }; 
+                renderList('proches'); 
+            });
+        } else { 
+            document.getElementById('filter-all').classList.add('active'); 
+            renderList('toutes'); 
+        }
     }
 
     function handleFile(input) {
         if (input.files && input.files[0]) {
             document.getElementById('ordonnance-upload-zone').style.display = 'block';
             const select = document.getElementById('pharmaOrdonnanceSelect');
-            select.innerHTML = `<option value="" disabled selected>Quelle pharmacie pour le devis ?</option>` + 
+            select.innerHTML = `<option value="" disabled selected>Quelle pharmacie doit chiffrer le devis ?</option>` + 
                 pharmacies.map(p => `<option value="${p.telephone}">${p.nom}</option>`).join('');
         }
     }
 
     function sendOrdonnance() {
         const tel = document.getElementById('pharmaOrdonnanceSelect').value;
-        if(!tel) return alert("Choisissez une pharmacie.");
-        window.open(`https://wa.me/${tel.replace(/\+/g,'')}?text=Bonjour, je souhaite vous envoyer une photo de mon ordonnance pour un devis via PharmaTic.`, '_blank');
+        if(!tel) return alert("Veuillez choisir une pharmacie.");
+        window.open(`https://wa.me/${tel.replace(/\+/g,'')}?text=Bonjour, je souhaite vous envoyer mon ordonnance pour un devis via PharmaTic.`, '_blank');
     }
 
     document.getElementById('searchInput').addEventListener('input', (e) => {
@@ -262,13 +264,15 @@
             const select = document.getElementById('pharmacySelect');
             select.innerHTML = `<option value="" disabled selected>Choisir la pharmacie</option>` + 
                 pharmacies.map(p => `<option value="${p.telephone}">${p.nom}</option>`).join('');
-        } else { document.getElementById('selection-box').style.display = 'none'; }
+        } else { 
+            document.getElementById('selection-box').style.display = 'none'; 
+        }
     });
 
     function sendToWhatsApp() {
         const tel = document.getElementById('pharmacySelect').value;
         const med = document.getElementById('searchInput').value;
-        if(!tel) return alert("Choisissez une pharmacie.");
+        if(!tel) return alert("Veuillez choisir une pharmacie.");
         window.open(`https://wa.me/${tel.replace(/\+/g,'')}?text=Bonjour, avez-vous en stock : ${med} ?`, '_blank');
     }
 
