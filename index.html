@@ -30,13 +30,39 @@
         header { display: flex; flex-direction: column; align-items: center; padding: 25px 20px 10px; gap: 15px; }
         .logo-img { width: 55px; height: 55px; border-radius: 12px; border: 1px solid var(--accent); box-shadow: 0 0 15px rgba(0, 255, 136, 0.2); }
 
-        .theme-btn { flex: 1; padding: 8px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .theme-btn { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
         .content-area { flex: 1; padding: 15px; overflow-y: auto; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
         .card { background: var(--card); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; margin-bottom: 15px; }
+
+        /* Correction Alignement Filtres */
+        .filter-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .filter-chip {
+            flex: 1;
+            max-width: 160px;
+            height: 42px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: inherit;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .filter-chip.active { background: rgba(0, 255, 136, 0.2); border-color: var(--accent); color: var(--accent); }
 
         input[type="text"], select { width: 100%; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 14px; color: inherit; outline: none; box-sizing: border-box; }
 
@@ -75,7 +101,7 @@
     <div id="recherche" class="tab-content active">
         <div class="card" style="border: 1px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1);">
             <h3 style="margin:0 0 10px 0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-moon"></i> En garde actuellement</h3>
-            <div id="guardsContainer" style="font-size: 0.8rem; font-weight: bold;">Chargement...</div>
+            <div id="guardsContainer" style="font-size: 0.8rem; font-weight: bold;">Vérification des créneaux...</div>
         </div>
 
         <div class="card">
@@ -101,7 +127,7 @@
     </div>
 
     <div id="pharmacies-list" class="tab-content">
-        <div class="card" style="display:flex; gap:10px; padding: 10px;">
+        <div class="filter-bar">
             <div class="filter-chip active" id="filter-all" onclick="applyFilter('toutes')">Toutes (26)</div>
             <div class="filter-chip" id="filter-near" onclick="applyFilter('proches')">Les plus proches 📍</div>
         </div>
@@ -123,18 +149,22 @@
 
     async function loadData() {
         try {
-            const res = await fetch('src/data/pharmacies.json');
+            // Assure-toi que le fichier est bien dans src/data/
+            const res = await fetch('data/pharmacies.json');
             pharmacies = await res.json();
             renderList();
             updateGuardsDisplay();
-        } catch (e) { console.error("Erreur JSON"); }
+        } catch (e) { console.error("Erreur de chargement JSON"); }
     }
 
     function updateGuardsDisplay() {
         const container = document.getElementById('guardsContainer');
-        const hour = new Date().getHours();
+        const now = new Date();
+        const hour = now.getHours();
+        
+        // Configuration des gardes : Nuit (23h-7h) / Dimanche (0)
         const isNight = (hour >= 23 || hour < 7);
-        const isSunday = (new Date().getDay() === 0);
+        const isSunday = (now.getDay() === 0);
 
         let active = pharmacies.filter(p => (isNight && p.nuit) || (isSunday && p.dimanche));
         
@@ -145,7 +175,7 @@
                     <a href="tel:${p.telephone}" style="background:var(--violet-nuit); color:white; padding:5px 12px; border-radius:8px; text-decoration:none; font-size:0.7rem;">Appeler</a>
                 </div>`).join('');
         } else {
-            container.innerHTML = `<div style="opacity:0.6; font-weight:normal; font-size:0.75rem;">Pas de garde active. Revenez à 23h00.</div>`;
+            container.innerHTML = `<div style="opacity:0.6; font-weight:normal; font-size:0.75rem;">Pas de garde active. Reprise à 23h00 ou dimanche.</div>`;
         }
     }
 
@@ -165,6 +195,7 @@
         const container = document.getElementById('listContainer');
         container.innerHTML = '';
         let list = pharmacies.map(p => ({ ...p, dist: userCoords ? calculateDistance(userCoords.lat, userCoords.lng, p.lat, p.lng) : null }));
+        
         if(filter === 'proches' && userCoords) list.sort((a, b) => a.dist - b.dist);
         else list.sort((a, b) => (b.nuit - a.nuit) || (b.dimanche - a.dimanche));
 
@@ -200,15 +231,15 @@
         if (input.files && input.files[0]) {
             document.getElementById('ordonnance-upload-zone').style.display = 'block';
             const select = document.getElementById('pharmaOrdonnanceSelect');
-            select.innerHTML = `<option value="" disabled selected>Choisir la pharmacie pour le devis</option>` + 
+            select.innerHTML = `<option value="" disabled selected>Quelle pharmacie pour le devis ?</option>` + 
                 pharmacies.map(p => `<option value="${p.telephone}">${p.nom}</option>`).join('');
         }
     }
 
     function sendOrdonnance() {
         const tel = document.getElementById('pharmaOrdonnanceSelect').value;
-        if(!tel) return alert("Choisissez une pharmacie.");
-        window.open(`https://wa.me/${tel.replace(/\+/g,'')}?text=Bonjour, je souhaite vous envoyer une photo de mon ordonnance pour un devis via PharmaTic.`, '_blank');
+        if(!tel) return alert("Veuillez choisir une pharmacie.");
+        window.open(`https://wa.me/${tel.replace(/\+/g,'')}?text=Bonjour, je souhaite vous envoyer une photo de mon ordonnance pour un devis via l'application PharmaTic.`, '_blank');
     }
 
     document.getElementById('searchInput').addEventListener('input', (e) => {
