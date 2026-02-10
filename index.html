@@ -7,15 +7,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #00f2fe;
-            --accent: #00ff88;
-            --dark-bg: #0f172a;
-            --glass: rgba(255, 255, 255, 0.08);
-            --rouge-dimanche: #ff4d4d;
-            --violet-nuit: #a855f7;
+            --primary: #00f2fe; --accent: #00ff88; --dark-bg: #0f172a;
+            --glass: rgba(255, 255, 255, 0.08); --rouge-dimanche: #ff4d4d; --violet-nuit: #a855f7;
         }
 
-        /* Reset pour éviter les débordements (auto-ajustable) */
+        /* Auto-ajustable : évite les débordements */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body.dark-theme { --bg: radial-gradient(circle at top, #1e293b, #0f172a); --text: #ffffff; --card: rgba(255,255,255,0.08); --nav: rgba(15, 23, 42, 0.95); }
@@ -23,16 +19,15 @@
         body.rose-theme { --bg: linear-gradient(135deg, #fdf2f8, #fbcfe8); --text: #831843; --card: rgba(255, 255, 255, 0.4); --nav: rgba(253, 242, 248, 0.95); }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: var(--bg); color: var(--text);
+            font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text);
             margin: 0; height: 100vh; display: flex; flex-direction: column;
             padding-bottom: 80px; transition: 0.3s; overflow-x: hidden;
         }
 
-        header { display: flex; flex-direction: column; align-items: center; padding: 25px 20px 10px; gap: 15px; width: 100%; }
+        header { display: flex; flex-direction: column; align-items: center; padding: 20px; width: 100%; }
         .logo-img { width: 55px; height: 55px; border-radius: 12px; border: 1px solid var(--accent); }
 
-        .theme-btn { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .theme-btn { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.7rem; cursor: pointer; }
 
         .content-area { flex: 1; padding: 15px; overflow-y: auto; width: 100%; }
         .tab-content { display: none; }
@@ -40,29 +35,24 @@
 
         .card { background: var(--card); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; margin-bottom: 15px; width: 100%; }
 
-        .filter-bar { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 15px; }
-        .filter-chip { flex: 1; height: 42px; display: flex; justify-content: center; align-items: center; border-radius: 20px; font-size: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: inherit; cursor: pointer; }
-        .filter-chip.active { background: rgba(0, 255, 136, 0.2); border-color: var(--accent); color: var(--accent); }
+        input[type="text"] { width: 100%; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 14px; color: inherit; font-size: 16px; }
 
-        input[type="text"] { width: 100%; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 14px; color: inherit; outline: none; font-size: 16px; /* Empêche le zoom iOS */ }
+        .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
 
-        .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
-
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.65rem; gap: 5px; cursor: pointer; text-decoration: none; }
-        .nav-item.active { color: var(--accent); }
-        
-        .btn-multi { background: var(--accent); color: #0f172a; border: none; padding: 12px; border-radius: 12px; width:100%; font-size: 0.75rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
-        .broadcast-list { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
-        .broadcast-btn { background: #25D366; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; text-decoration: none; font-size: 0.8rem; }
-
-        /* Style pour l'aperçu et le bouton supprimer */
+        /* Preview et Bouton Supprimer */
         .preview-container { position: relative; margin-top: 15px; display: none; }
         #preview-img { width: 100%; border-radius: 12px; border: 1px solid var(--accent); }
-        .btn-delete { position: absolute; top: 10px; right: 10px; background: var(--rouge-dimanche); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .btn-delete { 
+            position: absolute; top: 10px; right: 10px; background: var(--rouge-dimanche); 
+            color: white; border: none; width: 30px; height: 30px; border-radius: 50%; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
 
-        #fileInput { display: none; }
+        .btn-multi { background: var(--accent); color: #0f172a; border: none; padding: 15px; border-radius: 12px; width:100%; font-weight: bold; cursor: pointer; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.65rem; text-decoration: none; cursor: pointer; }
+        .nav-item.active { color: var(--accent); }
     </style>
 </head>
 <body class="dark-theme">
@@ -71,27 +61,26 @@
     <div style="display: flex; align-items: center; gap: 15px;">
         <img src="icon.jpeg" alt="Logo" class="logo-img">
         <div style="text-align: left;">
-            <h1 style="margin: 0; font-size: 1.7rem; font-weight: 900; background: linear-gradient(to right, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">PHARMATIC</h1>
-            <p style="font-size: 0.6rem; opacity: 0.6; margin-top: 5px;">KEUR MASSAR • GESTION DES GARDES</p>
+            <h1 style="margin: 0; font-size: 1.5rem; font-weight: 900; background: linear-gradient(to right, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">PHARMATIC</h1>
+            <p style="font-size: 0.6rem; opacity: 0.6;">KEUR MASSAR • GESTION DES GARDES</p>
         </div>
     </div>
-    <div style="display: flex; gap: 8px; width: 100%; max-width: 350px;">
-        <button class="theme-btn" onclick="setTheme('dark')" style="background: #1e293b; color: white;"><i class="fas fa-moon"></i> Sombre</button>
-        <button class="theme-btn" onclick="setTheme('light')" style="background: #f8fafc; color: #1e293b;"><i class="fas fa-sun"></i> Clair</button>
-        <button class="theme-btn" onclick="setTheme('rose')" style="background: #fbcfe8; color: #831843;"><i class="fas fa-heart"></i> Rose</button>
+    <div style="display: flex; gap: 8px; width: 100%; margin-top: 15px;">
+        <button class="theme-btn" onclick="setTheme('dark')">Sombre</button>
+        <button class="theme-btn" onclick="setTheme('light')">Clair</button>
+        <button class="theme-btn" onclick="setTheme('rose')">Rose</button>
     </div>
 </header>
 
 <div class="content-area">
     <div id="recherche" class="tab-content active">
         <div class="card" style="border: 1px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1);">
-            <h3 style="margin:0 0 10px 0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-moon"></i> En garde actuellement</h3>
-            <div id="guardsContainer" style="font-size: 0.8rem; font-weight: bold;">Chargement...</div>
+            <h3 style="margin:0 0 10px 0; font-size: 0.85rem; color: var(--violet-nuit);">En garde actuellement</h3>
+            <div id="guardsContainer" style="font-size: 0.8rem;">Chargement...</div>
         </div>
 
         <div class="card">
-            <h3 style="margin:0 0 10px 0; font-size: 0.85rem;">Chercher un médicament</h3>
-            <input type="text" id="searchInput" placeholder="Doliprane, Spasfon..." autocomplete="off">
+            <input type="text" id="searchInput" placeholder="Chercher un médicament..." autocomplete="off">
         </div>
 
         <div class="card">
@@ -104,41 +93,29 @@
             </div>
 
             <div id="ordonnance-upload-zone" style="display:none; margin-top: 15px;">
-                <button onclick="showBroadcastUI('devis')" class="btn-multi"><i class="fas fa-bullhorn"></i> DIFFUSER AUX PHARMACIES</button>
-                <div id="broadcast-devis-list" class="broadcast-list"></div>
+                <button onclick="showBroadcastUI('devis')" class="btn-multi">DIFFUSER AUX PHARMACIES</button>
+                <div id="broadcast-devis-list" style="margin-top:10px;"></div>
             </div>
-        </div>
-
-        <div id="selection-box" style="display:none;" class="card">
-            <div id="medSelected" style="color: var(--accent); font-weight: bold; margin-bottom: 20px; text-align:center;"></div>
-            <button onclick="showBroadcastUI('medoc')" class="btn-multi"><i class="fas fa-bullhorn"></i> DIFFUSER AUX PHARMACIES</button>
-            <div id="broadcast-medoc-list" class="broadcast-list"></div>
         </div>
     </div>
 
     <div id="pharmacies-list" class="tab-content">
-        <div class="filter-bar">
-            <div class="filter-chip active" id="filter-all" onclick="applyFilter('toutes')">Toutes</div>
-            <div class="filter-chip" id="filter-near" onclick="applyFilter('proches')">Les plus proches 📍</div>
-        </div>
         <div id="listContainer"></div>
     </div>
 </div>
 
 <nav class="bottom-nav">
-    <div class="nav-item active" id="nav-recherche" onclick="switchTab('recherche')"><i class="fas fa-search"></i><span>Recherche</span></div>
-    <div class="nav-item" id="nav-pharma" onclick="switchTab('pharmacies-list')"><i class="fas fa-hospital"></i><span>Pharmacies</span></div>
+    <div class="nav-item active" onclick="switchTab('recherche')"><i class="fas fa-search"></i><span>Recherche</span></div>
+    <div class="nav-item" onclick="switchTab('pharmacies-list')"><i class="fas fa-hospital"></i><span>Pharmacies</span></div>
     <a href="https://wa.me/221776779440" target="_blank" class="nav-item"><i class="fas fa-headset"></i><span>Aide</span></a>
 </nav>
 
-<input type="file" id="fileInput" accept="image/*" onchange="handleFile(this)">
+<input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(this)">
 
 <script>
     let pharmacies = [];
     let configGarde = {};
-    let userCoords = null;
 
-    // Chargement des données
     async function loadData() {
         try {
             const res = await fetch('src/data/pharmacies.json');
@@ -150,148 +127,60 @@
         } catch (e) { console.error("Erreur JSON", e); }
     }
 
-    function isUrgenceTime() {
-        const hour = new Date().getHours();
-        const isNight = (hour >= 23 || hour < 7);
-        const isSunday = (new Date().getDay() === 0);
-        return { isNight, isSunday, active: (isNight || isSunday) };
-    }
-
-    function updateGuardsDisplay() {
-        const container = document.getElementById('guardsContainer');
-        const urgence = isUrgenceTime();
-        let active = pharmacies.filter(p => (urgence.isNight && p.nuit) || (urgence.isSunday && p.dimanche));
-        
-        if (active.length > 0) {
-            container.innerHTML = active.map(p => 
-                `<div style="display:flex; justify-content:space-between; margin-bottom:8px; align-items:center;">
-                    <span>📍 ${p.nom}</span>
-                    <a href="tel:${p.telephone}" style="background:var(--violet-nuit); color:white; padding:5px 12px; border-radius:8px; text-decoration:none; font-size:0.7rem;">Appeler</a>
-                </div>`).join('');
-        } else {
-            container.innerHTML = `<div style="opacity:0.6; font-size:0.75rem;">Pas de garde active. Reprise à 23h.</div>`;
-        }
-    }
-
     function handleFile(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = (e) => {
                 document.getElementById('preview-img').src = e.target.result;
                 document.getElementById('preview-container').style.display = 'block';
                 document.getElementById('ordonnance-upload-zone').style.display = 'block';
-            }
+            };
             reader.readAsDataURL(input.files[0]);
-            alert("📸 Photo prête !\n\nChoisissez une pharmacie. Sur WhatsApp, joignez la photo avec le trombone 📎.");
         }
     }
 
-    // Nouvelle fonction pour supprimer la pièce jointe
     function removeFile() {
         document.getElementById('fileInput').value = "";
         document.getElementById('preview-container').style.display = 'none';
         document.getElementById('ordonnance-upload-zone').style.display = 'none';
-        document.getElementById('broadcast-devis-list').innerHTML = "";
     }
 
-    function setTheme(theme) {
-        document.body.className = theme + '-theme';
-        localStorage.setItem('pharma-theme', theme);
-    }
-
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        document.getElementById(tabId === 'recherche' ? 'nav-recherche' : 'nav-pharma')?.classList.add('active');
-        if(tabId === 'pharmacies-list') renderList();
-    }
-
-    function renderList(filter = 'toutes') {
+    function renderList() {
         const container = document.getElementById('listContainer');
-        container.innerHTML = '';
-        let all = pharmacies.map(p => ({ ...p, dist: userCoords ? calculateDistance(userCoords.lat, userCoords.lng, p.lat, p.lng) : null }));
+        container.innerHTML = `<div style="text-align:center; font-size:0.7rem; opacity:0.6; margin-bottom:15px;">Date : ${configGarde.date_dimanche}</div>`;
         
-        if(filter === 'proches' && userCoords) {
-            all.sort((a, b) => a.dist - b.dist);
-            all.forEach(p => container.appendChild(createPharmaCard(p)));
-        } else {
-            all.sort((a, b) => (b.nuit - a.nuit) || (b.dimanche - a.dimanche));
-            const sections = [
-                { name: "🌙 EN GARDE DE NUIT", list: all.filter(p => p.nuit) },
-                { name: "☀️ GARDE DU DIMANCHE", list: all.filter(p => !p.nuit && p.dimanche) },
-                { name: "🏥 AUTRES PHARMACIES", list: all.filter(p => !p.nuit && !p.dimanche) }
-            ];
-            sections.forEach(s => {
-                if(s.list.length > 0) {
-                    const h = document.createElement('div');
-                    h.style = "font-size:0.7rem; font-weight:bold; opacity:0.8; margin:20px 0 10px 5px; color:var(--accent); display:flex; justify-content:space-between; align-items:center; padding-right:10px;";
-                    h.innerHTML = `<span>${s.name}</span> <span style="font-weight:normal; opacity:0.6; font-size:0.6rem;">${s.name.includes("NUIT") ? configGarde.date_nuit : configGarde.date_dimanche}</span>`;
-                    container.appendChild(h);
-                    s.list.forEach(p => container.appendChild(createPharmaCard(p)));
-                }
-            });
-        }
-    }
+        const sections = [
+            { name: "🌙 EN GARDE DE NUIT", list: pharmacies.filter(p => p.nuit) },
+            { name: "☀️ GARDE DU DIMANCHE", list: pharmacies.filter(p => !p.nuit && p.dimanche) },
+            { name: "🏥 AUTRES PHARMACIES", list: pharmacies.filter(p => !p.nuit && !p.dimanche) }
+        ];
 
-    function createPharmaCard(p) {
-        const urgence = isUrgenceTime();
-        const estIndisponible = urgence.active && ((urgence.isNight && !p.nuit) || (urgence.isSunday && !p.dimanche));
-        const d = document.createElement('div');
-        d.className = 'pharma-item';
-        if(estIndisponible) d.style.opacity = "0.35";
-        d.innerHTML = `<div><div style="font-weight:bold; font-size:0.9rem;">${p.nom}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
-            <div style="display:flex; gap:15px; font-size:1.1rem;">
-                ${!estIndisponible ? `<a href="tel:${p.telephone}" style="color:inherit;"><i class="fas fa-phone-alt"></i></a><a href="https://www.google.com/maps?q=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-directions"></i></a>` : '<span style="font-size:0.6rem;">FERMÉ</span>'}
-            </div>`;
-        return d;
-    }
-
-    function showBroadcastUI(type) {
-        const med = document.getElementById('searchInput').value;
-        const container = document.getElementById(type === 'medoc' ? 'broadcast-medoc-list' : 'broadcast-devis-list');
-        const urgence = isUrgenceTime();
-        container.innerHTML = `<p style="font-size:0.65rem; opacity:0.7; text-align:center;">Appuyez pour envoyer :</p>`;
-        
-        pharmacies.forEach(p => {
-            const estIndisponible = urgence.active && ((urgence.isNight && !p.nuit) || (urgence.isSunday && !p.dimanche));
-            if (!estIndisponible) {
-                const btn = document.createElement('a');
-                btn.className = "broadcast-btn";
-                let msg = (type === 'medoc') 
-                    ? `🏥 *PharmaTic*\nAvez-vous : *${med}* ?` 
-                    : `🏥 *PharmaTic*\nJe vous joins mon *ordonnance* pour vérification. 📎`;
-                btn.href = `https://wa.me/${p.telephone.replace(/\s/g,'')}?text=${encodeURIComponent(msg)}`;
-                btn.target = "_blank";
-                btn.innerHTML = `<span>Envoyer à ${p.nom}</span> <i class="fab fa-whatsapp"></i>`;
-                container.appendChild(btn);
+        sections.forEach(s => {
+            if(s.list.length > 0) {
+                const h = document.createElement('div');
+                h.style = "font-size:0.7rem; font-weight:bold; color:var(--accent); margin:15px 0 10px 5px;";
+                h.innerText = s.name;
+                container.appendChild(h);
+                s.list.forEach(p => container.appendChild(createCard(p)));
             }
         });
     }
 
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2)**2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2)**2;
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    function createCard(p) {
+        const d = document.createElement('div');
+        d.className = 'pharma-item';
+        d.innerHTML = `<div><div style="font-weight:bold;">${p.nom}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
+            <a href="tel:${p.telephone}" style="color:inherit;"><i class="fas fa-phone-alt"></i></a>`;
+        return d;
     }
 
-    function applyFilter(mode) {
-        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-        if(mode === 'proches') {
-            document.getElementById('filter-near').classList.add('active');
-            navigator.geolocation.getCurrentPosition(pos => { userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude }; renderList('proches'); });
-        } else { document.getElementById('filter-all').classList.add('active'); renderList('toutes'); }
+    function switchTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
     }
 
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-        if(e.target.value.length > 2) {
-            document.getElementById('selection-box').style.display = 'block';
-            document.getElementById('medSelected').textContent = "📦 " + e.target.value;
-        } else { document.getElementById('selection-box').style.display = 'none'; }
-    });
+    function setTheme(t) { document.body.className = t + '-theme'; }
 
-    setTheme(localStorage.getItem('pharma-theme') || 'dark');
     loadData();
 </script>
 </body>
