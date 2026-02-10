@@ -59,6 +59,7 @@
         .broadcast-btn { background: #25D366; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; text-decoration: none; font-size: 0.8rem; }
 
         #fileInput { display: none; }
+        #preview-img { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid var(--accent); display: none; }
     </style>
 </head>
 <body class="dark-theme">
@@ -93,6 +94,9 @@
         <div class="card">
             <h3 style="margin:0 0 10px 0; font-size: 0.85rem;">Demande par ordonnance</h3>
             <button onclick="document.getElementById('fileInput').click()" style="background: var(--glass); color: inherit; border: 1px dashed var(--accent); padding: 15px; border-radius: 12px; width: 100%; cursor: pointer;"><i class="fas fa-camera"></i> Prendre en photo l'ordonnance</button>
+            
+            <img id="preview-img" alt="Aperçu">
+
             <div id="ordonnance-upload-zone" style="display:none; margin-top: 15px;">
                 <button onclick="showBroadcastUI('devis')" class="btn-multi"><i class="fas fa-bullhorn"></i> DIFFUSER AUX PHARMACIES</button>
                 <div id="broadcast-devis-list" class="broadcast-list"></div>
@@ -108,7 +112,7 @@
 
     <div id="pharmacies-list" class="tab-content">
         <div class="filter-bar">
-            <div class="filter-chip active" id="filter-all" onclick="applyFilter('toutes')">Toutes (26)</div>
+            <div class="filter-chip active" id="filter-all" onclick="applyFilter('toutes')">Toutes</div>
             <div class="filter-chip" id="filter-near" onclick="applyFilter('proches')">Les plus proches 📍</div>
         </div>
         <div id="listContainer"></div>
@@ -125,18 +129,15 @@
 
 <script>
     let pharmacies = [];
-    let configGarde = {}; // Nouveau: pour stocker les dates
+    let configGarde = {};
     let userCoords = null;
 
     async function loadData() {
         try {
             const res = await fetch('src/data/pharmacies.json');
             const data = await res.json();
-            
-            // On sépare la configuration et la liste
             configGarde = data.config;
             pharmacies = data.pharmacies;
-            
             renderList();
             updateGuardsDisplay();
         } catch (e) { console.error("Erreur JSON", e); }
@@ -197,10 +198,9 @@
                     const h = document.createElement('div');
                     h.style = "font-size:0.7rem; font-weight:bold; opacity:0.8; margin:20px 0 10px 5px; color:var(--accent); display:flex; justify-content:space-between; align-items:center; padding-right:10px;";
                     
-                    // Injection dynamique de la date dans le titre de section
                     let dateInfo = "";
-                    if(s.name.includes("NUIT")) dateInfo = `<span style="font-weight:normal; opacity:0.6; font-size:0.6rem;">${configGarde.date_nuit}</span>`;
-                    if(s.name.includes("DIMANCHE")) dateInfo = `<span style="font-weight:normal; opacity:0.6; font-size:0.6rem;">${configGarde.date_dimanche}</span>`;
+                    if(s.name.includes("NUIT")) dateInfo = `<span style="font-weight:normal; opacity:0.6; font-size:0.6rem;">${configGarde.date_nuit || ''}</span>`;
+                    if(s.name.includes("DIMANCHE")) dateInfo = `<span style="font-weight:normal; opacity:0.6; font-size:0.6rem;">${configGarde.date_dimanche || ''}</span>`;
                     
                     h.innerHTML = `<span>${s.name}</span> ${dateInfo}`;
                     container.appendChild(h);
@@ -245,11 +245,20 @@
 
     function handleFile(input) {
         if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('preview-img');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(input.files[0]);
+            
             document.getElementById('ordonnance-upload-zone').style.display = 'block';
+            alert("📸 Photo prête !\n\nChoisissez maintenant une pharmacie. Une fois sur WhatsApp, n'oubliez pas de joindre votre photo avec le trombone 📎.");
         }
     }
 
-  function showBroadcastUI(type) {
+    function showBroadcastUI(type) {
         const med = document.getElementById('searchInput').value;
         const container = document.getElementById(type === 'medoc' ? 'broadcast-medoc-list' : 'broadcast-devis-list');
         const urgence = isUrgenceTime();
@@ -265,14 +274,9 @@
                 btn.style.background = "#334155"; btn.style.opacity = "0.5"; btn.style.pointerEvents = "none";
                 btn.innerHTML = `<span>${p.nom} (Fermé)</span> <i class="fas fa-times"></i>`;
             } else {
-                let msg = "";
-                if (type === 'medoc') {
-                    // Message pour un médicament spécifique avec demande de prix
-                    msg = `🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${med}* ?\n\nMerci de me confirmer la disponibilité et le prix. 🙏`;
-                } else {
-                    // Message pour l'ordonnance avec demande de disponibilité et prix total
-                    msg = `🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nJe vous contacte pour vérifier la *disponibilité* et le *prix total* des produits sur mon *ordonnance ci-jointe*.\n\nMerci de me confirmer si vous pouvez la préparer. 🙏`;
-                }
+                let msg = (type === 'medoc') 
+                    ? `🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${med}* ?\n\nMerci de me confirmer la disponibilité et le prix. 🙏`
+                    : `🏥 *PharmaTic - Demande d'Ordonnance*\n\nBonjour *${p.nom}*,\nJe souhaite vérifier la disponibilité des produits sur mon ordonnance.\n\n👉 *Je vous joins la photo de l'ordonnance ci-dessous...* 📎`;
                 
                 btn.href = `https://wa.me/${p.telephone.replace(/\+/g,'')}?text=${encodeURIComponent(msg)}`;
                 btn.target = "_blank";
