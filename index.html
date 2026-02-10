@@ -9,7 +9,6 @@
         :root {
             --primary: #00f2fe; --accent: #00ff88;
             --rouge-dimanche: #ff4d4d; --violet-nuit: #a855f7;
-            --whatsapp: #22c55e;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -40,16 +39,12 @@
         .nuit-border { border-left-color: var(--violet-nuit); }
         .dimanche-border { border-left-color: var(--rouge-dimanche); }
 
-        /* Style des boutons verts WhatsApp dans les résultats */
-        .btn-whatsapp { background: var(--whatsapp); color: white; border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; font-weight: bold; border: none; width: 100%; cursor: pointer; }
-
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.6rem; text-decoration: none; cursor: pointer; gap: 4px; }
         .nav-item.active { color: var(--accent); }
 
+        .ios-prompt { position: fixed; bottom: 90px; left: 15px; right: 15px; background: var(--card); border: 2px solid var(--accent); border-radius: 15px; padding: 15px; z-index: 9999; display: none; backdrop-filter: blur(20px); }
         .btn-action { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
-        input::placeholder { opacity: 0.5; color: inherit; }
     </style>
 </head>
 <body class="dark-theme">
@@ -58,9 +53,9 @@
     <img src="icon.jpeg" alt="Logo" class="logo-img">
     <h1 style="margin: 10px 0 0; font-size: 1.5rem; font-weight: 900; background: linear-gradient(to right, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">PHARMATIC</h1>
     <div class="theme-switcher">
-        <button class="theme-btn" onclick="setTheme('dark')"><i class="fas fa-moon"></i> Sombre</button>
-        <button class="theme-btn" onclick="setTheme('light')"><i class="fas fa-sun"></i> Clair</button>
-        <button class="theme-btn" onclick="setTheme('rose')"><i class="fas fa-heart"></i> Rose</button>
+        <button class="theme-btn" onclick="setTheme('dark')" style="background: rgba(30, 41, 59, 0.8);">Sombre</button>
+        <button class="theme-btn" onclick="setTheme('light')" style="background: white; color: #1e293b;">Clair</button>
+        <button class="theme-btn" onclick="setTheme('rose')" style="background: #fbcfe8; color: #831843;">Rose</button>
     </div>
 </header>
 
@@ -70,24 +65,24 @@
             <h3 style="margin:0; font-size: 0.8rem; color: var(--violet-nuit);">Garde de Nuit</h3>
             <div id="statusText" style="font-weight: bold; margin-top: 5px;">Chargement...</div>
         </div>
-
         <div class="card">
-            <h3 style="margin: 0 0 10px 0; font-size: 0.9rem;">Chercher un médicament</h3>
-            <input type="text" id="searchBar" oninput="rechercherMedicament()" placeholder="Doliprane" style="width:100%; padding:14px; border-radius:12px; border:none; background:rgba(0,0,0,0.2); color:inherit; outline:none;">
+            <input type="text" placeholder="Doliprane, Spasfon..." style="width:100%; padding:14px; border-radius:12px; border:none; background:rgba(0,0,0,0.1); color:inherit; outline:none;">
         </div>
-
-        <div id="resultatsRecherche"></div>
-
         <div class="card">
-            <h3 style="margin: 0 0 10px 0; font-size: 0.9rem;">Demande de devis par ordonnance</h3>
-            <button onclick="document.getElementById('fileInput').click()" style="width:100%; padding:20px; background:none; border:2px dashed var(--accent); border-radius:12px; color:inherit; cursor:pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <i class="fas fa-camera"></i> Prendre en photo l'ordonnance
-            </button>
+            <button onclick="document.getElementById('fileInput').click()" style="width:100%; padding:20px; background:none; border:1px dashed var(--accent); border-radius:12px; color:inherit; cursor:pointer;"><i class="fas fa-camera"></i> Prendre photo ordonnance</button>
         </div>
     </div>
 
     <div id="pharmacies" class="tab-content">
         <div id="listContainer"></div>
+    </div>
+
+    <div id="installer" class="tab-content">
+        <div class="card">
+            <h3>Installer l'Application</h3>
+            <p style="font-size:0.8rem; opacity:0.8;">Ajoutez PharmaTic à votre écran d'accueil pour l'utiliser comme une vraie application.</p>
+            <button onclick="showTuto()" class="btn-action" style="background:var(--accent); color:#0f172a;">INSTALLER MAINTENANT</button>
+        </div>
     </div>
 
     <div id="aide" class="tab-content">
@@ -99,10 +94,22 @@
     </div>
 </div>
 
+<div id="ios-prompt" class="ios-prompt">
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <span style="font-weight:bold; color:var(--accent);">Guide iPhone</span>
+        <button onclick="document.getElementById('ios-prompt').style.display='none'" style="background:none; border:none; color:inherit; font-size:1.2rem;">&times;</button>
+    </div>
+    <div style="font-size: 0.85rem; line-height: 1.6;">
+        1. Appuyez sur <strong>Partager</strong> <i class="fas fa-external-link-alt" style="color:var(--primary)"></i>.<br>
+        2. Choisissez <strong>"Sur l'écran d'accueil"</strong> <i class="fas fa-plus-square" style="color:var(--primary)"></i>.
+    </div>
+</div>
+
 <nav class="bottom-nav">
     <div class="nav-item active" onclick="switchTab('recherche', this)"><i class="fas fa-search"></i><span>Recherche</span></div>
     <div class="nav-item" onclick="switchTab('pharmacies', this)"><i class="fas fa-hospital"></i><span>Pharmacies</span></div>
-    <div class="nav-item" onclick="switchTab('aide', this)"><i class="fas fa-headset"></i><span>Aide</span></div>
+    <div class="nav-item" onclick="switchTab('installer', this)"><i class="fas fa-download"></i><span>Installer</span></div>
+    <div class="nav-item" onclick="switchTab('aide', this)"><i class="fas fa-info-circle"></i><span>Aide</span></div>
 </nav>
 
 <input type="file" id="fileInput" accept="image/*" style="display:none">
@@ -113,67 +120,29 @@
 
     async function loadData() {
         try {
-            // Remplacez par votre chemin réel
             const res = await fetch('src/data/pharmacies.json');
             const data = await res.json();
             config = data.config;
             pharmacies = data.pharmacies;
             renderList();
-            const deGarde = pharmacies.find(p => p.nuit);
-            if(deGarde) document.getElementById('statusText').innerText = deGarde.nom;
-        } catch (e) { console.error("Erreur de chargement", e); }
-    }
-
-    function rechercherMedicament() {
-        const query = document.getElementById('searchBar').value.trim();
-        const container = document.getElementById('resultatsRecherche');
-        
-        if (query.length < 2) {
-            container.innerHTML = "";
-            return;
-        }
-
-        // On cible les pharmacies de garde pour la diffusion
-        const gardes = pharmacies.filter(p => p.nuit || p.dimanche);
-
-        let html = `
-            <div class="card" style="text-align: center;">
-                <h2 style="color: var(--accent); margin-bottom: 20px;">📦 ${query}</h2>
-                
-                <button class="btn-action" style="background: none; border: 2px solid var(--violet-nuit); color: inherit; width: 80%; margin: 0 auto 20px;">
-                    <i class="fas fa-bullhorn"></i> DIFFUSER AUX GARDES
-                </button>
-
-                <p style="font-size: 0.75rem; opacity: 0.7; margin-bottom: 15px;">Cliquez sur chaque pharmacie pour envoyer :</p>
-        `;
-
-        gardes.forEach(p => {
-            const msg = encodeURIComponent(`Bonjour, est-ce que le médicament ${query} est disponible à la pharmacie ${p.nom} ?`);
-            html += `
-                <a href="https://wa.me/${p.telephone.replace(/\s/g, '')}?text=${msg}" target="_blank" class="btn-whatsapp">
-                    <span>Envoyer à ${p.nom}</span>
-                    <i class="fab fa-whatsapp"></i>
-                </a>
-            `;
-        });
-
-        html += `</div>`;
-        container.innerHTML = html;
+            if(pharmacies.filter(p => p.nuit).length > 0) 
+                document.getElementById('statusText').innerText = pharmacies.filter(p => p.nuit)[0].nom;
+        } catch (e) { console.error(e); }
     }
 
     function renderList() {
         const container = document.getElementById('listContainer');
-        if(!container) return;
         container.innerHTML = "";
         const sections = [
-            { name: "🌙 GARDES DE NUIT", list: pharmacies.filter(p => p.nuit), color: "var(--violet-nuit)", class: "nuit-border" },
-            { name: "🏥 TOUTES LES PHARMACIES", list: pharmacies.filter(p => !p.nuit), color: "grey", class: "" }
+            { name: "🌙 GARDES DE NUIT", date: config.date_nuit, list: pharmacies.filter(p => p.nuit), color: "var(--violet-nuit)", class: "nuit-border" },
+            { name: "☀️ GARDES DU DIMANCHE", date: config.date_dimanche, list: pharmacies.filter(p => !p.nuit && p.dimanche), color: "var(--rouge-dimanche)", class: "dimanche-border" },
+            { name: "🏥 AUTRES PHARMACIES", date: "", list: pharmacies.filter(p => !p.nuit && !p.dimanche), color: "grey", class: "" }
         ];
         sections.forEach(s => {
             if(s.list.length > 0) {
                 const h = document.createElement('div');
-                h.style = `font-size:0.65rem; font-weight:bold; color:${s.color}; margin:15px 5px 8px;`;
-                h.innerText = s.name;
+                h.style = `display:flex; justify-content:space-between; font-size:0.65rem; font-weight:bold; color:${s.color}; margin:15px 5px 8px;`;
+                h.innerHTML = `<span>${s.name}</span> <span>${s.date}</span>`;
                 container.appendChild(h);
                 s.list.forEach(p => {
                     const item = document.createElement('div');
@@ -186,8 +155,13 @@
         });
     }
 
+    function showTuto() {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if(isIOS) { document.getElementById('ios-prompt').style.display = 'block'; }
+        else { alert("Menu navigateur > Installer l'application"); }
+    }
+
     function setTheme(t) { document.body.className = t + '-theme'; localStorage.setItem('theme', t); }
-    
     function switchTab(id, el) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.getElementById(id).classList.add('active');
