@@ -183,6 +183,33 @@
 
     loadData();
     if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
+    let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Empêche Chrome d'afficher la petite barre par défaut
+  e.preventDefault();
+  // Garde l'événement en mémoire pour l'utiliser plus tard
+  deferredPrompt = e;
+  
+  // Tu peux afficher un petit bandeau personnalisé ou une alerte ici
+  setTimeout(() => {
+    if (confirm("Voulez-vous installer PharmaTic sur votre écran d'accueil pour un accès rapide ?")) {
+      showInstallPromotion();
+    }
+  }, 5000); // Propose après 5 secondes
+});
+
+function showInstallPromotion() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('PharmaTic installé !');
+      }
+      deferredPrompt = null;
+    });
+  }
+}
 </script>
 </body>
 </html>
