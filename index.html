@@ -230,28 +230,41 @@
     }
 
     // INTERFACE DE DIFFUSION PAR ÉTAPE
-    function showBroadcastUI(type) {
-        const med = document.getElementById('searchInput').value;
-        const gardes = pharmacies.filter(p => p.nuit || p.dimanche);
-        const container = document.getElementById(type === 'medoc' ? 'broadcast-medoc-list' : 'broadcast-devis-list');
-        
-        let msg = (type === 'medoc') 
-            ? `Bonjour, avez-vous en stock : ${med} ? (PharmaTic)` 
-            : `Bonjour, je souhaite un devis pour mon ordonnance jointe. (PharmaTic)`;
-
-        container.innerHTML = `<p style="font-size:0.7rem; opacity:0.7; text-align:center;">Cliquez sur chaque pharmacie pour envoyer :</p>`;
-        
-        gardes.forEach(p => {
-            const btn = document.createElement('a');
-            btn.className = "broadcast-btn";
-            btn.href = `https://wa.me/${p.telephone.replace(/\+/g,'')}?text=${encodeURIComponent(msg)}`;
-            btn.target = "_blank";
-            btn.innerHTML = `<span>Envoyer à ${p.nom}</span> <i class="fab fa-whatsapp"></i>`;
-            btn.onclick = function() { this.style.opacity = "0.3"; this.style.background = "grey"; };
-            container.appendChild(btn);
-        });
+ function showBroadcastUI(type, scope) {
+    const med = document.getElementById('searchInput').value;
+    const container = document.getElementById(type === 'medoc' ? 'broadcast-medoc-list' : 'broadcast-devis-list');
+    
+    // On définit quelles pharmacies on affiche
+    let targets = [];
+    if (scope === 'gardes') {
+        targets = pharmacies.filter(p => p.nuit || p.dimanche);
+    } else {
+        targets = pharmacies; // Toutes les pharmacies
     }
 
+    if (targets.length === 0) return alert("Aucune pharmacie trouvée pour cette sélection.");
+
+    let msg = (type === 'medoc') 
+        ? `Bonjour, avez-vous en stock : ${med} ? (PharmaTic)` 
+        : `Bonjour, je souhaite un devis pour mon ordonnance jointe. (PharmaTic)`;
+
+    container.innerHTML = `<p style="font-size:0.7rem; opacity:0.7; text-align:center; margin-top:15px;">Appuyez sur chaque pharmacie pour envoyer :</p>`;
+    
+    targets.forEach(p => {
+        const btn = document.createElement('a');
+        btn.className = "broadcast-btn";
+        btn.href = `https://wa.me/${p.telephone.replace(/\+/g,'')}?text=${encodeURIComponent(msg)}`;
+        btn.target = "_blank";
+        btn.innerHTML = `<span>Envoyer à ${p.nom}</span> <i class="fab fa-whatsapp"></i>`;
+        
+        // Petit effet pour savoir où on en est
+        btn.onclick = function() { 
+            this.style.opacity = "0.4"; 
+            this.style.background = "#444"; 
+        };
+        container.appendChild(btn);
+    });
+}
     document.getElementById('searchInput').addEventListener('input', (e) => {
         let val = e.target.value;
         if(val.length > 2) {
