@@ -125,15 +125,21 @@
 
 <script>
     let pharmacies = [];
+    let configGarde = {}; // Nouveau: pour stocker les dates
     let userCoords = null;
 
     async function loadData() {
         try {
             const res = await fetch('src/data/pharmacies.json');
-            pharmacies = await res.json();
+            const data = await res.json();
+            
+            // On sépare la configuration et la liste
+            configGarde = data.config;
+            pharmacies = data.pharmacies;
+            
             renderList();
             updateGuardsDisplay();
-        } catch (e) { console.error("Erreur JSON"); }
+        } catch (e) { console.error("Erreur JSON", e); }
     }
 
     function isUrgenceTime() {
@@ -189,8 +195,14 @@
             sections.forEach(s => {
                 if(s.list.length > 0) {
                     const h = document.createElement('div');
-                    h.style = "font-size:0.7rem; font-weight:bold; opacity:0.8; margin:20px 0 10px 5px; color:var(--accent);";
-                    h.innerHTML = s.name;
+                    h.style = "font-size:0.7rem; font-weight:bold; opacity:0.8; margin:20px 0 10px 5px; color:var(--accent); display:flex; justify-content:space-between; align-items:center; padding-right:10px;";
+                    
+                    // Injection dynamique de la date dans le titre de section
+                    let dateInfo = "";
+                    if(s.name.includes("NUIT")) dateInfo = `<span style="font-weight:normal; opacity:0.6; font-size:0.6rem;">${configGarde.date_nuit}</span>`;
+                    if(s.name.includes("DIMANCHE")) dateInfo = `<span style="font-weight:normal; opacity:0.6; font-size:0.6rem;">${configGarde.date_dimanche}</span>`;
+                    
+                    h.innerHTML = `<span>${s.name}</span> ${dateInfo}`;
                     container.appendChild(h);
                     s.list.forEach(p => container.appendChild(createPharmaCard(p)));
                 }
@@ -208,9 +220,9 @@
         if(p.nuit) d.style.borderLeft = "4px solid var(--violet-nuit)";
         else if(p.dimanche) d.style.borderLeft = "4px solid var(--rouge-dimanche)";
 
-        d.innerHTML = `<div><div style="font-weight:bold; font-size:0.9rem;">${p.nom} ${p.nuit ? '<span class="badge badge-nuit">Nuit</span>' : ''}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
+        d.innerHTML = `<div><div style="font-weight:bold; font-size:0.9rem;">${p.nom} ${p.nuit ? '<span class="badge badge-nuit">Nuit</span>' : ''} ${p.dimanche ? '<span class="badge badge-dimanche">Dimanche</span>' : ''}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
             <div style="display:flex; gap:15px; font-size:1.1rem;">
-                ${!estIndisponible ? `<a href="tel:${p.telephone}" style="color:inherit;"><i class="fas fa-phone-alt"></i></a><a href="http://google.com/maps?q=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-directions"></i></a>` : '<span style="font-size:0.6rem;">FERMÉ</span>'}
+                ${!estIndisponible ? `<a href="tel:${p.telephone}" style="color:inherit;"><i class="fas fa-phone-alt"></i></a><a href="https://www.google.com/maps?q=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-directions"></i></a>` : '<span style="font-size:0.6rem;">FERMÉ</span>'}
             </div>`;
         return d;
     }
