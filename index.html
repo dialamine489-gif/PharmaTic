@@ -249,12 +249,11 @@
         }
     }
 
-    function showBroadcastUI(type) {
+  function showBroadcastUI(type) {
         const med = document.getElementById('searchInput').value;
         const container = document.getElementById(type === 'medoc' ? 'broadcast-medoc-list' : 'broadcast-devis-list');
         const urgence = isUrgenceTime();
         
-        let msg = (type === 'medoc') ? `Bonjour, avez-vous en stock : ${med} ? (PharmaTic)` : `Bonjour, je souhaite un devis pour mon ordonnance jointe. (PharmaTic)`;
         container.innerHTML = `<p style="font-size:0.65rem; opacity:0.7; text-align:center;">Appuyez pour envoyer :</p>`;
         
         pharmacies.forEach(p => {
@@ -266,6 +265,15 @@
                 btn.style.background = "#334155"; btn.style.opacity = "0.5"; btn.style.pointerEvents = "none";
                 btn.innerHTML = `<span>${p.nom} (Fermé)</span> <i class="fas fa-times"></i>`;
             } else {
+                let msg = "";
+                if (type === 'medoc') {
+                    // Message pour un médicament spécifique avec demande de prix
+                    msg = `🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${med}* ?\n\nMerci de me confirmer la disponibilité et le prix. 🙏`;
+                } else {
+                    // Message pour l'ordonnance avec demande de disponibilité et prix total
+                    msg = `🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nJe vous contacte pour vérifier la *disponibilité* et le *prix total* des produits sur mon *ordonnance ci-jointe*.\n\nMerci de me confirmer si vous pouvez la préparer. 🙏`;
+                }
+                
                 btn.href = `https://wa.me/${p.telephone.replace(/\+/g,'')}?text=${encodeURIComponent(msg)}`;
                 btn.target = "_blank";
                 btn.innerHTML = `<span>Envoyer à ${p.nom}</span> <i class="fab fa-whatsapp"></i>`;
