@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PharmaTic - Keur Massar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -15,6 +15,9 @@
             --violet-nuit: #a855f7;
         }
 
+        /* Reset pour éviter les débordements (auto-ajustable) */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body.dark-theme { --bg: radial-gradient(circle at top, #1e293b, #0f172a); --text: #ffffff; --card: rgba(255,255,255,0.08); --nav: rgba(15, 23, 42, 0.95); }
         body.light-theme { --bg: linear-gradient(135deg, #f8fafc, #e2e8f0); --text: #1e293b; --card: rgba(0,0,0,0.05); --nav: rgba(248, 250, 252, 0.95); }
         body.rose-theme { --bg: linear-gradient(135deg, #fdf2f8, #fbcfe8); --text: #831843; --card: rgba(255, 255, 255, 0.4); --nav: rgba(253, 242, 248, 0.95); }
@@ -23,31 +26,27 @@
             font-family: 'Segoe UI', sans-serif;
             background: var(--bg); color: var(--text);
             margin: 0; height: 100vh; display: flex; flex-direction: column;
-            padding-bottom: 80px; transition: 0.3s;
+            padding-bottom: 80px; transition: 0.3s; overflow-x: hidden;
         }
 
-        header { display: flex; flex-direction: column; align-items: center; padding: 25px 20px 10px; gap: 15px; }
-        .logo-img { width: 55px; height: 55px; border-radius: 12px; border: 1px solid var(--accent); box-shadow: 0 0 15px rgba(0, 255, 136, 0.2); }
+        header { display: flex; flex-direction: column; align-items: center; padding: 25px 20px 10px; gap: 15px; width: 100%; }
+        .logo-img { width: 55px; height: 55px; border-radius: 12px; border: 1px solid var(--accent); }
 
         .theme-btn { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
-        .content-area { flex: 1; padding: 15px; overflow-y: auto; }
+        .content-area { flex: 1; padding: 15px; overflow-y: auto; width: 100%; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .card { background: var(--card); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; margin-bottom: 15px; }
+        .card { background: var(--card); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; margin-bottom: 15px; width: 100%; }
 
         .filter-bar { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 15px; }
-        .filter-chip { flex: 1; max-width: 160px; height: 42px; display: flex; justify-content: center; align-items: center; border-radius: 20px; font-size: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: inherit; cursor: pointer; transition: 0.3s; }
+        .filter-chip { flex: 1; height: 42px; display: flex; justify-content: center; align-items: center; border-radius: 20px; font-size: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: inherit; cursor: pointer; }
         .filter-chip.active { background: rgba(0, 255, 136, 0.2); border-color: var(--accent); color: var(--accent); }
 
-        input[type="text"] { width: 100%; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 14px; color: inherit; outline: none; box-sizing: border-box; }
+        input[type="text"] { width: 100%; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 14px; color: inherit; outline: none; font-size: 16px; /* Empêche le zoom iOS */ }
 
-        .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-
-        .badge { font-size: 0.55rem; padding: 3px 6px; border-radius: 5px; font-weight: bold; text-transform: uppercase; margin-left: 5px; }
-        .badge-nuit { border: 1px solid var(--violet-nuit); color: var(--violet-nuit); }
-        .badge-dimanche { border: 1px solid var(--rouge-dimanche); color: var(--rouge-dimanche); }
+        .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.65rem; gap: 5px; cursor: pointer; text-decoration: none; }
@@ -58,8 +57,12 @@
         .broadcast-list { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
         .broadcast-btn { background: #25D366; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; text-decoration: none; font-size: 0.8rem; }
 
+        /* Style pour l'aperçu et le bouton supprimer */
+        .preview-container { position: relative; margin-top: 15px; display: none; }
+        #preview-img { width: 100%; border-radius: 12px; border: 1px solid var(--accent); }
+        .btn-delete { position: absolute; top: 10px; right: 10px; background: var(--rouge-dimanche); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+
         #fileInput { display: none; }
-        #preview-img { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid var(--accent); display: none; }
     </style>
 </head>
 <body class="dark-theme">
@@ -95,7 +98,10 @@
             <h3 style="margin:0 0 10px 0; font-size: 0.85rem;">Demande par ordonnance</h3>
             <button onclick="document.getElementById('fileInput').click()" style="background: var(--glass); color: inherit; border: 1px dashed var(--accent); padding: 15px; border-radius: 12px; width: 100%; cursor: pointer;"><i class="fas fa-camera"></i> Prendre en photo l'ordonnance</button>
             
-            <img id="preview-img" alt="Aperçu">
+            <div id="preview-container" class="preview-container">
+                <button class="btn-delete" onclick="removeFile()"><i class="fas fa-times"></i></button>
+                <img id="preview-img" src="" alt="Aperçu">
+            </div>
 
             <div id="ordonnance-upload-zone" style="display:none; margin-top: 15px;">
                 <button onclick="showBroadcastUI('devis')" class="btn-multi"><i class="fas fa-bullhorn"></i> DIFFUSER AUX PHARMACIES</button>
@@ -132,6 +138,7 @@
     let configGarde = {};
     let userCoords = null;
 
+    // Chargement des données
     async function loadData() {
         try {
             const res = await fetch('src/data/pharmacies.json');
@@ -166,6 +173,27 @@
         }
     }
 
+    function handleFile(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview-img').src = e.target.result;
+                document.getElementById('preview-container').style.display = 'block';
+                document.getElementById('ordonnance-upload-zone').style.display = 'block';
+            }
+            reader.readAsDataURL(input.files[0]);
+            alert("📸 Photo prête !\n\nChoisissez une pharmacie. Sur WhatsApp, joignez la photo avec le trombone 📎.");
+        }
+    }
+
+    // Nouvelle fonction pour supprimer la pièce jointe
+    function removeFile() {
+        document.getElementById('fileInput').value = "";
+        document.getElementById('preview-container').style.display = 'none';
+        document.getElementById('ordonnance-upload-zone').style.display = 'none';
+        document.getElementById('broadcast-devis-list').innerHTML = "";
+    }
+
     function setTheme(theme) {
         document.body.className = theme + '-theme';
         localStorage.setItem('pharma-theme', theme);
@@ -197,12 +225,7 @@
                 if(s.list.length > 0) {
                     const h = document.createElement('div');
                     h.style = "font-size:0.7rem; font-weight:bold; opacity:0.8; margin:20px 0 10px 5px; color:var(--accent); display:flex; justify-content:space-between; align-items:center; padding-right:10px;";
-                    
-                    let dateInfo = "";
-                    if(s.name.includes("NUIT")) dateInfo = `<span style="font-weight:normal; opacity:0.6; font-size:0.6rem;">${configGarde.date_nuit || ''}</span>`;
-                    if(s.name.includes("DIMANCHE")) dateInfo = `<span style="font-weight:normal; opacity:0.6; font-size:0.6rem;">${configGarde.date_dimanche || ''}</span>`;
-                    
-                    h.innerHTML = `<span>${s.name}</span> ${dateInfo}`;
+                    h.innerHTML = `<span>${s.name}</span> <span style="font-weight:normal; opacity:0.6; font-size:0.6rem;">${s.name.includes("NUIT") ? configGarde.date_nuit : configGarde.date_dimanche}</span>`;
                     container.appendChild(h);
                     s.list.forEach(p => container.appendChild(createPharmaCard(p)));
                 }
@@ -213,18 +236,36 @@
     function createPharmaCard(p) {
         const urgence = isUrgenceTime();
         const estIndisponible = urgence.active && ((urgence.isNight && !p.nuit) || (urgence.isSunday && !p.dimanche));
-
         const d = document.createElement('div');
         d.className = 'pharma-item';
         if(estIndisponible) d.style.opacity = "0.35";
-        if(p.nuit) d.style.borderLeft = "4px solid var(--violet-nuit)";
-        else if(p.dimanche) d.style.borderLeft = "4px solid var(--rouge-dimanche)";
-
-        d.innerHTML = `<div><div style="font-weight:bold; font-size:0.9rem;">${p.nom} ${p.nuit ? '<span class="badge badge-nuit">Nuit</span>' : ''} ${p.dimanche ? '<span class="badge badge-dimanche">Dimanche</span>' : ''}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
+        d.innerHTML = `<div><div style="font-weight:bold; font-size:0.9rem;">${p.nom}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
             <div style="display:flex; gap:15px; font-size:1.1rem;">
                 ${!estIndisponible ? `<a href="tel:${p.telephone}" style="color:inherit;"><i class="fas fa-phone-alt"></i></a><a href="https://www.google.com/maps?q=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-directions"></i></a>` : '<span style="font-size:0.6rem;">FERMÉ</span>'}
             </div>`;
         return d;
+    }
+
+    function showBroadcastUI(type) {
+        const med = document.getElementById('searchInput').value;
+        const container = document.getElementById(type === 'medoc' ? 'broadcast-medoc-list' : 'broadcast-devis-list');
+        const urgence = isUrgenceTime();
+        container.innerHTML = `<p style="font-size:0.65rem; opacity:0.7; text-align:center;">Appuyez pour envoyer :</p>`;
+        
+        pharmacies.forEach(p => {
+            const estIndisponible = urgence.active && ((urgence.isNight && !p.nuit) || (urgence.isSunday && !p.dimanche));
+            if (!estIndisponible) {
+                const btn = document.createElement('a');
+                btn.className = "broadcast-btn";
+                let msg = (type === 'medoc') 
+                    ? `🏥 *PharmaTic*\nAvez-vous : *${med}* ?` 
+                    : `🏥 *PharmaTic*\nJe vous joins mon *ordonnance* pour vérification. 📎`;
+                btn.href = `https://wa.me/${p.telephone.replace(/\s/g,'')}?text=${encodeURIComponent(msg)}`;
+                btn.target = "_blank";
+                btn.innerHTML = `<span>Envoyer à ${p.nom}</span> <i class="fab fa-whatsapp"></i>`;
+                container.appendChild(btn);
+            }
+        });
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -241,50 +282,6 @@
             document.getElementById('filter-near').classList.add('active');
             navigator.geolocation.getCurrentPosition(pos => { userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude }; renderList('proches'); });
         } else { document.getElementById('filter-all').classList.add('active'); renderList('toutes'); }
-    }
-
-    function handleFile(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const preview = document.getElementById('preview-img');
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-            }
-            reader.readAsDataURL(input.files[0]);
-            
-            document.getElementById('ordonnance-upload-zone').style.display = 'block';
-            alert("📸 Photo prête !\n\nChoisissez maintenant une pharmacie. Une fois sur WhatsApp, n'oubliez pas de joindre votre photo avec le trombone 📎.");
-        }
-    }
-
-    function showBroadcastUI(type) {
-        const med = document.getElementById('searchInput').value;
-        const container = document.getElementById(type === 'medoc' ? 'broadcast-medoc-list' : 'broadcast-devis-list');
-        const urgence = isUrgenceTime();
-        
-        container.innerHTML = `<p style="font-size:0.65rem; opacity:0.7; text-align:center;">Appuyez pour envoyer :</p>`;
-        
-        pharmacies.forEach(p => {
-            const btn = document.createElement('a');
-            btn.className = "broadcast-btn";
-            const estIndisponible = urgence.active && ((urgence.isNight && !p.nuit) || (urgence.isSunday && !p.dimanche));
-            
-            if (estIndisponible) {
-                btn.style.background = "#334155"; btn.style.opacity = "0.5"; btn.style.pointerEvents = "none";
-                btn.innerHTML = `<span>${p.nom} (Fermé)</span> <i class="fas fa-times"></i>`;
-            } else {
-                let msg = (type === 'medoc') 
-                    ? `🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${med}* ?\n\nMerci de me confirmer la disponibilité et le prix. 🙏`
-                    : `🏥 *PharmaTic - Demande d'Ordonnance*\n\nBonjour *${p.nom}*,\nJe souhaite vérifier la disponibilité des produits sur mon ordonnance.\n\n👉 *Je vous joins la photo de l'ordonnance ci-dessous...* 📎`;
-                
-                btn.href = `https://wa.me/${p.telephone.replace(/\+/g,'')}?text=${encodeURIComponent(msg)}`;
-                btn.target = "_blank";
-                btn.innerHTML = `<span>Envoyer à ${p.nom}</span> <i class="fab fa-whatsapp"></i>`;
-                btn.onclick = function() { this.style.background = "#1e293b"; };
-            }
-            container.appendChild(btn);
-        });
     }
 
     document.getElementById('searchInput').addEventListener('input', (e) => {
