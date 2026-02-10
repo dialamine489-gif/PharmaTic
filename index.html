@@ -7,54 +7,50 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #00f2fe;
-            --accent: #00ff88;
-            --dark-bg: #0f172a;
-            --glass: rgba(255, 255, 255, 0.08);
-            --rouge-dimanche: #ff4d4d;
-            --violet-nuit: #a855f7;
+            --primary: #00f2fe; --accent: #00ff88;
+            --rouge-dimanche: #ff4d4d; --violet-nuit: #a855f7;
         }
 
-        /* Auto-ajustement global */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+        /* Styles des Thèmes */
         body.dark-theme { --bg: radial-gradient(circle at top, #1e293b, #0f172a); --text: #ffffff; --card: rgba(255,255,255,0.08); --nav: rgba(15, 23, 42, 0.95); }
         body.light-theme { --bg: linear-gradient(135deg, #f8fafc, #e2e8f0); --text: #1e293b; --card: rgba(0,0,0,0.05); --nav: rgba(248, 250, 252, 0.95); }
+        body.rose-theme { --bg: linear-gradient(135deg, #fdf2f8, #fbcfe8); --text: #831843; --card: rgba(255, 255, 255, 0.4); --nav: rgba(253, 242, 248, 0.95); }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: var(--bg); color: var(--text);
+            font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text);
             margin: 0; height: 100vh; display: flex; flex-direction: column;
-            padding-bottom: 80px; transition: 0.3s; overflow-x: hidden;
+            padding-bottom: 80px; overflow-x: hidden; transition: 0.3s;
         }
 
-        header { display: flex; flex-direction: column; align-items: center; padding: 25px 20px 10px; gap: 15px; }
-        .logo-img { width: 55px; height: 55px; border-radius: 12px; border: 1px solid var(--accent); box-shadow: 0 0 15px rgba(0, 255, 136, 0.2); }
+        header { display: flex; flex-direction: column; align-items: center; padding: 20px; width: 100%; }
+        .logo-img { width: 55px; height: 55px; border-radius: 12px; border: 1px solid var(--accent); }
 
-        .theme-btn { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.7rem; cursor: pointer; color: inherit; font-weight: bold; }
+        .theme-switcher { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-top: 15px; }
+        .theme-btn { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; cursor: pointer; font-weight: bold; }
 
         .content-area { flex: 1; padding: 15px; overflow-y: auto; width: 100%; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
         .card { background: var(--card); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; margin-bottom: 15px; }
+        .card-garde { border: 1px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1); }
 
-        /* Couleurs de gardes respectées */
-        .card-garde-active { border: 1px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1); }
-        
         input[type="text"] { width: 100%; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 14px; color: inherit; outline: none; font-size: 16px; }
 
         .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .nuit-border { border-left: 4px solid var(--violet-nuit); }
+        .dimanche-border { border-left: 4px solid var(--rouge-dimanche); }
 
-        /* Preview et Bouton Supprimer */
-        .preview-wrapper { position: relative; margin-top: 15px; display: none; }
-        #preview-img { width: 100%; border-radius: 12px; border: 2px solid var(--accent); display: block; }
-        .btn-remove { position: absolute; top: 10px; right: 10px; background: var(--rouge-dimanche); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .preview-box { position: relative; margin-top: 15px; display: none; }
+        #preview-img { width: 100%; border-radius: 12px; border: 2px solid var(--accent); }
+        .del-btn { position: absolute; top: -10px; right: -10px; background: var(--rouge-dimanche); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; z-index: 10; }
 
-        .btn-multi { background: var(--accent); color: #0f172a; border: none; padding: 15px; border-radius: 12px; width:100%; font-size: 0.8rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-broadcast { background: var(--accent); color: #0f172a; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; margin-top: 10px; cursor: pointer; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.65rem; gap: 5px; cursor: pointer; text-decoration: none; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.65rem; text-decoration: none; cursor: pointer; }
         .nav-item.active { color: var(--accent); }
     </style>
 </head>
@@ -68,17 +64,18 @@
             <p style="font-size: 0.6rem; opacity: 0.6; font-weight: bold;">KEUR MASSAR • GESTION DES GARDES</p>
         </div>
     </div>
-    <div style="display: flex; gap: 8px; width: 100%; max-width: 350px; margin-top: 10px;">
+    <div class="theme-switcher">
         <button class="theme-btn" onclick="setTheme('dark')" style="background: #1e293b; color: white;">Sombre</button>
         <button class="theme-btn" onclick="setTheme('light')" style="background: #f8fafc; color: #1e293b;">Clair</button>
+        <button class="theme-btn" onclick="setTheme('rose')" style="background: #fbcfe8; color: #831843;">Rose</button>
     </div>
 </header>
 
 <div class="content-area">
     <div id="recherche" class="tab-content active">
-        <div class="card card-garde-active">
-            <h3 style="margin:0 0 10px 0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-moon"></i> Gardes actives</h3>
-            <div id="guardsContainer" style="font-size: 0.8rem; font-weight: bold;">Chargement...</div>
+        <div class="card card-garde">
+            <h3 style="margin:0 0 10px 0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-clock"></i> État des gardes</h3>
+            <div id="statusText" style="font-size: 0.8rem; font-weight: bold;">Chargement...</div>
         </div>
 
         <div class="card">
@@ -87,14 +84,15 @@
 
         <div class="card">
             <h3 style="margin:0 0 10px 0; font-size: 0.85rem;">Demande par ordonnance</h3>
-            <button onclick="document.getElementById('fileInput').click()" style="background: var(--glass); color: inherit; border: 1px dashed var(--accent); padding: 20px; border-radius: 12px; width: 100%; cursor: pointer;"><i class="fas fa-camera"></i> Prendre en photo l'ordonnance</button>
-            
-            <div id="preview-container" class="preview-wrapper">
-                <button class="btn-remove" onclick="removeFile()"><i class="fas fa-times"></i></button>
-                <img id="preview-img" src="" alt="Aperçu">
-                <button onclick="showBroadcastUI('devis')" class="btn-multi">DIFFUSER AUX PHARMACIES</button>
+            <button onclick="document.getElementById('fileInput').click()" style="width:100%; padding:20px; background:none; border:1px dashed var(--accent); border-radius:12px; color:inherit; cursor:pointer;">
+                <i class="fas fa-camera"></i> Prendre en photo l'ordonnance
+            </button>
+            <div id="preview-box" class="preview-box">
+                <button class="del-btn" onclick="removePhoto()"><i class="fas fa-times"></i></button>
+                <img id="preview-img" src="">
+                <button class="btn-broadcast" onclick="showBroadcastUI('devis')">DIFFUSER AUX PHARMACIES</button>
             </div>
-            <div id="broadcast-devis-list" style="margin-top:10px;"></div>
+            <div id="devis-list" style="margin-top:10px;"></div>
         </div>
     </div>
 
@@ -104,44 +102,26 @@
 </div>
 
 <nav class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('recherche')"><i class="fas fa-search"></i><span>Recherche</span></div>
-    <div class="nav-item" onclick="switchTab('pharmacies-list')"><i class="fas fa-hospital"></i><span>Pharmacies</span></div>
+    <div class="nav-item active" onclick="switchTab('recherche', this)"><i class="fas fa-search"></i><span>Recherche</span></div>
+    <div class="nav-item" onclick="switchTab('pharmacies-list', this)"><i class="fas fa-hospital"></i><span>Pharmacies</span></div>
     <a href="https://wa.me/221776779440" class="nav-item"><i class="fas fa-headset"></i><span>Aide</span></a>
 </nav>
 
-<input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(this)">
+<input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handlePhoto(this)">
 
 <script>
     let pharmacies = [];
-    let configGarde = {};
+    let config = {};
 
     async function loadData() {
         try {
             const res = await fetch('src/data/pharmacies.json');
             const data = await res.json();
-            configGarde = data.config;
+            config = data.config;
             pharmacies = data.pharmacies;
             renderList();
-            updateGuardsDisplay();
-        } catch (e) { console.error("Erreur chargement", e); }
-    }
-
-    function handleFile(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('preview-img').src = e.target.result;
-                document.getElementById('preview-container').style.display = 'block';
-            }
-            reader.readAsDataURL(input.files[0]);
-            alert("📸 Photo prête ! Cliquez sur DIFFUSER et n'oubliez pas le trombone 📎 sur WhatsApp.");
-        }
-    }
-
-    function removeFile() {
-        document.getElementById('fileInput').value = "";
-        document.getElementById('preview-container').style.display = 'none';
-        document.getElementById('broadcast-devis-list').innerHTML = "";
+            updateStatus();
+        } catch (e) { console.error("Erreur JSON", e); }
     }
 
     function renderList() {
@@ -149,25 +129,22 @@
         container.innerHTML = "";
 
         const sections = [
-            { name: "🌙 GARDES DE NUIT", date: configGarde.date_nuit, list: pharmacies.filter(p => p.nuit), color: "var(--violet-nuit)" },
-            { name: "☀️ GARDES DU DIMANCHE", date: configGarde.date_dimanche, list: pharmacies.filter(p => !p.nuit && p.dimanche), color: "var(--rouge-dimanche)" },
-            { name: "🏥 AUTRES PHARMACIES", date: "", list: pharmacies.filter(p => !p.nuit && !p.dimanche), color: "grey" }
+            { name: "🌙 GARDES DE NUIT", date: config.date_nuit, list: pharmacies.filter(p => p.nuit), color: "var(--violet-nuit)", class: "nuit-border" },
+            { name: "☀️ GARDES DU DIMANCHE", date: config.date_dimanche, list: pharmacies.filter(p => !p.nuit && p.dimanche), color: "var(--rouge-dimanche)", class: "dimanche-border" },
+            { name: "🏥 AUTRES PHARMACIES", date: "", list: pharmacies.filter(p => !p.nuit && !p.dimanche), color: "grey", class: "" }
         ];
 
         sections.forEach(s => {
             if(s.list.length > 0) {
                 const h = document.createElement('div');
-                h.style = `display:flex; justify-content:space-between; font-size:0.7rem; font-weight:900; color:${s.color}; margin:15px 5px 10px;`;
+                h.style = `display:flex; justify-content:space-between; font-size:0.7rem; font-weight:bold; color:${s.color}; margin:15px 5px 8px;`;
                 h.innerHTML = `<span>${s.name}</span> <span style="opacity:0.6">${s.date}</span>`;
                 container.appendChild(h);
 
                 s.list.forEach(p => {
                     const item = document.createElement('div');
-                    item.className = 'pharma-item';
-                    if(s.color.includes('violet')) item.style.borderLeft = "4px solid var(--violet-nuit)";
-                    if(s.color.includes('rouge')) item.style.borderLeft = "4px solid var(--rouge-dimanche)";
-                    
-                    item.innerHTML = `<div><div style="font-weight:bold; font-size:0.9rem;">${p.nom}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
+                    item.className = `pharma-item ${s.class}`;
+                    item.innerHTML = `<div><div style="font-weight:bold; font-size:0.9rem;">${p.nom}</div><div style="font-size:0.65rem; opacity:0.6;">${p.quartier}</div></div>
                                       <a href="tel:${p.telephone}" style="color:var(--accent);"><i class="fas fa-phone-alt"></i></a>`;
                     container.appendChild(item);
                 });
@@ -175,20 +152,37 @@
         });
     }
 
-    function updateGuardsDisplay() {
+    function updateStatus() {
         const nuit = pharmacies.filter(p => p.nuit);
-        if(nuit.length > 0) document.getElementById('guardsContainer').innerText = "📍 " + nuit[0].nom;
+        if(nuit.length > 0) document.getElementById('statusText').innerText = `Garde actuelle : ${nuit[0].nom}`;
     }
 
-    function setTheme(t) { document.body.className = t + '-theme'; }
-    function switchTab(id) {
+    function handlePhoto(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('preview-img').src = e.target.result;
+                document.getElementById('preview-box').style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function removePhoto() {
+        document.getElementById('fileInput').value = "";
+        document.getElementById('preview-box').style.display = 'none';
+    }
+
+    function setTheme(t) { document.body.className = t + '-theme'; localStorage.setItem('theme', t); }
+    function switchTab(id, el) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        event.currentTarget.classList.add('active');
+        el.classList.add('active');
     }
 
     loadData();
+    if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
 </script>
 </body>
 </html>
