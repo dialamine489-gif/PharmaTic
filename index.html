@@ -41,9 +41,9 @@
         .filter-chip { flex: 1; max-width: 160px; height: 42px; display: flex; justify-content: center; align-items: center; border-radius: 20px; font-size: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: inherit; cursor: pointer; transition: 0.3s; }
         .filter-chip.active { background: rgba(0, 255, 136, 0.2); border-color: var(--accent); color: var(--accent); }
 
-        input[type="text"], select { width: 100%; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 14px; color: inherit; outline: none; box-sizing: border-box; }
+        input[type="text"] { width: 100%; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 14px; color: inherit; outline: none; box-sizing: border-box; }
 
-        .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
 
         .badge { font-size: 0.55rem; padding: 3px 6px; border-radius: 5px; font-weight: bold; text-transform: uppercase; margin-left: 5px; }
         .badge-nuit { border: 1px solid var(--violet-nuit); color: var(--violet-nuit); }
@@ -53,12 +53,10 @@
         .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.65rem; gap: 5px; cursor: pointer; text-decoration: none; }
         .nav-item.active { color: var(--accent); }
         
-        .btn-multi { background: rgba(168, 85, 247, 0.1); color: var(--violet-nuit); border: 1px solid var(--violet-nuit); padding: 12px; border-radius: 12px; width:100%; font-size: 0.75rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-multi { background: var(--accent); color: #0f172a; border: none; padding: 12px; border-radius: 12px; width:100%; font-size: 0.75rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
         
-        /* Style spécial pour la diffusion */
-        .broadcast-list { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .broadcast-list { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
         .broadcast-btn { background: #25D366; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; text-decoration: none; font-size: 0.8rem; }
-        .broadcast-btn i { font-size: 1.1rem; }
 
         #fileInput { display: none; }
     </style>
@@ -69,7 +67,7 @@
     <div style="display: flex; align-items: center; gap: 15px;">
         <img src="icon.jpeg" alt="Logo" class="logo-img">
         <div style="text-align: left;">
-            <h1 style="margin: 0; font-size: 1.7rem; letter-spacing: 2px; font-weight: 900; background: linear-gradient(to right, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">PHARMATIC</h1>
+            <h1 style="margin: 0; font-size: 1.7rem; font-weight: 900; background: linear-gradient(to right, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">PHARMATIC</h1>
             <p style="font-size: 0.6rem; opacity: 0.6; margin-top: 5px;">KEUR MASSAR • GESTION DES GARDES</p>
         </div>
     </div>
@@ -92,19 +90,18 @@
             <input type="text" id="searchInput" placeholder="Doliprane, Spasfon..." autocomplete="off">
         </div>
 
-        <div class="card" id="ordonnance-section">
-            <h3 style="margin:0 0 10px 0; font-size: 0.85rem;">Demande de devis par ordonnance</h3>
+        <div class="card">
+            <h3 style="margin:0 0 10px 0; font-size: 0.85rem;">Demande par ordonnance</h3>
             <button onclick="document.getElementById('fileInput').click()" style="background: var(--glass); color: inherit; border: 1px dashed var(--accent); padding: 15px; border-radius: 12px; width: 100%; cursor: pointer;"><i class="fas fa-camera"></i> Prendre en photo l'ordonnance</button>
-            <div id="ordonnance-upload-zone" style="display:none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                <p style="font-size: 0.75rem; color: var(--accent); text-align: center; margin-bottom: 10px;"><i class="fas fa-check-circle"></i> Image prête</p>
-                <button onclick="showBroadcastUI('devis')" class="btn-multi"><i class="fas fa-bullhorn"></i> DIFFUSER AUX GARDES</button>
+            <div id="ordonnance-upload-zone" style="display:none; margin-top: 15px;">
+                <button onclick="showBroadcastUI('devis')" class="btn-multi"><i class="fas fa-bullhorn"></i> DIFFUSER AUX PHARMACIES</button>
                 <div id="broadcast-devis-list" class="broadcast-list"></div>
             </div>
         </div>
 
         <div id="selection-box" style="display:none;" class="card">
             <div id="medSelected" style="color: var(--accent); font-weight: bold; margin-bottom: 20px; text-align:center;"></div>
-            <button onclick="showBroadcastUI('medoc')" class="btn-multi"><i class="fas fa-bullhorn"></i> DIFFUSER AUX GARDES</button>
+            <button onclick="showBroadcastUI('medoc')" class="btn-multi"><i class="fas fa-bullhorn"></i> DIFFUSER AUX PHARMACIES</button>
             <div id="broadcast-medoc-list" class="broadcast-list"></div>
         </div>
     </div>
@@ -124,7 +121,7 @@
     <a href="https://wa.me/221776779440" target="_blank" class="nav-item"><i class="fas fa-headset"></i><span>Aide</span></a>
 </nav>
 
-<input type="file" id="fileInput" accept="image/*,.pdf" onchange="handleFile(this)">
+<input type="file" id="fileInput" accept="image/*" onchange="handleFile(this)">
 
 <script>
     let pharmacies = [];
@@ -132,19 +129,25 @@
 
     async function loadData() {
         try {
-            const res = await fetch('src/data/pharmacies.json');
+            const res = await fetch('data/pharmacies.json');
             pharmacies = await res.json();
             renderList();
             updateGuardsDisplay();
         } catch (e) { console.error("Erreur JSON"); }
     }
 
-    function updateGuardsDisplay() {
-        const container = document.getElementById('guardsContainer');
+    function isUrgenceTime() {
         const hour = new Date().getHours();
         const isNight = (hour >= 23 || hour < 7);
         const isSunday = (new Date().getDay() === 0);
-        let active = pharmacies.filter(p => (isNight && p.nuit) || (isSunday && p.dimanche));
+        return { isNight, isSunday, active: (isNight || isSunday) };
+    }
+
+    function updateGuardsDisplay() {
+        const container = document.getElementById('guardsContainer');
+        const urgence = isUrgenceTime();
+        let active = pharmacies.filter(p => (urgence.isNight && p.nuit) || (urgence.isSunday && p.dimanche));
+        
         if (active.length > 0) {
             container.innerHTML = active.map(p => 
                 `<div style="display:flex; justify-content:space-between; margin-bottom:8px; align-items:center;">
@@ -162,12 +165,10 @@
     }
 
     function switchTab(tabId) {
-        if(tabId === 'recherche' || tabId === 'pharmacies-list') {
-            document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.getElementById(tabId === 'recherche' ? 'nav-recherche' : 'nav-pharma')?.classList.add('active');
-            if(tabId === 'pharmacies-list') renderList();
-        }
+        document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.getElementById(tabId === 'recherche' ? 'nav-recherche' : 'nav-pharma')?.classList.add('active');
+        if(tabId === 'pharmacies-list') renderList();
     }
 
     function renderList(filter = 'toutes') {
@@ -179,30 +180,38 @@
             all.sort((a, b) => a.dist - b.dist);
             all.forEach(p => container.appendChild(createPharmaCard(p)));
         } else {
-            const listNuit = all.filter(p => p.nuit);
-            const listDimanche = all.filter(p => !p.nuit && p.dimanche);
-            const listAutres = all.filter(p => !p.nuit && !p.dimanche);
-
-            if(listNuit.length > 0) { container.appendChild(createSectionHeader("🌙 EN GARDE DE NUIT")); listNuit.forEach(p => container.appendChild(createPharmaCard(p))); }
-            if(listDimanche.length > 0) { container.appendChild(createSectionHeader("☀️ GARDE DU DIMANCHE")); listDimanche.forEach(p => container.appendChild(createPharmaCard(p))); }
-            if(listAutres.length > 0) { container.appendChild(createSectionHeader("🏥 AUTRES PHARMACIES")); listAutres.forEach(p => container.appendChild(createPharmaCard(p))); }
+            all.sort((a, b) => (b.nuit - a.nuit) || (b.dimanche - a.dimanche));
+            const sections = [
+                { name: "🌙 EN GARDE DE NUIT", list: all.filter(p => p.nuit) },
+                { name: "☀️ GARDE DU DIMANCHE", list: all.filter(p => !p.nuit && p.dimanche) },
+                { name: "🏥 AUTRES PHARMACIES", list: all.filter(p => !p.nuit && !p.dimanche) }
+            ];
+            sections.forEach(s => {
+                if(s.list.length > 0) {
+                    const h = document.createElement('div');
+                    h.style = "font-size:0.7rem; font-weight:bold; opacity:0.8; margin:20px 0 10px 5px; color:var(--accent);";
+                    h.innerHTML = s.name;
+                    container.appendChild(h);
+                    s.list.forEach(p => container.appendChild(createPharmaCard(p)));
+                }
+            });
         }
     }
 
-    function createSectionHeader(text) {
-        const h = document.createElement('div');
-        h.style = "font-size: 0.7rem; font-weight: bold; opacity: 0.8; margin: 25px 0 10px 5px; text-transform: uppercase; color: var(--accent);";
-        h.innerHTML = text;
-        return h;
-    }
-
     function createPharmaCard(p) {
+        const urgence = isUrgenceTime();
+        const estIndisponible = urgence.active && ((urgence.isNight && !p.nuit) || (urgence.isSunday && !p.dimanche));
+
         const d = document.createElement('div');
         d.className = 'pharma-item';
+        if(estIndisponible) d.style.opacity = "0.35";
         if(p.nuit) d.style.borderLeft = "4px solid var(--violet-nuit)";
         else if(p.dimanche) d.style.borderLeft = "4px solid var(--rouge-dimanche)";
-        d.innerHTML = `<div><div style="font-weight:bold; font-size:0.9rem;">${p.nom} ${p.nuit ? '<span class="badge badge-nuit">Nuit</span>' : ''}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier} ${p.dist ? '• '+p.dist.toFixed(1)+'km' : ''}</div></div>
-            <div style="display:flex; gap:15px; font-size:1.2rem;"><a href="tel:${p.telephone}" style="color:inherit;"><i class="fas fa-phone-alt"></i></a><a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-directions"></i></a></div>`;
+
+        d.innerHTML = `<div><div style="font-weight:bold; font-size:0.9rem;">${p.nom} ${p.nuit ? '<span class="badge badge-nuit">Nuit</span>' : ''}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
+            <div style="display:flex; gap:15px; font-size:1.1rem;">
+                ${!estIndisponible ? `<a href="tel:${p.telephone}" style="color:inherit;"><i class="fas fa-phone-alt"></i></a><a href="http://google.com/maps?q=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-directions"></i></a>` : '<span style="font-size:0.6rem;">FERMÉ</span>'}
+            </div>`;
         return d;
     }
 
@@ -225,52 +234,39 @@
     function handleFile(input) {
         if (input.files && input.files[0]) {
             document.getElementById('ordonnance-upload-zone').style.display = 'block';
-            document.getElementById('broadcast-devis-list').innerHTML = ""; // Reset
         }
     }
 
-    // INTERFACE DE DIFFUSION PAR ÉTAPE
- function showBroadcastUI(type, scope) {
-    const med = document.getElementById('searchInput').value;
-    const container = document.getElementById(type === 'medoc' ? 'broadcast-medoc-list' : 'broadcast-devis-list');
-    
-    // On définit quelles pharmacies on affiche
-    let targets = [];
-    if (scope === 'gardes') {
-        targets = pharmacies.filter(p => p.nuit || p.dimanche);
-    } else {
-        targets = pharmacies; // Toutes les pharmacies
+    function showBroadcastUI(type) {
+        const med = document.getElementById('searchInput').value;
+        const container = document.getElementById(type === 'medoc' ? 'broadcast-medoc-list' : 'broadcast-devis-list');
+        const urgence = isUrgenceTime();
+        
+        let msg = (type === 'medoc') ? `Bonjour, avez-vous en stock : ${med} ? (PharmaTic)` : `Bonjour, je souhaite un devis pour mon ordonnance jointe. (PharmaTic)`;
+        container.innerHTML = `<p style="font-size:0.65rem; opacity:0.7; text-align:center;">Appuyez pour envoyer :</p>`;
+        
+        pharmacies.forEach(p => {
+            const btn = document.createElement('a');
+            btn.className = "broadcast-btn";
+            const estIndisponible = urgence.active && ((urgence.isNight && !p.nuit) || (urgence.isSunday && !p.dimanche));
+            
+            if (estIndisponible) {
+                btn.style.background = "#334155"; btn.style.opacity = "0.5"; btn.style.pointerEvents = "none";
+                btn.innerHTML = `<span>${p.nom} (Fermé)</span> <i class="fas fa-times"></i>`;
+            } else {
+                btn.href = `https://wa.me/${p.telephone.replace(/\+/g,'')}?text=${encodeURIComponent(msg)}`;
+                btn.target = "_blank";
+                btn.innerHTML = `<span>Envoyer à ${p.nom}</span> <i class="fab fa-whatsapp"></i>`;
+                btn.onclick = function() { this.style.background = "#1e293b"; };
+            }
+            container.appendChild(btn);
+        });
     }
 
-    if (targets.length === 0) return alert("Aucune pharmacie trouvée pour cette sélection.");
-
-    let msg = (type === 'medoc') 
-        ? `Bonjour, avez-vous en stock : ${med} ? (PharmaTic)` 
-        : `Bonjour, je souhaite un devis pour mon ordonnance jointe. (PharmaTic)`;
-
-    container.innerHTML = `<p style="font-size:0.7rem; opacity:0.7; text-align:center; margin-top:15px;">Appuyez sur chaque pharmacie pour envoyer :</p>`;
-    
-    targets.forEach(p => {
-        const btn = document.createElement('a');
-        btn.className = "broadcast-btn";
-        btn.href = `https://wa.me/${p.telephone.replace(/\+/g,'')}?text=${encodeURIComponent(msg)}`;
-        btn.target = "_blank";
-        btn.innerHTML = `<span>Envoyer à ${p.nom}</span> <i class="fab fa-whatsapp"></i>`;
-        
-        // Petit effet pour savoir où on en est
-        btn.onclick = function() { 
-            this.style.opacity = "0.4"; 
-            this.style.background = "#444"; 
-        };
-        container.appendChild(btn);
-    });
-}
     document.getElementById('searchInput').addEventListener('input', (e) => {
-        let val = e.target.value;
-        if(val.length > 2) {
+        if(e.target.value.length > 2) {
             document.getElementById('selection-box').style.display = 'block';
-            document.getElementById('medSelected').textContent = "📦 " + val;
-            document.getElementById('broadcast-medoc-list').innerHTML = ""; // Reset
+            document.getElementById('medSelected').textContent = "📦 " + e.target.value;
         } else { document.getElementById('selection-box').style.display = 'none'; }
     });
 
