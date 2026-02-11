@@ -234,10 +234,6 @@
     function setTheme(t) { document.body.className = t + '-theme'; localStorage.setItem('theme', t); }
     function resetSearch() { document.getElementById('searchInput').value = ""; document.getElementById('broadcast-zone').style.display = 'none'; }
     function resetOrdo() { document.getElementById('ordo-zone').style.display = 'none'; document.getElementById('fileInput').value = ""; }
-
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
-    document.getElementById('pwaBtn').onclick = async () => { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; } };
-
     if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
     loadData();
     if ('serviceWorker' in navigator) {
@@ -247,6 +243,29 @@
       .catch(err => console.error('Erreur SW:', err));
   });
 }
+const installBtn = document.getElementById('pwaBtn'); // Vérifie que l'ID correspond bien à ton bouton
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Empêche le navigateur d'afficher sa propre barre
+    e.preventDefault();
+    deferredPrompt = e;
+    // Affiche ton bouton vert
+    installBtn.style.display = 'flex';
+});
+
+installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            installBtn.style.display = 'none';
+        }
+        deferredPrompt = null;
+    } else {
+        // Message spécial pour les utilisateurs iPhone qui cliquent
+        alert("Sur iPhone, l'installation se fait manuellement : appuyez sur 'Partager' puis 'Sur l'écran d'accueil'.");
+    }
+});
 </script>
 </body>
 </html>
