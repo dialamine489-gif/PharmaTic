@@ -129,7 +129,7 @@
 
     async function loadData() {
         try {
-            const res = await fetch('pharmacies.json'); // Ajusté au chemin racine
+            const res = await fetch('src/data/pharmacies.json'); // Ajusté au chemin racine
             const data = await res.json();
             configGarde = data.config;
             pharmacies = data.pharmacies;
