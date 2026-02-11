@@ -14,8 +14,8 @@
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        body.dark-theme { --bg: radial-gradient(circle at top, #1e293b, #0f172a); --text: #ffffff; --card: rgba(255,255,255,0.08); --nav: rgba(15, 23, 42, 0.95); }
-        body.light-theme { --bg: linear-gradient(135deg, #f8fafc, #e2e8f0); --text: #1e293b; --card: rgba(0,0,0,0.05); --nav: rgba(248, 250, 252, 0.95); }
+        body.dark-theme { --bg: #0f172a; --text: #ffffff; --card: rgba(255, 255, 255, 0.08); --nav: #0f172a; }
+        body.light-theme { --bg: #f8fafc; --text: #1e293b; --card: rgba(0, 0, 0, 0.05); --nav: #f8fafc; }
         body.rose-theme { --bg: #fdf2f8; --text: #831843; --card: #fbcfe8; --nav: #fdf2f8; }
 
         body {
@@ -24,41 +24,42 @@
             padding-bottom: 90px; overflow-x: hidden; transition: 0.3s;
         }
 
-        header { display: flex; flex-direction: column; align-items: center; padding: 25px 20px 10px; gap: 15px; }
-        .logo-img { width: 55px; height: 55px; border-radius: 12px; border: 1px solid var(--accent); box-shadow: 0 0 15px rgba(0, 255, 136, 0.2); }
+        header { display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .logo-img { width: 60px; height: 60px; border-radius: 15px; border: 2px solid var(--accent); box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
 
         .theme-switcher { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-top: 15px; }
-        .theme-btn { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; cursor: pointer; font-weight: bold; color: inherit; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .theme-btn { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.8rem; cursor: pointer; font-weight: bold; color: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
         .content-area { flex: 1; padding: 15px; overflow-y: auto; width: 100%; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .card { background: var(--card); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; margin-bottom: 15px; }
+        .card { background: var(--card); border-radius: 20px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
         
         .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid transparent; }
         .nuit-border { border-left-color: var(--violet-nuit); }
         .dimanche-border { border-left-color: var(--rouge-dimanche); }
 
         .btn-wa { background: var(--whatsapp); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; margin-top: 10px; }
-        .btn-multi { background: var(--accent); color: #0f172a; border: none; padding: 15px; border-radius: 12px; width:100%; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 12px 0 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.65rem; text-decoration: none; cursor: pointer; gap: 4px; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 12px 0 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.7rem; text-decoration: none; cursor: pointer; gap: 4px; }
         .nav-item.active { color: var(--accent); }
 
-        .ios-prompt { position: fixed; bottom: 100px; left: 15px; right: 15px; background: #ffffff; color: #1e293b; border-radius: 15px; padding: 20px; z-index: 9999; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid var(--accent); text-align: center; }
+        .ios-prompt { position: fixed; bottom: 100px; left: 15px; right: 15px; background: #ffffff; color: #1e293b; border-radius: 15px; padding: 20px; z-index: 9999; display: none; border: 2px solid var(--accent); text-align: center; }
+        
+        .broadcast-item { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; font-size: 0.9rem; }
     </style>
 </head>
 <body class="dark-theme">
 
 <header>
     <img src="icon.jpeg" alt="Logo" class="logo-img">
-    <h1 style="margin: 10px 0 0; font-size: 1.7rem; font-weight: 900; background: linear-gradient(to right, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">PHARMATIC</h1>
+    <h1 style="margin: 10px 0 0; font-size: 1.8rem; font-weight: 900; background: linear-gradient(to right, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">PHARMATIC</h1>
     <div class="theme-switcher">
-        <button class="theme-btn btn-dark" onclick="setTheme('dark')" style="background: #1e293b; color: white;">Sombre</button>
-        <button class="theme-btn btn-light" onclick="setTheme('light')" style="background: white; color: #1e293b;">Clair</button>
-        <button class="theme-btn btn-rose" onclick="setTheme('rose')" style="background: #fbcfe8; color: #831843;">Rose</button>
+        <button class="theme-btn" onclick="setTheme('dark')" style="background: #1e293b; color: white;"><i class="fas fa-moon"></i> Sombre</button>
+        <button class="theme-btn" onclick="setTheme('light')" style="background: white; color: #1e293b;"><i class="fas fa-sun"></i> Clair</button>
+        <button class="theme-btn" onclick="setTheme('rose')" style="background: #fbcfe8; color: #831843;"><i class="fas fa-heart"></i> Rose</button>
     </div>
 </header>
 
@@ -66,23 +67,25 @@
     <div id="recherche" class="tab-content active">
         <div class="card" style="border-left: 5px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1);">
             <h3 style="margin:0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-moon"></i> En garde actuellement</h3>
-            <div id="statusText" style="font-weight: bold; margin-top: 5px;">Chargement...</div>
+            <div id="statusText" style="font-weight: bold; margin-top: 5px; font-size: 1.1rem;">Vérification...</div>
         </div>
 
         <div class="card">
             <h3 style="margin-top:0; font-size: 0.9rem;">Chercher un médicament</h3>
-            <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Doliprane, Spasfon..." style="width:100%; padding:14px; border-radius:12px; border:none; background:rgba(0,0,0,0.1); color:inherit; outline:none;">
-            <div id="selection-box" style="display:none; margin-top:15px; text-align:center;">
-                <p id="medLabel" style="color: var(--accent); font-weight: bold; font-size: 1.2rem;"></p>
-                <button onclick="startBroadcast('medoc')" class="btn-multi"><i class="fas fa-bullhorn"></i> DIFFUSER AUX GARDES</button>
+            <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Doliprane, Spasfon..." style="width:100%; padding:14px; border-radius:12px; border:none; background:rgba(0,0,0,0.1); color:inherit; outline:none; font-size: 1rem;">
+            
+            <div id="broadcast-zone" style="display:none; margin-top:15px;">
+                <div id="medLabel" style="color: var(--accent); font-weight: bold; text-align:center; font-size: 1.2rem; margin-bottom: 10px;"></div>
+                <p style="font-size: 0.75rem; text-align:center; opacity:0.7;">Appuyez sur une pharmacie pour envoyer :</p>
+                <div id="broadcastList"></div>
             </div>
         </div>
 
         <div class="card">
-            <h3 style="margin-top:0; font-size: 0.9rem;">Demande par ordonnance</h3>
-            <button onclick="document.getElementById('fileInput').click()" style="width:100%; padding:15px; background:none; border:1.5px dashed var(--accent); border-radius:12px; color:inherit; cursor:pointer;"><i class="fas fa-camera"></i> PRENDRE PHOTO ORDONNANCE</button>
-            <div id="wa-ordonnance" style="display:none; margin-top:15px;">
-                <select id="pharmaOrdoSelect" style="width:100%; padding:12px; border-radius:10px; border:none; background:var(--card); color:inherit; margin-bottom:10px;"></select>
+            <h3 style="margin-top:0; font-size: 0.9rem;">Par ordonnance</h3>
+            <button onclick="document.getElementById('fileInput').click()" style="width:100%; padding:18px; background:none; border:1.5px dashed var(--accent); border-radius:12px; color:inherit; cursor:pointer;"><i class="fas fa-camera"></i> PRENDRE PHOTO ORDONNANCE</button>
+            <div id="ordo-zone" style="display:none; margin-top:15px;">
+                <select id="pharmaOrdoSelect" style="width:100%; padding:12px; border-radius:10px; border:none; background:rgba(0,0,0,0.1); color:inherit; margin-bottom:10px;"></select>
                 <button onclick="triggerOrdoPopup()" class="btn-wa"><i class="fab fa-whatsapp"></i> ENVOYER L'ORDONNANCE</button>
             </div>
         </div>
@@ -96,16 +99,16 @@
         <div class="card" style="text-align:center;">
             <i class="fas fa-download" style="font-size: 3rem; color: var(--accent); margin-bottom: 15px;"></i>
             <h3>Installer l'Application</h3>
-            <p style="font-size:0.85rem; opacity:0.8;">Utilisez PharmaTic directement sur votre écran d'accueil.</p>
-            <button onclick="showInstallTuto()" class="btn-multi">Installer maintenant</button>
+            <p style="font-size:0.85rem; opacity:0.8; line-height:1.5;">Ajoutez PharmaTic à votre écran d'accueil pour un accès instantané.</p>
+            <button onclick="showInstallTuto()" class="btn-wa">INSTALLER MAINTENANT</button>
         </div>
     </div>
 </div>
 
 <div id="ordo-popup" class="ios-prompt">
     <i class="fas fa-paperclip" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 15px;"></i>
-    <h3>N'oubliez pas la pièce jointe !</h3>
-    <p style="font-size: 0.9rem; margin: 15px 0;">Une fois sur WhatsApp, cliquez sur le <strong>trombone</strong> ou le <strong>plus (+)</strong> pour joindre la photo de votre ordonnance.</p>
+    <h3>N'oubliez pas !</h3>
+    <p style="font-size: 0.9rem;">Une fois sur WhatsApp, joignez votre photo avant d'envoyer le message.</p>
     <button id="btn-final-send" class="btn-wa">J'ai compris, envoyer</button>
 </div>
 
@@ -141,13 +144,31 @@
             pharmacies = data.pharmacies;
             renderList();
             updateUI();
-        } catch (e) { console.error("Erreur JSON", e); }
+        } catch (e) { console.error(e); }
     }
 
     function updateUI() {
         const activeGarde = pharmacies.filter(p => p.nuit);
         if(activeGarde.length > 0) document.getElementById('statusText').innerText = "📍 " + activeGarde[0].nom;
         document.getElementById('pharmaOrdoSelect').innerHTML = pharmacies.map(p => `<option value="${p.telephone}">${p.nom}</option>`).join('');
+    }
+
+    function handleSearch() {
+        const val = document.getElementById('searchInput').value;
+        const zone = document.getElementById('broadcast-zone');
+        const list = document.getElementById('broadcastList');
+        
+        if(val.length > 2) {
+            zone.style.display = 'block';
+            document.getElementById('medLabel').innerText = "📦 " + val;
+            const gardes = pharmacies.filter(p => p.nuit || p.dimanche);
+            list.innerHTML = gardes.map(p => `
+                <a href="https://wa.me/${p.telephone.replace(/\D/g,'')}?text=${encodeURIComponent('🏥 *PharmaTic*\nAvez-vous : *'+val+'* ?')}" 
+                   target="_blank" class="broadcast-item">
+                    <span>${p.nom}</span><i class="fab fa-whatsapp" style="color:var(--whatsapp)"></i>
+                </a>
+            `).join('');
+        } else { zone.style.display = 'none'; }
     }
 
     function renderList() {
@@ -160,42 +181,28 @@
         ];
         sections.forEach(s => {
             if(s.list.length > 0) {
-                const h = document.createElement('div');
-                h.style = `display:flex; justify-content:space-between; font-size:0.65rem; font-weight:bold; color:${s.color}; margin:15px 5px 8px;`;
-                h.innerHTML = `<span>${s.name}</span> <span>${s.date || ""}</span>`;
-                container.appendChild(h);
+                const header = document.createElement('div');
+                header.style = `display:flex; justify-content:space-between; font-size:0.7rem; font-weight:bold; color:${s.color}; margin:20px 5px 10px;`;
+                header.innerHTML = `<span>${s.name}</span> <span>${s.date || ""}</span>`;
+                container.appendChild(header);
+                
                 s.list.forEach(p => {
-                    const d = document.createElement('div');
-                    d.className = `pharma-item ${s.class}`;
-                    d.innerHTML = `<div><div style="font-weight:bold;">${p.nom}</div><div style="font-size:0.65rem; opacity:0.6;">${p.quartier}</div></div>
-                                  <div style="display:flex; gap:15px; font-size:1.2rem;">
-                                    <a href="tel:${p.telephone}" style="color:var(--accent);"><i class="fas fa-phone-alt"></i></a>
-                                    <a href="https://wa.me/${p.telephone.replace(/\D/g,'')}" target="_blank" style="color:var(--whatsapp);"><i class="fab fa-whatsapp"></i></a>
-                                  </div>`;
-                    container.appendChild(d);
+                    const item = document.createElement('div');
+                    item.className = `pharma-item ${s.class}`;
+                    item.innerHTML = `
+                        <div><div style="font-weight:bold;">${p.nom}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
+                        <div style="display:flex; gap:20px; font-size:1.3rem;">
+                            <a href="tel:${p.telephone}" style="color:inherit;"><i class="fas fa-phone-alt" style="color:var(--whatsapp)"></i></a>
+                            <a href="https://www.google.com/maps?q=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-map-marker-alt"></i></a>
+                        </div>`;
+                    container.appendChild(item);
                 });
             }
         });
     }
 
-    function startBroadcast(type) {
-        const med = document.getElementById('searchInput').value;
-        const gardes = pharmacies.filter(p => p.nuit || p.dimanche);
-        if(confirm(`Diffuser aux ${gardes.length} pharmacies de garde ? (Envoi successif)`)) {
-            openStep(gardes, 0, med);
-        }
-    }
-
-    function openStep(list, i, med) {
-        const p = list[i];
-        const cleanNum = p.telephone.replace(/\D/g, '');
-        window.open(`https://wa.me/${cleanNum}?text=${encodeURIComponent('🏥 *PharmaTic*\nAvez-vous : *'+med+'* ?')}`, '_blank');
-        setTimeout(() => {
-            if(i + 1 < list.length && confirm(`Passer à la suivante : ${list[i+1].nom} ?`)) openStep(list, i+1, med);
-        }, 1000);
-    }
-
-    function triggerOrdoPopup() { document.getElementById('ordo-popup').style.display = 'block';
+    function triggerOrdoPopup() {
+        document.getElementById('ordo-popup').style.display = 'block';
         document.getElementById('btn-final-send').onclick = () => {
             const tel = document.getElementById('pharmaOrdoSelect').value.replace(/\D/g, '');
             window.open(`https://wa.me/${tel}?text=${encodeURIComponent('🏥 *PharmaTic*\nBonjour, voici mon ordonnance pour un devis.')}`, '_blank');
@@ -203,28 +210,16 @@
         };
     }
 
-    function handleSearch() {
-        const val = document.getElementById('searchInput').value;
-        const box = document.getElementById('selection-box');
-        if(val.length > 2) { box.style.display = 'block'; document.getElementById('medLabel').innerText = "📦 " + val; }
-        else box.style.display = 'none';
-    }
-
-    function handleFileSelected() { document.getElementById('wa-ordonnance').style.display = 'block'; }
-
+    function handleFileSelected() { document.getElementById('ordo-zone').style.display = 'block'; }
     function showInstallTuto() {
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        if(isIOS) document.getElementById('ios-tuto').style.display = 'block';
+        if(/iPad|iPhone|iPod/.test(navigator.userAgent)) document.getElementById('ios-tuto').style.display = 'block';
         else alert("Menu Chrome > Installer l'application");
     }
-
     function switchTab(id, el) {
         document.querySelectorAll('.tab-content, .nav-item').forEach(x => x.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        el.classList.add('active');
+        document.getElementById(id).classList.add('active'); el.classList.add('active');
         if(id === 'pharmacies') renderList();
     }
-
     function setTheme(t) { document.body.className = t + '-theme'; localStorage.setItem('theme', t); }
     if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
     loadData();
