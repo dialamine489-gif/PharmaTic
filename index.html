@@ -28,15 +28,13 @@
         header { display: flex; flex-direction: column; align-items: center; padding: 25px 20px 10px; gap: 15px; }
         .logo-img { width: 55px; height: 55px; border-radius: 12px; border: 1px solid var(--accent); box-shadow: 0 0 15px rgba(0, 255, 136, 0.2); }
 
-        /* BOUTONS THÈME AMÉLIORÉS */
         .theme-switcher { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-top: 15px; }
         .theme-btn { 
             flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); 
             font-size: 0.75rem; cursor: pointer; font-weight: bold; 
             display: flex; align-items: center; justify-content: center; gap: 5px;
-            transition: transform 0.2s;
+            transition: 0.2s;
         }
-        .theme-btn:active { transform: scale(0.95); }
         .theme-btn.btn-dark { background: #1e293b; color: #ffffff; }
         .theme-btn.btn-light { background: #ffffff; color: #1e293b; border: 1px solid #cbd5e1; }
         .theme-btn.btn-rose { background: #fbcfe8; color: #831843; }
@@ -54,10 +52,10 @@
         .broadcast-btn { background: var(--whatsapp); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; text-decoration: none; font-size: 0.9rem; }
 
         /* PHARMACIES */
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; }
-        .filter-chip { flex: 1; padding: 10px; border-radius: 20px; font-size: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; color: inherit; }
-        .filter-chip.active { background: rgba(0, 255, 136, 0.2); border-color: var(--accent); color: var(--accent); }
         .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .badge { font-size: 0.55rem; padding: 3px 6px; border-radius: 5px; font-weight: bold; text-transform: uppercase; margin-left: 5px; }
+        .badge-nuit { border: 1px solid var(--violet-nuit); color: var(--violet-nuit); }
+        .badge-dimanche { border: 1px solid var(--rouge-dimanche); color: var(--rouge-dimanche); }
 
         /* NAVIGATION BASSE */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 15px 0 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); z-index: 1000; }
@@ -114,10 +112,6 @@
     </div>
 
     <div id="pharmacies-list" class="tab-content">
-        <div class="filter-bar">
-            <div class="filter-chip active" id="filter-all" onclick="applyFilter('toutes')">Toutes</div>
-            <div class="filter-chip" id="filter-near" onclick="applyFilter('proches')">Les plus proches 📍</div>
-        </div>
         <div id="listContainer"></div>
     </div>
 
@@ -162,7 +156,7 @@
             updateGuardsDisplay();
         } catch (e) { 
             console.error("Erreur JSON", e);
-            // Fallback de sécurité pour Keur Massar
+            // Fallback pour Keur Massar
             pharmacies = [{ nom: "Pharmacie Dial Diop", telephone: "776779440", quartier: "Keur Massar", nuit: true, dimanche: true }];
             renderList();
         }
@@ -192,13 +186,10 @@
     }
 
     function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-        document.getElementById(tabId).style.display = 'block';
-        
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
         const indexMap = {'recherche':0, 'pharmacies-list':1, 'installer':2, 'aide':3};
         document.querySelectorAll('.nav-item')[indexMap[tabId]].classList.add('active');
-        
         if(tabId === 'pharmacies-list') renderList();
     }
 
@@ -221,7 +212,6 @@
             btn.className = "broadcast-btn";
             let pureNumber = p.telephone.replace(/\s/g,'');
             if(!pureNumber.startsWith('221')) pureNumber = '221' + pureNumber;
-
             let msg = type === 'medoc' ? `🏥 *PharmaTic*\nAvez-vous : *${med}* ?` : `🏥 *PharmaTic*\nDevis pour mon ordonnance.`;
             btn.href = `https://wa.me/${pureNumber}?text=${encodeURIComponent(msg)}`;
             btn.target = "_blank";
@@ -230,16 +220,39 @@
         });
     }
 
+    // RÉTABLISSEMENT DE LA LISTE ORGANISÉE
     function renderList() {
         const container = document.getElementById('listContainer');
         container.innerHTML = '';
-        pharmacies.forEach(p => {
-            const d = document.createElement('div');
-            d.className = 'pharma-item';
-            if(p.nuit) d.style.borderLeft = "4px solid var(--violet-nuit)";
-            d.innerHTML = `<div><div style="font-weight:bold;">${p.nom}</div><div style="font-size:0.65rem; opacity:0.6;">${p.quartier}</div></div>
-                          <a href="tel:${p.telephone}" style="color:var(--accent);"><i class="fas fa-phone-alt"></i></a>`;
-            container.appendChild(d);
+        
+        const sections = [
+            { name: "🌙 EN GARDE DE NUIT", list: pharmacies.filter(p => p.nuit), date: configGarde.date_nuit || "", cls: "badge-nuit" },
+            { name: "☀️ GARDE DU DIMANCHE", list: pharmacies.filter(p => !p.nuit && p.dimanche), date: configGarde.date_dimanche || "", cls: "badge-dimanche" },
+            { name: "🏥 AUTRES PHARMACIES", list: pharmacies.filter(p => !p.nuit && !p.dimanche), date: "", cls: "" }
+        ];
+
+        sections.forEach(s => {
+            if(s.list.length > 0) {
+                const h = document.createElement('div');
+                h.style = "font-size:0.7rem; font-weight:bold; margin:20px 0 10px 5px; color:var(--accent); display:flex; justify-content:space-between;";
+                h.innerHTML = `<span>${s.name}</span> <span style="opacity:0.5; font-weight:normal;">${s.date}</span>`;
+                container.appendChild(h);
+                
+                s.list.forEach(p => {
+                    const d = document.createElement('div');
+                    d.className = 'pharma-item';
+                    if(p.nuit) d.style.borderLeft = "4px solid var(--violet-nuit)";
+                    else if(p.dimanche) d.style.borderLeft = "4px solid var(--rouge-dimanche)";
+                    
+                    d.innerHTML = `
+                        <div>
+                            <div style="font-weight:bold;">${p.nom} ${s.cls ? `<span class="badge ${s.cls}">Garde</span>` : ''}</div>
+                            <div style="font-size:0.65rem; opacity:0.6;">${p.quartier || 'Keur Massar'}</div>
+                        </div>
+                        <a href="tel:${p.telephone}" style="color:var(--accent);"><i class="fas fa-phone-alt"></i></a>`;
+                    container.appendChild(d);
+                });
+            }
         });
     }
 
