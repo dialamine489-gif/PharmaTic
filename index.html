@@ -208,11 +208,16 @@
                     const item = document.createElement('div');
                     item.className = `pharma-item ${s.border}`;
                     item.innerHTML = `
-                        <div><div style="font-weight:bold;">${p.nom}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
-                        <div style="display:flex; gap:20px; font-size:1.3rem;">
-                            <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--whatsapp)"></i></a>
-                            <a href="https://www.google.com/maps/search/${encodeURIComponent(p.nom + ' Keur Massar')}" target="_blank" style="color:var(--primary);"><i class="fas fa-map-marker-alt"></i></a>
-                        </div>`;
+    <div>
+        <div style="font-weight:bold;">${p.nom}</div>
+        <div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div>
+    </div>
+    <div style="display:flex; gap:20px; font-size:1.3rem;">
+        <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--whatsapp)"></i></a>
+        <a href="https://www.google.com/maps/search/${encodeURIComponent(p.nom + ' ' + p.quartier + ' Keur Massar')}" target="_blank" style="color:var(--primary);">
+            <i class="fas fa-map-marker-alt"></i>
+        </a>
+    </div>`;
                     container.appendChild(item);
                 });
             }
