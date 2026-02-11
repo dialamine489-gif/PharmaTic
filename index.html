@@ -40,8 +40,7 @@
 
         .card { background: var(--card); border-radius: 20px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
         
-        /* BOUTON FERMER */
-        .close-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.1); border: none; color: inherit; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+        .close-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.1); border: none; color: inherit; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; z-index: 10; }
 
         .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid transparent; }
         .nuit-border { border-left-color: var(--violet-nuit); }
@@ -53,6 +52,7 @@
         .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.7rem; text-decoration: none; cursor: pointer; gap: 4px; }
         .nav-item.active { color: var(--accent); }
 
+        /* POPUPS */
         .ios-prompt { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 350px; background: #ffffff; color: #1e293b; border-radius: 15px; padding: 25px; z-index: 10000; display: none; border: 2px solid var(--accent); text-align: center; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; display: none; }
         .broadcast-item { background: var(--card); border-radius: 12px; padding: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.05); }
@@ -123,8 +123,8 @@
 <div id="ordo-popup" class="ios-prompt">
     <i class="fas fa-paperclip" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 15px;"></i>
     <h3>N'oubliez pas la photo !</h3>
-    <p style="font-size: 0.9rem; color: #1e293b;">Une fois sur WhatsApp, joignez votre ordonnance avant d'envoyer le message chaleureux.</p>
-    <button id="btn-final-send" class="btn-wa">J'ai compris, envoyer</button>
+    <p style="font-size: 0.9rem; color: #1e293b;">Une fois sur WhatsApp, joignez votre ordonnance avant d'envoyer le message de <strong>PharmaTic</strong>.</p>
+    <button id="btn-final-send" class="btn-wa" onclick="executeOrdoSend()">J'ai compris, envoyer</button>
     <button onclick="closePopups()" style="background:none; border:none; color:grey; margin-top:15px; cursor:pointer;">Annuler</button>
 </div>
 
@@ -163,7 +163,6 @@
         }
     }
 
-    // NOUVELLES FONCTIONS DE RÉINITIALISATION
     function resetSearch() {
         document.getElementById('searchInput').value = "";
         document.getElementById('broadcast-zone').style.display = 'none';
@@ -183,14 +182,12 @@
             const hour = new Date().getHours();
             const isNight = (hour >= 23 || hour < 8);
             const isSunday = (new Date().getDay() === 0);
-            
             let htmlOuvert = ""; let htmlFerme = "";
 
             pharmacies.forEach(p => {
                 const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
                 const cleanNum = p.telephone.replace(/\D/g, '');
-                const msg = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\nAuriez-vous la gentillesse de me confirmer si vous avez : *${val}* ?\n\nMerci beaucoup ! 🙏`;
-                
+                const msg = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\nAuriez-vous l'amabilité de me confirmer si vous avez : *${val}* ?\n\nMerci beaucoup ! 🙏`;
                 const cardHtml = `
                     <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.4; background: #334155;'}">
                         <span>${p.nom} ${ouvert ? '' : '(Fermé)'}</span>
@@ -216,13 +213,10 @@
             const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
             const cleanNum = p.telephone.replace(/\D/g, '');
             const msg = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\nJe souhaiterais savoir si vous avez les produits de cette ordonnance (en pièce jointe).\n\nMerci d'avance ! 🙏`;
-            
             const cardHtml = `
                 <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.4; background: #334155;'}">
                     <span>${p.nom} ${ouvert ? '' : '(Fermé)'}</span>
-                    <i class="fab fa-whatsapp" 
-                       onclick="${ouvert ? `prepareOrdo('${cleanNum}', '${encodeURIComponent(msg)}')` : ''}" 
-                       style="color: ${ouvert ? 'var(--whatsapp)' : 'grey'}; font-size:1.3rem; cursor:pointer;"></i>
+                    <i class="fab fa-whatsapp" onclick="${ouvert ? `prepareOrdo('${cleanNum}', '${encodeURIComponent(msg)}')` : ''}" style="color: ${ouvert ? 'var(--whatsapp)' : 'grey'}; font-size:1.3rem; cursor:pointer;"></i>
                 </div>`;
             if (ouvert) htmlOuvert += cardHtml; else htmlFerme += cardHtml;
         });
@@ -237,12 +231,12 @@
         document.getElementById('ordo-popup').style.display = 'block';
     }
 
-    document.getElementById('btn-final-send').onclick = function() {
+    function executeOrdoSend() {
         if(pendingNum !== "") {
             window.open(`https://wa.me/${pendingNum}?text=${pendingMsg}`, '_blank');
             closePopups();
         }
-    };
+    }
 
     function closePopups() {
         document.getElementById('overlay').style.display = 'none';
@@ -289,7 +283,5 @@
     if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
     loadData();
 </script>
-
-<div id="overlay" class="overlay" onclick="closePopups()"></div>
 </body>
 </html>
