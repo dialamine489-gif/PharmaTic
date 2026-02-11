@@ -48,7 +48,7 @@
 
         .ios-prompt { position: fixed; bottom: 100px; left: 15px; right: 15px; background: #ffffff; color: #1e293b; border-radius: 15px; padding: 20px; z-index: 9999; display: none; border: 2px solid var(--accent); text-align: center; }
         
-        .broadcast-item { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; font-size: 0.9rem; }
+        .broadcast-item { background: var(--card); border-radius: 12px; padding: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body class="dark-theme">
@@ -76,8 +76,8 @@
             
             <div id="broadcast-zone" style="display:none; margin-top:15px;">
                 <div id="medLabel" style="color: var(--accent); font-weight: bold; text-align:center; font-size: 1.2rem; margin-bottom: 10px;"></div>
-                <p style="font-size: 0.75rem; text-align:center; opacity:0.7;">Appuyez sur une pharmacie pour envoyer :</p>
-                <div id="broadcastList"></div>
+                <div id="pharmaciesOuvertes"></div>
+                <div id="pharmaciesFermees" style="margin-top: 20px;"></div>
             </div>
         </div>
 
@@ -98,8 +98,8 @@
     <div id="installer" class="tab-content">
         <div class="card" style="text-align:center;">
             <i class="fas fa-download" style="font-size: 3rem; color: var(--accent); margin-bottom: 15px;"></i>
-            <h3>Installer l'Application</h3>
-            <p style="font-size:0.85rem; opacity:0.8; line-height:1.5;">Ajoutez PharmaTic à votre écran d'accueil pour un accès instantané.</p>
+            <h3>Installer PharmaTic</h3>
+            <p style="font-size:0.85rem; opacity:0.8;">Ajoutez PharmaTic à votre écran d'accueil.</p>
             <button onclick="showInstallTuto()" class="btn-wa">INSTALLER MAINTENANT</button>
         </div>
     </div>
@@ -107,15 +107,15 @@
 
 <div id="ordo-popup" class="ios-prompt">
     <i class="fas fa-paperclip" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 15px;"></i>
-    <h3>N'oubliez pas !</h3>
-    <p style="font-size: 0.9rem;">Une fois sur WhatsApp, joignez votre photo avant d'envoyer le message.</p>
+    <h3>N'oubliez pas la photo !</h3>
+    <p style="font-size: 0.9rem;">Une fois sur WhatsApp, joignez votre ordonnance avant d'envoyer le message chaleureux généré par PharmaTic.</p>
     <button id="btn-final-send" class="btn-wa">J'ai compris, envoyer</button>
 </div>
 
 <div id="ios-tuto" class="ios-prompt">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
         <span style="font-weight:bold;">Installation iPhone</span>
-        <button onclick="document.getElementById('ios-tuto').style.display='none'" style="background:none; border:none; font-size:1.5rem; color:inherit;">&times;</button>
+        <button onclick="document.getElementById('ios-tuto').style.display='none'" style="background:none; border:none; font-size:1.5rem; color:inherit;">×</button>
     </div>
     <div style="text-align:left; font-size:0.9rem; line-height:1.6;">
         1. Appuyez sur <strong>Partager</strong> <i class="fas fa-external-link-alt" style="color:#007aff"></i>.<br>
@@ -153,21 +153,41 @@
         document.getElementById('pharmaOrdoSelect').innerHTML = pharmacies.map(p => `<option value="${p.telephone}">${p.nom}</option>`).join('');
     }
 
+    function isUrgenceTime() {
+        const hour = new Date().getHours();
+        const isNight = (hour >= 23 || hour < 8);
+        const isSunday = (new Date().getDay() === 0);
+        return { isNight, isSunday };
+    }
+
     function handleSearch() {
         const val = document.getElementById('searchInput').value;
         const zone = document.getElementById('broadcast-zone');
-        const list = document.getElementById('broadcastList');
-        
-        if(val.length > 2) {
+        const ouvertConteneur = document.getElementById('pharmaciesOuvertes');
+        const fermeConteneur = document.getElementById('pharmaciesFermees');
+        const urgence = isUrgenceTime();
+
+        if (val.length > 2) {
             zone.style.display = 'block';
             document.getElementById('medLabel').innerText = "📦 " + val;
-            const gardes = pharmacies.filter(p => p.nuit || p.dimanche);
-            list.innerHTML = gardes.map(p => `
-                <a href="https://wa.me/${p.telephone.replace(/\D/g,'')}?text=${encodeURIComponent('🏥 *PharmaTic*\nAvez-vous : *'+val+'* ?')}" 
-                   target="_blank" class="broadcast-item">
-                    <span>${p.nom}</span><i class="fab fa-whatsapp" style="color:var(--whatsapp)"></i>
-                </a>
-            `).join('');
+            let htmlOuvert = ""; let htmlFerme = "";
+
+            pharmacies.forEach(p => {
+                const ouvert = (urgence.isNight && p.nuit) || (urgence.isSunday && p.dimanche) || (!urgence.isNight && !urgence.isSunday);
+                const cleanNum = p.telephone.replace(/\D/g, '');
+                const msgMedoc = `🌟 *PharmaTic* 🌟\n\nBonjour l'équipe de la *${p.nom}* ! 👋\n\nJ'espère que vous allez bien. Auriez-vous la gentillesse de me confirmer si vous avez en stock : *${val}* ?\n\nMerci d'avance pour votre aide précieuse ! 🙏✨`;
+
+                const cardHtml = `
+                    <a href="${ouvert ? `https://wa.me/${cleanNum}?text=${encodeURIComponent(msgMedoc)}` : '#'}" 
+                       target="${ouvert ? '_blank' : '_self'}" class="broadcast-item" 
+                       style="${ouvert ? '' : 'opacity: 0.4; background: #334155; pointer-events: none;'}">
+                        <span>${p.nom} ${ouvert ? '' : '(Fermé)'}</span>
+                        <i class="fab fa-whatsapp" style="color: ${ouvert ? 'var(--whatsapp)' : 'grey'}"></i>
+                    </a>`;
+                if (ouvert) htmlOuvert += cardHtml; else htmlFerme += cardHtml;
+            });
+            ouvertConteneur.innerHTML = htmlOuvert || "<p style='font-size:0.7rem; text-align:center;'>Aucune pharmacie ouverte actuellement.</p>";
+            fermeConteneur.innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin: 15px 0 5px;">Pharmacies fermées actuellement :</p>${htmlFerme}` : "";
         } else { zone.style.display = 'none'; }
     }
 
@@ -185,7 +205,6 @@
                 header.style = `display:flex; justify-content:space-between; font-size:0.7rem; font-weight:bold; color:${s.color}; margin:20px 5px 10px;`;
                 header.innerHTML = `<span>${s.name}</span> <span>${s.date || ""}</span>`;
                 container.appendChild(header);
-                
                 s.list.forEach(p => {
                     const item = document.createElement('div');
                     item.className = `pharma-item ${s.class}`;
@@ -205,7 +224,8 @@
         document.getElementById('ordo-popup').style.display = 'block';
         document.getElementById('btn-final-send').onclick = () => {
             const tel = document.getElementById('pharmaOrdoSelect').value.replace(/\D/g, '');
-            window.open(`https://wa.me/${tel}?text=${encodeURIComponent('🏥 *PharmaTic*\nBonjour, voici mon ordonnance pour un devis.')}`, '_blank');
+            const msgOrdo = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n\nJe vous contacte pour savoir si vous pouvez honorer l'ordonnance que je vous joins en photo à l'instant.\n\nD'avance, un grand merci pour votre retour rapide ! 🙏`;
+            window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msgOrdo)}`, '_blank');
             document.getElementById('ordo-popup').style.display = 'none';
         };
     }
