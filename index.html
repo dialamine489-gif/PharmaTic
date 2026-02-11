@@ -132,14 +132,15 @@
 </nav>
 
 <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelected()">
-
 <script>
     let pharmacies = [];
     let config = {};
-    let deferredPrompt;
+    let deferredPrompt = null; // Initialisation propre
+    const installBtn = document.getElementById('pwaBtn');
 
     async function loadData() {
         try {
+            // Vérifie bien ce chemin : si index.html est dans 'src', utilise 'data/pharmacies.json'
             const res = await fetch('src/data/pharmacies.json');
             const data = await res.json();
             config = data.config;
@@ -209,16 +210,16 @@
                     const item = document.createElement('div');
                     item.className = `pharma-item ${s.border}`;
                     item.innerHTML = `
-    <div>
-        <div style="font-weight:bold;">${p.nom}</div>
-        <div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div>
-    </div>
-    <div style="display:flex; gap:20px; font-size:1.3rem;">
-        <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--whatsapp)"></i></a>
-        <a href="https://www.google.com/maps/search/${encodeURIComponent(p.nom + ' ' + p.quartier + ' Keur Massar')}" target="_blank" style="color:var(--primary);">
-            <i class="fas fa-map-marker-alt"></i>
-        </a>
-    </div>`;
+                        <div>
+                            <div style="font-weight:bold;">${p.nom}</div>
+                            <div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div>
+                        </div>
+                        <div style="display:flex; gap:20px; font-size:1.3rem;">
+                            <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--whatsapp)"></i></a>
+                            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier + ' Keur Massar')}" target="_blank" style="color:var(--primary);">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </a>
+                        </div>`;
                     container.appendChild(item);
                 });
             }
@@ -234,38 +235,43 @@
     function setTheme(t) { document.body.className = t + '-theme'; localStorage.setItem('theme', t); }
     function resetSearch() { document.getElementById('searchInput').value = ""; document.getElementById('broadcast-zone').style.display = 'none'; }
     function resetOrdo() { document.getElementById('ordo-zone').style.display = 'none'; document.getElementById('fileInput').value = ""; }
+
+    // --- LOGIQUE PWA ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker actif !'))
+                .catch(err => console.error('Erreur SW:', err));
+        });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (installBtn) installBtn.style.display = 'flex';
+    });
+
+    if (installBtn) {
+        installBtn.onclick = async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') installBtn.style.display = 'none';
+                deferredPrompt = null;
+            } else {
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                if (isIOS) {
+                    alert("Sur iPhone, appuyez sur le bouton de partage (carré avec flèche) puis sur 'Sur l'écran d'accueil'.");
+                } else {
+                    alert("L'application est déjà prête ou votre navigateur ne supporte pas l'installation directe.");
+                }
+            }
+        };
+    }
+
+    // Initialisation finale
     if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
     loadData();
-    if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('Service Worker actif !'))
-      .catch(err => console.error('Erreur SW:', err));
-  });
-}
-const installBtn = document.getElementById('pwaBtn'); // Vérifie que l'ID correspond bien à ton bouton
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    // Empêche le navigateur d'afficher sa propre barre
-    e.preventDefault();
-    deferredPrompt = e;
-    // Affiche ton bouton vert
-    installBtn.style.display = 'flex';
-});
-
-installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-            installBtn.style.display = 'none';
-        }
-        deferredPrompt = null;
-    } else {
-        // Message spécial pour les utilisateurs iPhone qui cliquent
-        alert("Sur iPhone, l'installation se fait manuellement : appuyez sur 'Partager' puis 'Sur l'écran d'accueil'.");
-    }
-});
 </script>
 </body>
 </html>
