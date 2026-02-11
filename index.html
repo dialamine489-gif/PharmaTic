@@ -184,19 +184,20 @@
             const isSunday = (new Date().getDay() === 0);
             let htmlOuvert = ""; let htmlFerme = "";
 
-            pharmacies.forEach(p => {
-                const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
-                const cleanNum = p.telephone.replace(/\D/g, '');
-                const msg = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\nAuriez-vous l'amabilité de me confirmer si vous avez : *${val}* ?\n\nMerci beaucoup ! 🙏`;
-                const cardHtml = `
-                    <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.4; background: #334155;'}">
-                        <span>${p.nom} ${ouvert ? '' : '(Fermé)'}</span>
-                        <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${encodeURIComponent(msg)}" target="_blank"` : ''} style="text-decoration:none;">
-                            <i class="fab fa-whatsapp" style="color: ${ouvert ? 'var(--whatsapp)' : 'grey'}; font-size:1.3rem;"></i>
-                        </a>
-                    </div>`;
-                if (ouvert) htmlOuvert += cardHtml; else htmlFerme += cardHtml;
-            });
+       pharmacies.forEach(p => {
+    const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
+    const cleanNum = p.telephone.replace(/\D/g, '');
+    const msg = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\nJe souhaiterais savoir si vous avez les produits de cette ordonnance (en pièce jointe).\n\nMerci d'avance ! 🙏`;
+    
+    const cardHtml = `
+        <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.4; background: #334155;'}">
+            <span>${p.nom} ${ouvert ? '' : '(Fermé)'}</span>
+            <i class="fab fa-whatsapp" 
+               onclick="${ouvert ? `prepareOrdo('${cleanNum}', '${encodeURIComponent(msg)}')` : ''}" 
+               style="color: ${ouvert ? 'var(--whatsapp)' : 'grey'}; font-size:1.3rem; cursor:pointer;"></i>
+        </div>`;
+    if (ouvert) htmlOuvert += cardHtml; else htmlFerme += cardHtml;
+});
             document.getElementById('pharmaciesOuvertesMed').innerHTML = htmlOuvert;
             document.getElementById('pharmaciesFermeesMed').innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin-top:10px;">Fermées :</p>${htmlFerme}` : "";
         } else { zone.style.display = 'none'; }
