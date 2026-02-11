@@ -76,17 +76,20 @@
             
             <div id="broadcast-zone" style="display:none; margin-top:15px;">
                 <div id="medLabel" style="color: var(--accent); font-weight: bold; text-align:center; font-size: 1.2rem; margin-bottom: 10px;"></div>
-                <div id="pharmaciesOuvertes"></div>
-                <div id="pharmaciesFermees" style="margin-top: 20px;"></div>
+                <div id="pharmaciesOuvertesMed"></div>
+                <div id="pharmaciesFermeesMed" style="margin-top: 15px;"></div>
             </div>
         </div>
 
         <div class="card">
             <h3 style="margin-top:0; font-size: 0.9rem;">Par ordonnance</h3>
             <button onclick="document.getElementById('fileInput').click()" style="width:100%; padding:18px; background:none; border:1.5px dashed var(--accent); border-radius:12px; color:inherit; cursor:pointer;"><i class="fas fa-camera"></i> PRENDRE PHOTO ORDONNANCE</button>
+            
             <div id="ordo-zone" style="display:none; margin-top:15px;">
-                <select id="pharmaOrdoSelect" style="width:100%; padding:12px; border-radius:10px; border:none; background:rgba(0,0,0,0.1); color:inherit; margin-bottom:10px;"></select>
-                <button onclick="triggerOrdoPopup()" class="btn-wa"><i class="fab fa-whatsapp"></i> ENVOYER L'ORDONNANCE</button>
+                <p style="font-size: 0.8rem; color: var(--accent); font-weight: bold; text-align:center;">📸 PHOTO PRÊTE</p>
+                <p style="font-size: 0.75rem; text-align:center; opacity:0.7; margin-bottom:10px;">Choisissez une pharmacie ouverte :</p>
+                <div id="pharmaciesOuvertesOrdo"></div>
+                <div id="pharmaciesFermeesOrdo" style="margin-top: 15px;"></div>
             </div>
         </div>
     </div>
@@ -108,7 +111,7 @@
 <div id="ordo-popup" class="ios-prompt">
     <i class="fas fa-paperclip" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 15px;"></i>
     <h3>N'oubliez pas la photo !</h3>
-    <p style="font-size: 0.9rem;">Une fois sur WhatsApp, joignez votre ordonnance avant d'envoyer le message chaleureux généré par PharmaTic.</p>
+    <p style="font-size: 0.9rem;">Une fois sur WhatsApp, joignez votre ordonnance avant d'envoyer le message chaleureux.</p>
     <button id="btn-final-send" class="btn-wa">J'ai compris, envoyer</button>
 </div>
 
@@ -150,7 +153,6 @@
     function updateUI() {
         const activeGarde = pharmacies.filter(p => p.nuit);
         if(activeGarde.length > 0) document.getElementById('statusText').innerText = "📍 " + activeGarde[0].nom;
-        document.getElementById('pharmaOrdoSelect').innerHTML = pharmacies.map(p => `<option value="${p.telephone}">${p.nom}</option>`).join('');
     }
 
     function isUrgenceTime() {
@@ -160,35 +162,62 @@
         return { isNight, isSunday };
     }
 
+    function generatePharmaList(val, type) {
+        const urgence = isUrgenceTime();
+        let htmlOuvert = ""; let htmlFerme = "";
+
+        pharmacies.forEach(p => {
+            const ouvert = (urgence.isNight && p.nuit) || (urgence.isSunday && p.dimanche) || (!urgence.isNight && !urgence.isSunday);
+            const cleanNum = p.telephone.replace(/\D/g, '');
+            
+            // Messages chaleureux PharmaTic
+            const msg = type === 'medoc' 
+                ? `🌟 *PharmaTic* 🌟\n\nBonjour l'équipe de la *${p.nom}* ! 👋\n\nJ'espère que vous allez bien. Auriez-vous la gentillesse de me confirmer si vous avez en stock : *${val}* ?\n\nMerci d'avance pour votre aide précieuse ! 🙏✨`
+                : `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n\nJe vous contacte pour savoir si vous pouvez honorer l'ordonnance que je vous joins en photo à l'instant.\n\nD'avance, un grand merci pour votre retour ! 🙏`;
+
+            const action = type === 'medoc' 
+                ? `href="https://wa.me/${cleanNum}?text=${encodeURIComponent(msg)}" target="_blank"` 
+                : `onclick="openOrdoPopup('${cleanNum}', '${encodeURIComponent(msg)}')"`;
+
+            const cardHtml = `
+                <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.4; background: #334155;'}">
+                    <span>${p.nom} ${ouvert ? '' : '(Fermé)'}</span>
+                    <a ${ouvert ? action : ''} style="text-decoration:none; cursor:${ouvert ? 'pointer' : 'not-allowed'};">
+                        <i class="fab fa-whatsapp" style="color: ${ouvert ? 'var(--whatsapp)' : 'grey'}; font-size:1.3rem;"></i>
+                    </a>
+                </div>`;
+            
+            if (ouvert) htmlOuvert += cardHtml; else htmlFerme += cardHtml;
+        });
+
+        return { ouvert: htmlOuvert, fermee: htmlFerme };
+    }
+
     function handleSearch() {
         const val = document.getElementById('searchInput').value;
         const zone = document.getElementById('broadcast-zone');
-        const ouvertConteneur = document.getElementById('pharmaciesOuvertes');
-        const fermeConteneur = document.getElementById('pharmaciesFermees');
-        const urgence = isUrgenceTime();
-
         if (val.length > 2) {
             zone.style.display = 'block';
             document.getElementById('medLabel').innerText = "📦 " + val;
-            let htmlOuvert = ""; let htmlFerme = "";
-
-            pharmacies.forEach(p => {
-                const ouvert = (urgence.isNight && p.nuit) || (urgence.isSunday && p.dimanche) || (!urgence.isNight && !urgence.isSunday);
-                const cleanNum = p.telephone.replace(/\D/g, '');
-                const msgMedoc = `🌟 *PharmaTic* 🌟\n\nBonjour l'équipe de la *${p.nom}* ! 👋\n\nJ'espère que vous allez bien. Auriez-vous la gentillesse de me confirmer si vous avez en stock : *${val}* ?\n\nMerci d'avance pour votre aide précieuse ! 🙏✨`;
-
-                const cardHtml = `
-                    <a href="${ouvert ? `https://wa.me/${cleanNum}?text=${encodeURIComponent(msgMedoc)}` : '#'}" 
-                       target="${ouvert ? '_blank' : '_self'}" class="broadcast-item" 
-                       style="${ouvert ? '' : 'opacity: 0.4; background: #334155; pointer-events: none;'}">
-                        <span>${p.nom} ${ouvert ? '' : '(Fermé)'}</span>
-                        <i class="fab fa-whatsapp" style="color: ${ouvert ? 'var(--whatsapp)' : 'grey'}"></i>
-                    </a>`;
-                if (ouvert) htmlOuvert += cardHtml; else htmlFerme += cardHtml;
-            });
-            ouvertConteneur.innerHTML = htmlOuvert || "<p style='font-size:0.7rem; text-align:center;'>Aucune pharmacie ouverte actuellement.</p>";
-            fermeConteneur.innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin: 15px 0 5px;">Pharmacies fermées actuellement :</p>${htmlFerme}` : "";
+            const lists = generatePharmaList(val, 'medoc');
+            document.getElementById('pharmaciesOuvertesMed').innerHTML = lists.ouvert;
+            document.getElementById('pharmaciesFermeesMed').innerHTML = lists.fermee ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin: 15px 0 5px;">Indisponibles :</p>${lists.fermee}` : "";
         } else { zone.style.display = 'none'; }
+    }
+
+    function handleFileSelected() {
+        document.getElementById('ordo-zone').style.display = 'block';
+        const lists = generatePharmaList('', 'ordonnance');
+        document.getElementById('pharmaciesOuvertesOrdo').innerHTML = lists.ouvert;
+        document.getElementById('pharmaciesFermeesOrdo').innerHTML = lists.fermee ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin: 15px 0 5px;">Indisponibles :</p>${lists.fermee}` : "";
+    }
+
+    function openOrdoPopup(num, msg) {
+        document.getElementById('ordo-popup').style.display = 'block';
+        document.getElementById('btn-final-send').onclick = () => {
+            window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+            document.getElementById('ordo-popup').style.display = 'none';
+        };
     }
 
     function renderList() {
@@ -212,7 +241,7 @@
                         <div><div style="font-weight:bold;">${p.nom}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
                         <div style="display:flex; gap:20px; font-size:1.3rem;">
                             <a href="tel:${p.telephone}" style="color:inherit;"><i class="fas fa-phone-alt" style="color:var(--whatsapp)"></i></a>
-                            <a href="https://www.google.com/maps?q=${p.lat},${p.lng}" target="_blank" style="color:var(--primary);"><i class="fas fa-map-marker-alt"></i></a>
+                            <a href="http://maps.google.com/?q=${p.nom} Keur Massar" target="_blank" style="color:var(--primary);"><i class="fas fa-map-marker-alt"></i></a>
                         </div>`;
                     container.appendChild(item);
                 });
@@ -220,17 +249,6 @@
         });
     }
 
-    function triggerOrdoPopup() {
-        document.getElementById('ordo-popup').style.display = 'block';
-        document.getElementById('btn-final-send').onclick = () => {
-            const tel = document.getElementById('pharmaOrdoSelect').value.replace(/\D/g, '');
-            const msgOrdo = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n\nJe vous contacte pour savoir si vous pouvez honorer l'ordonnance que je vous joins en photo à l'instant.\n\nD'avance, un grand merci pour votre retour rapide ! 🙏`;
-            window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msgOrdo)}`, '_blank');
-            document.getElementById('ordo-popup').style.display = 'none';
-        };
-    }
-
-    function handleFileSelected() { document.getElementById('ordo-zone').style.display = 'block'; }
     function showInstallTuto() {
         if(/iPad|iPhone|iPod/.test(navigator.userAgent)) document.getElementById('ios-tuto').style.display = 'block';
         else alert("Menu Chrome > Installer l'application");
@@ -238,7 +256,6 @@
     function switchTab(id, el) {
         document.querySelectorAll('.tab-content, .nav-item').forEach(x => x.classList.remove('active'));
         document.getElementById(id).classList.add('active'); el.classList.add('active');
-        if(id === 'pharmacies') renderList();
     }
     function setTheme(t) { document.body.className = t + '-theme'; localStorage.setItem('theme', t); }
     if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
