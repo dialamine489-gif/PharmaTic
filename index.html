@@ -136,7 +136,7 @@
 
     async function loadData() {
         try {
-            const res = await fetch('pharmacies.json'); // Chemin corrigé
+            const res = await fetch('src/data/pharmacies.json'); // Chemin corrigé
             const data = await res.json();
             configGarde = data.config;
             pharmacies = data.pharmacies;
