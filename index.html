@@ -9,11 +9,12 @@
         :root {
             --primary: #00f2fe; --accent: #00ff88;
             --rouge-dimanche: #ff4d4d; --violet-nuit: #a855f7;
-            --dark-bg: #0f172a; --whatsapp: #22c55e;
+            --whatsapp: #22c55e;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+        /* THÈMES ORIGINAUX */
         body.dark-theme { --bg: radial-gradient(circle at top, #1e293b, #0f172a); --text: #ffffff; --card: rgba(255,255,255,0.08); --nav: rgba(15, 23, 42, 0.95); }
         body.light-theme { --bg: linear-gradient(135deg, #f8fafc, #e2e8f0); --text: #1e293b; --card: rgba(0,0,0,0.05); --nav: rgba(248, 250, 252, 0.95); }
         body.rose-theme { --bg: linear-gradient(135deg, #fdf2f8, #fbcfe8); --text: #831843; --card: rgba(255, 255, 255, 0.4); --nav: rgba(253, 242, 248, 0.95); }
@@ -21,7 +22,7 @@
         body {
             font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text);
             margin: 0; height: 100vh; display: flex; flex-direction: column;
-            padding-bottom: 80px; overflow-x: hidden; transition: 0.3s;
+            padding-bottom: 90px; overflow-x: hidden; transition: 0.3s;
         }
 
         header { display: flex; flex-direction: column; align-items: center; padding: 25px 20px 10px; gap: 15px; }
@@ -35,30 +36,29 @@
         .tab-content.active { display: block; }
 
         .card { background: var(--card); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; margin-bottom: 15px; }
-        .card-garde { border: 1px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1); }
 
+        /* RECHERCHE & DIFFUSION */
         input[type="text"] { width: 100%; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 14px; color: inherit; outline: none; font-size: 16px; }
+        .btn-multi { background: var(--accent); color: #0f172a; border: none; padding: 15px; border-radius: 12px; width:100%; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
+        .broadcast-list { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+        .broadcast-btn { background: var(--whatsapp); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; text-decoration: none; font-size: 0.9rem; }
 
+        /* PHARMACIES */
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; }
+        .filter-chip { flex: 1; padding: 10px; border-radius: 20px; font-size: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; color: inherit; }
+        .filter-chip.active { background: rgba(0, 255, 136, 0.2); border-color: var(--accent); color: var(--accent); }
         .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
-        .nuit-border { border-left: 4px solid var(--violet-nuit); }
-        .dimanche-border { border-left: 4px solid var(--rouge-dimanche); }
+        .badge { font-size: 0.55rem; padding: 3px 6px; border-radius: 5px; font-weight: bold; text-transform: uppercase; margin-left: 5px; }
+        .badge-nuit { border: 1px solid var(--violet-nuit); color: var(--violet-nuit); }
+        .badge-dimanche { border: 1px solid var(--rouge-dimanche); color: var(--rouge-dimanche); }
 
-        /* Style Diffusion WhatsApp */
-        .broadcast-container { text-align: center; }
-        .med-label { color: var(--accent); font-size: 1.5rem; font-weight: bold; margin-bottom: 15px; display: block; }
-        .btn-whatsapp-send { background: var(--whatsapp); color: white; border-radius: 15px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; font-weight: bold; width: 100%; }
-
-        .preview-box { position: relative; margin-top: 15px; display: none; text-align: center; }
-        #preview-img { width: 100%; border-radius: 12px; border: 2px solid var(--accent); }
-        .del-btn { position: absolute; top: -10px; right: -10px; background: var(--rouge-dimanche); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; }
-
-        .btn-broadcast { background: var(--accent); color: #0f172a; border: none; padding: 18px; border-radius: 50px; width: 100%; font-weight: 900; margin-top: 15px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3); }
-
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.65rem; text-decoration: none; cursor: pointer; gap: 5px; }
+        /* NAVIGATION BASSE */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 15px 0 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.65rem; text-decoration: none; cursor: pointer; gap: 5px; flex: 1; }
         .nav-item.active { color: var(--accent); }
+        .nav-item i { font-size: 1.2rem; }
 
-        .ios-install-alert { position: fixed; bottom: 85px; left: 15px; right: 15px; background: var(--card); border: 1px solid var(--accent); border-radius: 15px; padding: 15px; z-index: 9999; display: none; backdrop-filter: blur(20px); }
+        #fileInput { display: none; }
     </style>
 </head>
 <body class="dark-theme">
@@ -80,165 +80,188 @@
 
 <div class="content-area">
     <div id="recherche" class="tab-content active">
-        <div class="card card-garde">
-            <h3 style="margin:0 0 10px 0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-clock"></i> État des gardes</h3>
-            <div id="statusText" style="font-size: 0.8rem; font-weight: bold;">Chargement...</div>
+        <div class="card" style="border: 1px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1);">
+            <h3 style="margin:0 0 10px 0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-moon"></i> En garde actuellement</h3>
+            <div id="guardsContainer" style="font-size: 0.8rem; font-weight: bold;">Chargement...</div>
         </div>
 
         <div class="card">
-            <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Chercher un médicament..." autocomplete="off">
+            <h3 style="margin:0 0 10px 0; font-size: 0.85rem;">Chercher un médicament</h3>
+            <input type="text" id="searchInput" placeholder="Doliprane, Spasfon..." autocomplete="off">
         </div>
 
-        <div id="search-results"></div>
+        <div id="selection-box" style="display:none;" class="card">
+            <div id="medSelected" style="color: var(--accent); font-weight: bold; margin-bottom: 20px; text-align:center; font-size: 1.2rem;"></div>
+            <button onclick="showBroadcastUI('medoc')" class="btn-multi"><i class="fas fa-bullhorn"></i> DIFFUSER AUX PHARMACIES</button>
+            <div id="broadcast-medoc-list" class="broadcast-list"></div>
+        </div>
 
         <div class="card">
             <h3 style="margin:0 0 10px 0; font-size: 0.85rem;">Demande par ordonnance</h3>
-            <button onclick="document.getElementById('fileInput').click()" style="width:100%; padding:20px; background:none; border:1px dashed var(--accent); border-radius:12px; color:inherit; cursor:pointer;">
-                <i class="fas fa-camera"></i> Prendre en photo l'ordonnance
-            </button>
-            
-            <div id="preview-box" class="preview-box">
-                <button class="del-btn" onclick="removePhoto()"><i class="fas fa-times"></i></button>
-                <img id="preview-img" src="">
-                <button class="btn-broadcast" onclick="alert('Diffusion de l\'ordonnance envoyée !')">
-                    <i class="fas fa-bullhorn"></i> DIFFUSER AUX PHARMACIES
-                </button>
+            <button onclick="document.getElementById('fileInput').click()" style="background: rgba(255,255,255,0.05); color: inherit; border: 1px dashed var(--accent); padding: 15px; border-radius: 12px; width: 100%; cursor: pointer;"><i class="fas fa-camera"></i> Prendre en photo l'ordonnance</button>
+            <div id="ordonnance-upload-zone" style="display:none; margin-top: 15px;">
+                <button onclick="showBroadcastUI('devis')" class="btn-multi"><i class="fas fa-bullhorn"></i> DIFFUSER AUX PHARMACIES</button>
+                <div id="broadcast-devis-list" class="broadcast-list"></div>
             </div>
         </div>
     </div>
 
     <div id="pharmacies-list" class="tab-content">
+        <div class="filter-bar">
+            <div class="filter-chip active" id="filter-all" onclick="applyFilter('toutes')">Toutes</div>
+            <div class="filter-chip" id="filter-near" onclick="applyFilter('proches')">Les plus proches 📍</div>
+        </div>
         <div id="listContainer"></div>
+    </div>
+
+    <div id="installer" class="tab-content">
+        <div class="card" style="text-align:center; padding: 40px 20px;">
+            <i class="fas fa-download" style="font-size: 3rem; color: var(--accent); margin-bottom: 20px;"></i>
+            <h2 style="margin-bottom: 10px;">Installer PharmaTic</h2>
+            <p style="opacity: 0.7; font-size: 0.9rem; margin-bottom: 25px;">Utilisez l'application sur votre écran d'accueil pour un accès instantané.</p>
+            <button onclick="alert('Installation...')" class="btn-multi">Installer maintenant</button>
+        </div>
     </div>
 
     <div id="aide" class="tab-content">
         <div class="card">
-            <h3 style="margin-bottom:15px;">Installation de l'application</h3>
-            <p style="font-size: 0.85rem; opacity: 0.8;">Installez PharmaTic pour un accès rapide sur votre téléphone.</p>
-            <button onclick="triggerInstall()" style="width:100%; padding:15px; background:var(--accent); color:#0f172a; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">
-                <i class="fas fa-download"></i> INSTALLER MAINTENANT
-            </button>
+            <h3 style="margin-bottom:15px;">Besoin d'aide ?</h3>
+            <p style="font-size: 0.85rem; opacity: 0.8; line-height: 1.5;">Vous ne trouvez pas un médicament ? Une pharmacie ne répond pas ? Contactez notre support technique.</p>
+            <a href="https://wa.me/221776779440" target="_blank" style="display:block; text-decoration:none; margin-top:15px; padding:15px; background:#25D366; color:white; border-radius:12px; text-align:center; font-weight:bold;">
+                <i class="fab fa-whatsapp"></i> Contacter le support
+            </a>
         </div>
     </div>
 </div>
 
 <nav class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('recherche', this)"><i class="fas fa-search"></i><span>Recherche</span></div>
-    <div class="nav-item" onclick="switchTab('pharmacies-list', this)"><i class="fas fa-hospital"></i><span>Pharmacies</span></div>
-    <div class="nav-item" onclick="switchTab('aide', this)"><i class="fas fa-info-circle"></i><span>Aide</span></div>
+    <div class="nav-item active" onclick="switchTab('recherche')"><i class="fas fa-search"></i><span>Recherche</span></div>
+    <div class="nav-item" onclick="switchTab('pharmacies-list')"><i class="fas fa-hospital"></i><span>Pharmacies</span></div>
+    <div class="nav-item" onclick="switchTab('installer')"><i class="fas fa-download"></i><span>Installer</span></div>
+    <div class="nav-item" onclick="switchTab('aide')"><i class="fas fa-info-circle"></i><span>Aide</span></div>
 </nav>
 
-<input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+<input type="file" id="fileInput" accept="image/*" onchange="handleFile(this)">
 
 <script>
     let pharmacies = [];
-    let config = {};
+    let configGarde = {};
+    let userCoords = null;
 
     async function loadData() {
         try {
             const res = await fetch('src/data/pharmacies.json');
             const data = await res.json();
-            config = data.config;
+            configGarde = data.config;
             pharmacies = data.pharmacies;
             renderList();
-            updateStatus();
+            updateGuardsDisplay();
         } catch (e) { console.error("Erreur JSON", e); }
     }
 
-    // FONCTION DE RECHERCHE CORRIGÉE
-    function handleSearch() {
-        const query = document.getElementById('searchInput').value.trim();
-        const resultContainer = document.getElementById('search-results');
-        
-        if (query.length < 2) {
-            resultContainer.innerHTML = "";
-            return;
-        }
-
-        const gardes = pharmacies.filter(p => p.nuit || p.dimanche);
-        
-        let html = `
-            <div class="card broadcast-container">
-                <span class="med-label">📦 ${query}</span>
-                <button class="btn-broadcast" onclick="alert('Diffusion lancée !')"><i class="fas fa-bullhorn"></i> Diffuser aux gardes</button>
-                <p style="font-size:0.7rem; opacity:0.6; margin: 15px 0;">Ou contactez individuellement :</p>
-        `;
-
-        gardes.forEach(p => {
-            const msg = encodeURIComponent(`Bonjour, est-ce que le médicament ${query} est disponible ?`);
-            html += `
-                <a href="https://wa.me/221${p.telephone.replace(/\s/g, '')}?text=${msg}" target="_blank" class="btn-whatsapp-send">
-                    <span>Envoyer à ${p.nom}</span>
-                    <i class="fab fa-whatsapp"></i>
-                </a>
-            `;
-        });
-
-        html += `</div>`;
-        resultContainer.innerHTML = html;
+    function isUrgenceTime() {
+        const hour = new Date().getHours();
+        const isNight = (hour >= 23 || hour < 7);
+        const isSunday = (new Date().getDay() === 0);
+        return { isNight, isSunday, active: (isNight || isSunday) };
     }
 
-    function renderList() {
+    function updateGuardsDisplay() {
+        const container = document.getElementById('guardsContainer');
+        const urgence = isUrgenceTime();
+        let active = pharmacies.filter(p => (urgence.isNight && p.nuit) || (urgence.isSunday && p.dimanche));
+        
+        if (active.length > 0) {
+            container.innerHTML = active.map(p => 
+                `<div style="display:flex; justify-content:space-between; margin-bottom:8px; align-items:center;">
+                    <span>📍 ${p.nom}</span>
+                    <a href="tel:${p.telephone}" style="background:var(--violet-nuit); color:white; padding:5px 12px; border-radius:8px; text-decoration:none; font-size:0.7rem;">Appeler</a>
+                </div>`).join('');
+        } else {
+            container.innerHTML = `<div style="opacity:0.6; font-size:0.75rem;">Reprise des gardes à 23h.</div>`;
+        }
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        // Associer l'item de nav à l'onglet
+        const indexMap = {'recherche':0, 'pharmacies-list':1, 'installer':2, 'aide':3};
+        document.querySelectorAll('.nav-item')[indexMap[tabId]].classList.add('active');
+    }
+
+    function handleSearch(val) {
+        const selectionBox = document.getElementById('selection-box');
+        if(val.length > 2) {
+            selectionBox.style.display = 'block';
+            document.getElementById('medSelected').textContent = "📦 " + val;
+        } else {
+            selectionBox.style.display = 'none';
+        }
+    }
+    document.getElementById('searchInput').addEventListener('input', (e) => handleSearch(e.target.value));
+
+    function showBroadcastUI(type) {
+        const med = document.getElementById('searchInput').value;
+        const container = document.getElementById(type === 'medoc' ? 'broadcast-medoc-list' : 'broadcast-devis-list');
+        const urgence = isUrgenceTime();
+        container.innerHTML = `<p style="font-size:0.65rem; opacity:0.7; text-align:center;">Appuyez pour envoyer :</p>`;
+        
+        pharmacies.forEach(p => {
+            const btn = document.createElement('a');
+            btn.className = "broadcast-btn";
+            const estIndisponible = urgence.active && ((urgence.isNight && !p.nuit) || (urgence.isSunday && !p.dimanche));
+            
+            if (estIndisponible) {
+                btn.style.background = "#334155"; btn.style.opacity = "0.5"; btn.style.pointerEvents = "none";
+                btn.innerHTML = `<span>${p.nom} (Fermé)</span> <i class="fas fa-times"></i>`;
+            } else {
+                let msg = type === 'medoc' ? 
+                    `🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${med}* ?` : 
+                    `🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nJe vous contacte pour un devis sur mon *ordonnance ci-jointe*.`;
+                
+                btn.href = `https://wa.me/${p.telephone.replace(/\s/g,'')}?text=${encodeURIComponent(msg)}`;
+                btn.target = "_blank";
+                btn.innerHTML = `<span>Envoyer à ${p.nom}</span> <i class="fab fa-whatsapp"></i>`;
+            }
+            container.appendChild(btn);
+        });
+    }
+
+    function renderList(filter = 'toutes') {
         const container = document.getElementById('listContainer');
-        container.innerHTML = "";
+        container.innerHTML = '';
+        let all = [...pharmacies];
+        
         const sections = [
-            { name: "🌙 GARDES DE NUIT", list: pharmacies.filter(p => p.nuit), color: "var(--violet-nuit)", class: "nuit-border" },
-            { name: "☀️ GARDES DU DIMANCHE", list: pharmacies.filter(p => !p.nuit && p.dimanche), color: "var(--rouge-dimanche)", class: "dimanche-border" },
-            { name: "🏥 AUTRES PHARMACIES", list: pharmacies.filter(p => !p.nuit && !p.dimanche), color: "grey", class: "" }
+            { name: "🌙 EN GARDE DE NUIT", list: all.filter(p => p.nuit), date: configGarde.date_nuit },
+            { name: "☀️ GARDE DU DIMANCHE", list: all.filter(p => !p.nuit && p.dimanche), date: configGarde.date_dimanche },
+            { name: "🏥 AUTRES PHARMACIES", list: all.filter(p => !p.nuit && !p.dimanche), date: "" }
         ];
+
         sections.forEach(s => {
             if(s.list.length > 0) {
                 const h = document.createElement('div');
-                h.style = `font-size:0.7rem; font-weight:900; color:${s.color}; margin:15px 5px 8px;`;
-                h.innerText = s.name;
+                h.style = "font-size:0.7rem; font-weight:bold; margin:20px 0 10px 5px; color:var(--accent); display:flex; justify-content:space-between;";
+                h.innerHTML = `<span>${s.name}</span> <span style="opacity:0.5; font-weight:normal;">${s.date}</span>`;
                 container.appendChild(h);
                 s.list.forEach(p => {
-                    const item = document.createElement('div');
-                    item.className = `pharma-item ${s.class}`;
-                    item.innerHTML = `<div><div style="font-weight:bold; font-size:0.9rem;">${p.nom}</div><div style="font-size:0.65rem; opacity:0.6;">${p.quartier}</div></div>
-                                      <a href="tel:${p.telephone}" style="color:var(--accent); font-size:1.2rem;"><i class="fas fa-phone-alt"></i></a>`;
-                    container.appendChild(item);
+                    const d = document.createElement('div');
+                    d.className = 'pharma-item';
+                    if(p.nuit) d.style.borderLeft = "4px solid var(--violet-nuit)";
+                    else if(p.dimanche) d.style.borderLeft = "4px solid var(--rouge-dimanche)";
+                    d.innerHTML = `<div><div style="font-weight:bold;">${p.nom}</div><div style="font-size:0.65rem; opacity:0.6;">${p.quartier}</div></div>
+                                  <a href="tel:${p.telephone}" style="color:var(--accent);"><i class="fas fa-phone-alt"></i></a>`;
+                    container.appendChild(d);
                 });
             }
         });
     }
 
-    function updateStatus() {
-        const nuit = pharmacies.filter(p => p.nuit);
-        if(nuit.length > 0) document.getElementById('statusText').innerText = `Garde actuelle : ${nuit[0].nom}`;
-    }
-
-    function handlePhoto(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                document.getElementById('preview-img').src = e.target.result;
-                document.getElementById('preview-box').style.display = 'block';
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function removePhoto() {
-        document.getElementById('fileInput').value = "";
-        document.getElementById('preview-box').style.display = 'none';
-    }
-
-    function triggerInstall() {
-        alert("Appuyez sur 'Partager' puis 'Sur l'écran d'accueil' (iOS) ou sur les 3 points du navigateur (Android).");
-    }
-
+    function handleFile(input) { if (input.files && input.files[0]) document.getElementById('ordonnance-upload-zone').style.display = 'block'; }
     function setTheme(t) { document.body.className = t + '-theme'; localStorage.setItem('theme', t); }
-    
-    function switchTab(id, el) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        el.classList.add('active');
-    }
-
-    loadData();
     if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
+    loadData();
 </script>
 </body>
 </html>
