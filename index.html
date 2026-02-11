@@ -14,7 +14,7 @@
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        /* THÈMES ORIGINAUX */
+        /* THÈMES */
         body.dark-theme { --bg: radial-gradient(circle at top, #1e293b, #0f172a); --text: #ffffff; --card: rgba(255,255,255,0.08); --nav: rgba(15, 23, 42, 0.95); }
         body.light-theme { --bg: linear-gradient(135deg, #f8fafc, #e2e8f0); --text: #1e293b; --card: rgba(0,0,0,0.05); --nav: rgba(248, 250, 252, 0.95); }
         body.rose-theme { --bg: linear-gradient(135deg, #fdf2f8, #fbcfe8); --text: #831843; --card: rgba(255, 255, 255, 0.4); --nav: rgba(253, 242, 248, 0.95); }
@@ -28,8 +28,18 @@
         header { display: flex; flex-direction: column; align-items: center; padding: 25px 20px 10px; gap: 15px; }
         .logo-img { width: 55px; height: 55px; border-radius: 12px; border: 1px solid var(--accent); box-shadow: 0 0 15px rgba(0, 255, 136, 0.2); }
 
+        /* BOUTONS THÈME AMÉLIORÉS */
         .theme-switcher { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-top: 15px; }
-        .theme-btn { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; cursor: pointer; font-weight: bold; color: inherit; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .theme-btn { 
+            flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); 
+            font-size: 0.75rem; cursor: pointer; font-weight: bold; 
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+            transition: transform 0.2s;
+        }
+        .theme-btn:active { transform: scale(0.95); }
+        .theme-btn.btn-dark { background: #1e293b; color: #ffffff; }
+        .theme-btn.btn-light { background: #ffffff; color: #1e293b; border: 1px solid #cbd5e1; }
+        .theme-btn.btn-rose { background: #fbcfe8; color: #831843; }
 
         .content-area { flex: 1; padding: 15px; overflow-y: auto; width: 100%; }
         .tab-content { display: none; }
@@ -48,9 +58,6 @@
         .filter-chip { flex: 1; padding: 10px; border-radius: 20px; font-size: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); text-align: center; cursor: pointer; color: inherit; }
         .filter-chip.active { background: rgba(0, 255, 136, 0.2); border-color: var(--accent); color: var(--accent); }
         .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
-        .badge { font-size: 0.55rem; padding: 3px 6px; border-radius: 5px; font-weight: bold; text-transform: uppercase; margin-left: 5px; }
-        .badge-nuit { border: 1px solid var(--violet-nuit); color: var(--violet-nuit); }
-        .badge-dimanche { border: 1px solid var(--rouge-dimanche); color: var(--rouge-dimanche); }
 
         /* NAVIGATION BASSE */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 15px 0 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); z-index: 1000; }
@@ -72,9 +79,9 @@
         </div>
     </div>
     <div class="theme-switcher">
-        <button class="theme-btn" onclick="setTheme('dark')"><i class="fas fa-moon"></i> Sombre</button>
-        <button class="theme-btn" onclick="setTheme('light')"><i class="fas fa-sun"></i> Clair</button>
-        <button class="theme-btn" onclick="setTheme('rose')"><i class="fas fa-heart"></i> Rose</button>
+        <button class="theme-btn btn-dark" onclick="setTheme('dark')"><i class="fas fa-moon"></i> Sombre</button>
+        <button class="theme-btn btn-light" onclick="setTheme('light')"><i class="fas fa-sun"></i> Clair</button>
+        <button class="theme-btn btn-rose" onclick="setTheme('rose')"><i class="fas fa-heart"></i> Rose</button>
     </div>
 </header>
 
@@ -118,15 +125,13 @@
         <div class="card" style="text-align:center; padding: 40px 20px;">
             <i class="fas fa-download" style="font-size: 3rem; color: var(--accent); margin-bottom: 20px;"></i>
             <h2 style="margin-bottom: 10px;">Installer PharmaTic</h2>
-            <p style="opacity: 0.7; font-size: 0.9rem; margin-bottom: 25px;">Utilisez l'application sur votre écran d'accueil pour un accès instantané.</p>
             <button onclick="alert('Installation...')" class="btn-multi">Installer maintenant</button>
         </div>
     </div>
 
     <div id="aide" class="tab-content">
         <div class="card">
-            <h3 style="margin-bottom:15px;">Besoin d'aide ?</h3>
-            <p style="font-size: 0.85rem; opacity: 0.8; line-height: 1.5;">Vous ne trouvez pas un médicament ? Une pharmacie ne répond pas ? Contactez notre support technique.</p>
+            <h3>Support Technique</h3>
             <a href="https://wa.me/221776779440" target="_blank" style="display:block; text-decoration:none; margin-top:15px; padding:15px; background:#25D366; color:white; border-radius:12px; text-align:center; font-weight:bold;">
                 <i class="fab fa-whatsapp"></i> Contacter le support
             </a>
@@ -146,22 +151,26 @@
 <script>
     let pharmacies = [];
     let configGarde = {};
-    let userCoords = null;
 
     async function loadData() {
         try {
-            const res = await fetch('src/data/pharmacies.json');
+            const res = await fetch('pharmacies.json');
             const data = await res.json();
             configGarde = data.config;
             pharmacies = data.pharmacies;
             renderList();
             updateGuardsDisplay();
-        } catch (e) { console.error("Erreur JSON", e); }
+        } catch (e) { 
+            console.error("Erreur JSON", e);
+            // Fallback de sécurité pour Keur Massar
+            pharmacies = [{ nom: "Pharmacie Dial Diop", telephone: "776779440", quartier: "Keur Massar", nuit: true, dimanche: true }];
+            renderList();
+        }
     }
 
     function isUrgenceTime() {
         const hour = new Date().getHours();
-        const isNight = (hour >= 23 || hour < 7);
+        const isNight = (hour >= 23 || hour < 8);
         const isSunday = (new Date().getDay() === 0);
         return { isNight, isSunday, active: (isNight || isSunday) };
     }
@@ -183,11 +192,14 @@
     }
 
     function switchTab(tabId) {
-        document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        // Associer l'item de nav à l'onglet
+        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+        document.getElementById(tabId).style.display = 'block';
+        
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         const indexMap = {'recherche':0, 'pharmacies-list':1, 'installer':2, 'aide':3};
         document.querySelectorAll('.nav-item')[indexMap[tabId]].classList.add('active');
+        
+        if(tabId === 'pharmacies-list') renderList();
     }
 
     function handleSearch(val) {
@@ -195,66 +207,39 @@
         if(val.length > 2) {
             selectionBox.style.display = 'block';
             document.getElementById('medSelected').textContent = "📦 " + val;
-        } else {
-            selectionBox.style.display = 'none';
-        }
+        } else { selectionBox.style.display = 'none'; }
     }
     document.getElementById('searchInput').addEventListener('input', (e) => handleSearch(e.target.value));
 
     function showBroadcastUI(type) {
         const med = document.getElementById('searchInput').value;
         const container = document.getElementById(type === 'medoc' ? 'broadcast-medoc-list' : 'broadcast-devis-list');
-        const urgence = isUrgenceTime();
         container.innerHTML = `<p style="font-size:0.65rem; opacity:0.7; text-align:center;">Appuyez pour envoyer :</p>`;
         
         pharmacies.forEach(p => {
             const btn = document.createElement('a');
             btn.className = "broadcast-btn";
-            const estIndisponible = urgence.active && ((urgence.isNight && !p.nuit) || (urgence.isSunday && !p.dimanche));
-            
-            if (estIndisponible) {
-                btn.style.background = "#334155"; btn.style.opacity = "0.5"; btn.style.pointerEvents = "none";
-                btn.innerHTML = `<span>${p.nom} (Fermé)</span> <i class="fas fa-times"></i>`;
-            } else {
-                let msg = type === 'medoc' ? 
-                    `🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nAvez-vous en stock : *${med}* ?` : 
-                    `🏥 *PharmaTic*\n\nBonjour *${p.nom}*,\nJe vous contacte pour un devis sur mon *ordonnance ci-jointe*.`;
-                
-                btn.href = `https://wa.me/${p.telephone.replace(/\s/g,'')}?text=${encodeURIComponent(msg)}`;
-                btn.target = "_blank";
-                btn.innerHTML = `<span>Envoyer à ${p.nom}</span> <i class="fab fa-whatsapp"></i>`;
-            }
+            let pureNumber = p.telephone.replace(/\s/g,'');
+            if(!pureNumber.startsWith('221')) pureNumber = '221' + pureNumber;
+
+            let msg = type === 'medoc' ? `🏥 *PharmaTic*\nAvez-vous : *${med}* ?` : `🏥 *PharmaTic*\nDevis pour mon ordonnance.`;
+            btn.href = `https://wa.me/${pureNumber}?text=${encodeURIComponent(msg)}`;
+            btn.target = "_blank";
+            btn.innerHTML = `<span>Envoyer à ${p.nom}</span> <i class="fab fa-whatsapp"></i>`;
             container.appendChild(btn);
         });
     }
 
-    function renderList(filter = 'toutes') {
+    function renderList() {
         const container = document.getElementById('listContainer');
         container.innerHTML = '';
-        let all = [...pharmacies];
-        
-        const sections = [
-            { name: "🌙 EN GARDE DE NUIT", list: all.filter(p => p.nuit), date: configGarde.date_nuit },
-            { name: "☀️ GARDE DU DIMANCHE", list: all.filter(p => !p.nuit && p.dimanche), date: configGarde.date_dimanche },
-            { name: "🏥 AUTRES PHARMACIES", list: all.filter(p => !p.nuit && !p.dimanche), date: "" }
-        ];
-
-        sections.forEach(s => {
-            if(s.list.length > 0) {
-                const h = document.createElement('div');
-                h.style = "font-size:0.7rem; font-weight:bold; margin:20px 0 10px 5px; color:var(--accent); display:flex; justify-content:space-between;";
-                h.innerHTML = `<span>${s.name}</span> <span style="opacity:0.5; font-weight:normal;">${s.date}</span>`;
-                container.appendChild(h);
-                s.list.forEach(p => {
-                    const d = document.createElement('div');
-                    d.className = 'pharma-item';
-                    if(p.nuit) d.style.borderLeft = "4px solid var(--violet-nuit)";
-                    else if(p.dimanche) d.style.borderLeft = "4px solid var(--rouge-dimanche)";
-                    d.innerHTML = `<div><div style="font-weight:bold;">${p.nom}</div><div style="font-size:0.65rem; opacity:0.6;">${p.quartier}</div></div>
-                                  <a href="tel:${p.telephone}" style="color:var(--accent);"><i class="fas fa-phone-alt"></i></a>`;
-                    container.appendChild(d);
-                });
-            }
+        pharmacies.forEach(p => {
+            const d = document.createElement('div');
+            d.className = 'pharma-item';
+            if(p.nuit) d.style.borderLeft = "4px solid var(--violet-nuit)";
+            d.innerHTML = `<div><div style="font-weight:bold;">${p.nom}</div><div style="font-size:0.65rem; opacity:0.6;">${p.quartier}</div></div>
+                          <a href="tel:${p.telephone}" style="color:var(--accent);"><i class="fas fa-phone-alt"></i></a>`;
+            container.appendChild(d);
         });
     }
 
