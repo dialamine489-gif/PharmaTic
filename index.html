@@ -144,7 +144,7 @@
     async function loadData() {
         try {
             // Ici, assure-toi que le fichier pharmacies.json est présent
-            const res = await fetch('pharmacies.json');
+            const res = await fetch('src/data/pharmacies.json');
             const data = await res.json();
             config = data.config;
             pharmacies = data.pharmacies;
