@@ -247,6 +247,38 @@
     // Chargement auto du thème
     const savedTheme = localStorage.getItem('pharmaTheme') || 'dark';
     setTheme(savedTheme);
+    // Nouvelle fonction pour afficher la liste complète dans l'onglet Pharmacies
+    function afficherListePharmacies() {
+        const listContainer = document.getElementById('listContainer');
+        let html = '<h2 style="padding:0 10px;">Pharmacies à proximité</h2>';
+        
+        pharmacies.forEach(p => {
+            html += `
+                <div class="card" style="margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <strong style="font-size:1.1rem;">${p.nom}</strong><br>
+                        <small style="opacity:0.7;">Keur Massar, Sénégal</small>
+                    </div>
+                    <a href="tel:${p.tel}" class="btn-call" style="background:var(--accent); color:#0f172a;">
+                        <i class="fas fa-phone"></i>
+                    </a>
+                </div>`;
+        });
+        listContainer.innerHTML = html;
+    }
+
+    // Modifier la fonction switchTab pour lancer l'affichage quand on clique sur l'onglet
+    function switchTab(id, el) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+
+        // Si on clique sur l'onglet pharmacies, on génère la liste
+        if(id === 'pharmacies') {
+            afficherListePharmacies();
+        }
+    }
 </script>
 </body>
 </html>
