@@ -24,8 +24,12 @@
             padding-bottom: 90px; overflow-x: hidden; transition: 0.3s;
         }
 
-        header { display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        header { display: flex; flex-direction: column; align-items: center; padding: 15px; }
         .logo-img { width: 60px; height: 60px; border-radius: 15px; border: 2px solid var(--accent); box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
+
+        .news-ticker { background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--accent); padding: 8px 0; overflow: hidden; white-space: nowrap; }
+        .ticker-wrapper { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; font-size: 0.8rem; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
 
         .theme-switcher { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-top: 15px; }
         .theme-btn { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.8rem; cursor: pointer; font-weight: bold; color: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -34,8 +38,11 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .card { background: var(--card); border-radius: 20px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .card { background: var(--card); border-radius: 20px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
         
+        /* BOUTON FERMER */
+        .close-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.1); border: none; color: inherit; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+
         .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid transparent; }
         .nuit-border { border-left-color: var(--violet-nuit); }
         .dimanche-border { border-left-color: var(--rouge-dimanche); }
@@ -48,23 +55,26 @@
 
         .ios-prompt { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 350px; background: #ffffff; color: #1e293b; border-radius: 15px; padding: 25px; z-index: 10000; display: none; border: 2px solid var(--accent); text-align: center; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; display: none; }
-        
         .broadcast-item { background: var(--card); border-radius: 12px; padding: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body class="dark-theme">
 
-<div id="overlay" class="overlay"></div>
+<div id="overlay" class="overlay" onclick="closePopups()"></div>
 
 <header>
     <img src="icon.jpeg" alt="Logo" class="logo-img">
     <h1 style="margin: 10px 0 0; font-size: 1.8rem; font-weight: 900; background: linear-gradient(to right, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">PHARMATIC</h1>
     <div class="theme-switcher">
-        <button class="theme-btn" onclick="setTheme('dark')" style="background: #1e293b; color: white;"><i class="fas fa-moon"></i> Sombre</button>
-        <button class="theme-btn" onclick="setTheme('light')" style="background: white; color: #1e293b;"><i class="fas fa-sun"></i> Clair</button>
-        <button class="theme-btn" onclick="setTheme('rose')" style="background: #fbcfe8; color: #831843;"><i class="fas fa-heart"></i> Rose</button>
+        <button class="theme-btn" onclick="setTheme('dark')" style="background: #1e293b; color: white;">Sombre</button>
+        <button class="theme-btn" onclick="setTheme('light')" style="background: white; color: #1e293b;">Clair</button>
+        <button class="theme-btn" onclick="setTheme('rose')" style="background: #fbcfe8; color: #831843;">Rose</button>
     </div>
 </header>
+
+<div class="news-ticker">
+    <div class="ticker-wrapper" id="tickerText">PharmaTic : Votre santé, notre priorité à Keur Massar !</div>
+</div>
 
 <div class="content-area">
     <div id="recherche" class="tab-content active">
@@ -78,6 +88,7 @@
             <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Doliprane, Spasfon..." style="width:100%; padding:14px; border-radius:12px; border:none; background:rgba(0,0,0,0.1); color:inherit; outline:none; font-size: 1rem;">
             
             <div id="broadcast-zone" style="display:none; margin-top:15px;">
+                <button class="close-btn" onclick="resetSearch()"><i class="fas fa-times"></i></button>
                 <div id="medLabel" style="color: var(--accent); font-weight: bold; text-align:center; font-size: 1.2rem; margin-bottom: 10px;"></div>
                 <div id="pharmaciesOuvertesMed"></div>
                 <div id="pharmaciesFermeesMed" style="margin-top: 15px;"></div>
@@ -87,10 +98,9 @@
         <div class="card">
             <h3 style="margin-top:0; font-size: 0.9rem;">Par ordonnance</h3>
             <button onclick="document.getElementById('fileInput').click()" style="width:100%; padding:18px; background:none; border:1.5px dashed var(--accent); border-radius:12px; color:inherit; cursor:pointer;"><i class="fas fa-camera"></i> PRENDRE PHOTO ORDONNANCE</button>
-            
             <div id="ordo-zone" style="display:none; margin-top:15px;">
+                <button class="close-btn" onclick="resetOrdo()"><i class="fas fa-times"></i></button>
                 <p style="font-size: 0.8rem; color: var(--accent); font-weight: bold; text-align:center;">📸 PHOTO PRÊTE</p>
-                <p style="font-size: 0.75rem; text-align:center; opacity:0.7; margin-bottom:10px;">Choisissez une pharmacie ouverte :</p>
                 <div id="pharmaciesOuvertesOrdo"></div>
                 <div id="pharmaciesFermeesOrdo" style="margin-top: 15px;"></div>
             </div>
@@ -105,7 +115,6 @@
         <div class="card" style="text-align:center;">
             <i class="fas fa-download" style="font-size: 3rem; color: var(--accent); margin-bottom: 15px;"></i>
             <h3>Installer PharmaTic</h3>
-            <p style="font-size:0.85rem; opacity:0.8;">Ajoutez PharmaTic à votre écran d'accueil.</p>
             <button onclick="showInstallTuto()" class="btn-wa">INSTALLER MAINTENANT</button>
         </div>
     </div>
@@ -116,18 +125,7 @@
     <h3>N'oubliez pas la photo !</h3>
     <p style="font-size: 0.9rem; color: #1e293b;">Une fois sur WhatsApp, joignez votre ordonnance avant d'envoyer le message chaleureux.</p>
     <button id="btn-final-send" class="btn-wa">J'ai compris, envoyer</button>
-    <button onclick="closePopups()" style="background:none; border:none; color:grey; margin-top:10px; cursor:pointer;">Annuler</button>
-</div>
-
-<div id="ios-tuto" class="ios-prompt">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <span style="font-weight:bold;">Installation iPhone</span>
-        <button onclick="closePopups()" style="background:none; border:none; font-size:1.5rem; color:inherit;">×</button>
-    </div>
-    <div style="text-align:left; font-size:0.9rem; line-height:1.6;">
-        1. Appuyez sur <strong>Partager</strong> <i class="fas fa-external-link-alt" style="color:#007aff"></i>.<br>
-        2. Choisissez <strong>"Sur l'écran d'accueil"</strong> <i class="fas fa-plus-square" style="color:#007aff"></i>.
-    </div>
+    <button onclick="closePopups()" style="background:none; border:none; color:grey; margin-top:15px; cursor:pointer;">Annuler</button>
 </div>
 
 <nav class="bottom-nav">
@@ -142,6 +140,8 @@
 <script>
     let pharmacies = [];
     let config = {};
+    let pendingNum = "";
+    let pendingMsg = "";
 
     async function loadData() {
         try {
@@ -156,14 +156,22 @@
 
     function updateUI() {
         const activeGarde = pharmacies.filter(p => p.nuit);
-        if(activeGarde.length > 0) document.getElementById('statusText').innerText = "📍 " + activeGarde[0].nom;
+        if(activeGarde.length > 0) {
+            document.getElementById('statusText').innerText = "📍 " + activeGarde[0].nom;
+            const noms = activeGarde.map(p => p.nom).join(' • ');
+            document.getElementById('tickerText').innerText = `✨ PharmaTic : Santé & Gardes à Keur Massar • En garde : ${noms} • Toujours là pour vous ! ✨`;
+        }
     }
 
-    function isUrgenceTime() {
-        const hour = new Date().getHours();
-        const isNight = (hour >= 23 || hour < 8);
-        const isSunday = (new Date().getDay() === 0);
-        return { isNight, isSunday };
+    // NOUVELLES FONCTIONS DE RÉINITIALISATION
+    function resetSearch() {
+        document.getElementById('searchInput').value = "";
+        document.getElementById('broadcast-zone').style.display = 'none';
+    }
+
+    function resetOrdo() {
+        document.getElementById('ordo-zone').style.display = 'none';
+        document.getElementById('fileInput').value = "";
     }
 
     function handleSearch() {
@@ -172,64 +180,74 @@
         if (val.length > 2) {
             zone.style.display = 'block';
             document.getElementById('medLabel').innerText = "📦 " + val;
-            const urgence = isUrgenceTime();
+            const hour = new Date().getHours();
+            const isNight = (hour >= 23 || hour < 8);
+            const isSunday = (new Date().getDay() === 0);
+            
             let htmlOuvert = ""; let htmlFerme = "";
 
             pharmacies.forEach(p => {
-                const ouvert = (urgence.isNight && p.nuit) || (urgence.isSunday && p.dimanche) || (!urgence.isNight && !urgence.isSunday);
+                const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
                 const cleanNum = p.telephone.replace(/\D/g, '');
-                const msg = `🌟 *PharmaTic* 🌟\n\nBonjour l'équipe de la *${p.nom}* ! 👋\n\nJ'espère que vous allez bien. Auriez-vous la gentillesse de me confirmer si vous avez en stock : *${val}* ?\n\nMerci d'avance pour votre aide précieuse ! 🙏✨`;
+                const msg = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\nAuriez-vous la gentillesse de me confirmer si vous avez : *${val}* ?\n\nMerci beaucoup ! 🙏`;
                 
                 const cardHtml = `
                     <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.4; background: #334155;'}">
                         <span>${p.nom} ${ouvert ? '' : '(Fermé)'}</span>
-                        <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${encodeURIComponent(msg)}" target="_blank"` : ''} style="text-decoration:none; cursor:${ouvert ? 'pointer' : 'not-allowed'};">
+                        <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${encodeURIComponent(msg)}" target="_blank"` : ''} style="text-decoration:none;">
                             <i class="fab fa-whatsapp" style="color: ${ouvert ? 'var(--whatsapp)' : 'grey'}; font-size:1.3rem;"></i>
                         </a>
                     </div>`;
                 if (ouvert) htmlOuvert += cardHtml; else htmlFerme += cardHtml;
             });
             document.getElementById('pharmaciesOuvertesMed').innerHTML = htmlOuvert;
-            document.getElementById('pharmaciesFermeesMed').innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin: 15px 0 5px;">Fermées :</p>${htmlFerme}` : "";
+            document.getElementById('pharmaciesFermeesMed').innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin-top:10px;">Fermées :</p>${htmlFerme}` : "";
         } else { zone.style.display = 'none'; }
     }
 
     function handleFileSelected() {
         document.getElementById('ordo-zone').style.display = 'block';
-        const urgence = isUrgenceTime();
+        const hour = new Date().getHours();
+        const isNight = (hour >= 23 || hour < 8);
+        const isSunday = (new Date().getDay() === 0);
         let htmlOuvert = ""; let htmlFerme = "";
 
         pharmacies.forEach(p => {
-            const ouvert = (urgence.isNight && p.nuit) || (urgence.isSunday && p.dimanche) || (!urgence.isNight && !urgence.isSunday);
+            const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
             const cleanNum = p.telephone.replace(/\D/g, '');
-            const msg = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n\nJe vous contacte pour savoir si vous pouvez honorer l'ordonnance que je vous joins en photo à l'instant.\n\nD'avance, un grand merci pour votre retour ! 🙏`;
+            const msg = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\nJe souhaiterais savoir si vous avez les produits de cette ordonnance (en pièce jointe).\n\nMerci d'avance ! 🙏`;
             
             const cardHtml = `
                 <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.4; background: #334155;'}">
                     <span>${p.nom} ${ouvert ? '' : '(Fermé)'}</span>
                     <i class="fab fa-whatsapp" 
                        onclick="${ouvert ? `prepareOrdo('${cleanNum}', '${encodeURIComponent(msg)}')` : ''}" 
-                       style="color: ${ouvert ? 'var(--whatsapp)' : 'grey'}; font-size:1.3rem; cursor:${ouvert ? 'pointer' : 'not-allowed'};"></i>
+                       style="color: ${ouvert ? 'var(--whatsapp)' : 'grey'}; font-size:1.3rem; cursor:pointer;"></i>
                 </div>`;
             if (ouvert) htmlOuvert += cardHtml; else htmlFerme += cardHtml;
         });
         document.getElementById('pharmaciesOuvertesOrdo').innerHTML = htmlOuvert;
-        document.getElementById('pharmaciesFermeesOrdo').innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin: 15px 0 5px;">Fermées :</p>${htmlFerme}` : "";
+        document.getElementById('pharmaciesFermeesOrdo').innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin-top:10px;">Fermées :</p>${htmlFerme}` : "";
     }
 
     function prepareOrdo(num, msg) {
+        pendingNum = num;
+        pendingMsg = msg;
         document.getElementById('overlay').style.display = 'block';
         document.getElementById('ordo-popup').style.display = 'block';
-        document.getElementById('btn-final-send').onclick = function() {
-            window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
-            closePopups();
-        };
     }
+
+    document.getElementById('btn-final-send').onclick = function() {
+        if(pendingNum !== "") {
+            window.open(`https://wa.me/${pendingNum}?text=${pendingMsg}`, '_blank');
+            closePopups();
+        }
+    };
 
     function closePopups() {
         document.getElementById('overlay').style.display = 'none';
         document.getElementById('ordo-popup').style.display = 'none';
-        document.getElementById('ios-tuto').style.display = 'none';
+        pendingNum = "";
     }
 
     function renderList() {
@@ -242,10 +260,10 @@
         ];
         sections.forEach(s => {
             if(s.list.length > 0) {
-                const header = document.createElement('div');
-                header.style = `display:flex; justify-content:space-between; font-size:0.7rem; font-weight:bold; color:${s.color}; margin:20px 5px 10px;`;
-                header.innerHTML = `<span>${s.name}</span> <span>${s.date || ""}</span>`;
-                container.appendChild(header);
+                const h = document.createElement('div');
+                h.style = `display:flex; justify-content:space-between; font-size:0.7rem; font-weight:bold; color:${s.color}; margin:20px 5px 10px;`;
+                h.innerHTML = `<span>${s.name}</span> <span>${s.date || ""}</span>`;
+                container.appendChild(h);
                 s.list.forEach(p => {
                     const item = document.createElement('div');
                     item.className = `pharma-item ${s.class}`;
@@ -261,20 +279,17 @@
         });
     }
 
-    function showInstallTuto() {
-        document.getElementById('overlay').style.display = 'block';
-        if(/iPad|iPhone|iPod/.test(navigator.userAgent)) document.getElementById('ios-tuto').style.display = 'block';
-        else alert("Menu Chrome > Installer l'application");
-    }
-
     function switchTab(id, el) {
         document.querySelectorAll('.tab-content, .nav-item').forEach(x => x.classList.remove('active'));
         document.getElementById(id).classList.add('active'); el.classList.add('active');
+        if(id === 'pharmacies') renderList();
     }
 
     function setTheme(t) { document.body.className = t + '-theme'; localStorage.setItem('theme', t); }
     if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
     loadData();
 </script>
+
+<div id="overlay" class="overlay" onclick="closePopups()"></div>
 </body>
 </html>
