@@ -33,7 +33,6 @@
         .ticker-wrapper { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; font-size: 0.8rem; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
 
-        /* Boutons thèmes fixes */
         .theme-switcher { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-top: 15px; padding: 0 10px; }
         .theme-btn { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.8rem; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .btn-dark { background: #1e293b; color: white; }
@@ -53,11 +52,20 @@
         
         .section-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 800; margin: 20px 5px 10px; text-transform: uppercase; }
 
+        .broadcast-item { background: rgba(0,0,0,0.05); border-radius: 12px; padding: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,255,136,0.1); }
+        
+        /* Animation Pulse */
+        @keyframes pulse-blue {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(0, 242, 254, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 242, 254, 0); }
+        }
+        .pulse-maps { animation: pulse-blue 2s infinite; display: inline-block; border-radius: 50%; }
+
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 12px 0 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.7rem; text-decoration: none; cursor: pointer; gap: 4px; }
         .nav-item.active { color: var(--accent); }
 
-        .broadcast-item { background: rgba(0,0,0,0.05); border-radius: 12px; padding: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; border: 1px solid rgba(0,255,136,0.1); }
         .download-btn { background: var(--accent); color: #0f172a; border: none; padding: 16px; border-radius: 50px; font-weight: 900; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; text-transform: uppercase; }
     </style>
 </head>
@@ -117,9 +125,6 @@
             <h3>Installer PharmaTic</h3>
             <p style="font-size:0.85rem; opacity:0.8; line-height:1.5;">Pour un accès rapide, ajoutez l'application sur votre écran d'accueil.</p>
             <button id="pwaBtn" class="download-btn"><i class="fas fa-download"></i> INSTALLER MAINTENANT</button>
-            <div style="font-size:0.75rem; margin-top:15px; text-align:left; opacity:0.8;">
-                <b>Sur iPhone :</b> Appuyez sur <i class="fas fa-share-square"></i> puis sur <b>"Sur l'écran d'accueil"</b>.
-            </div>
         </div>
     </div>
 </div>
@@ -132,22 +137,24 @@
 </nav>
 
 <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelected()">
+
 <script>
     let pharmacies = [];
     let config = {};
-    let deferredPrompt = null; // Initialisation propre
-    const installBtn = document.getElementById('pwaBtn');
+    let deferredPrompt = null;
 
     async function loadData() {
         try {
-            // Vérifie bien ce chemin : si index.html est dans 'src', utilise 'data/pharmacies.json'
             const res = await fetch('src/data/pharmacies.json');
             const data = await res.json();
             config = data.config;
             pharmacies = data.pharmacies;
-            renderList();
-            updateUI();
-        } catch (e) { console.error(e); }
+        } catch (e) { 
+            console.error("Erreur de chargement JSON, chargement secours...");
+            pharmacies = [{ nom: "Pharmacie Pascale", telephone: "221776779440", quartier: "Keur Massar", nuit: true, dimanche: true }];
+        }
+        renderList();
+        updateUI();
     }
 
     function updateUI() {
@@ -157,40 +164,15 @@
         }
     }
 
-function generateWA(idOpen, idClose, customText) {
-    const hour = new Date().getHours();
-    // Ajustement Sénégal : Garde à partir de 21h
-    const isNight = (hour >= 21 || hour < 8); 
-    const isSunday = (new Date().getDay() === 0);
-    let htmlOuvert = ""; let htmlFerme = "";
+    function handleSearch() {
+        const val = document.getElementById('searchInput').value;
+        if (val.length > 2) {
+            document.getElementById('broadcast-zone').style.display = 'block';
+            document.getElementById('medLabel').innerText = "📦 " + val;
+            generateWA('pharmaciesOuvertesMed', 'pharmaciesFermeesMed', `Auriez-vous la gentillesse de me confirmer si vous avez : *${val}* ?`);
+        } else { document.getElementById('broadcast-zone').style.display = 'none'; }
+    }
 
-    pharmacies.forEach(p => {
-        const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
-        const cleanNum = p.telephone.replace(/\D/g, '');
-        const msg = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`;
-        
-        // URL Corrigée (sans l'accolade erronée)
-        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + (p.quartier || '') + ' Keur Massar')}`;
-
-        const cardHtml = `
-            <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.4;'}">
-                <span>${p.nom} ${ouvert ? '' : '(Fermé)'}</span>
-                <div style="display:flex; gap:15px; align-items:center;">
-                    <a href="${mapUrl}" target="_blank" style="color:var(--primary); font-size:1.2rem;">
-                        <i class="fas fa-map-marker-alt ${ouvert ? 'pulse-maps' : ''}"></i>
-                    </a>
-                    <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${encodeURIComponent(msg)}" target="_blank"` : ''}>
-                        <i class="fab fa-whatsapp" style="color:${ouvert ? 'var(--whatsapp)' : 'grey'}; font-size:1.3rem;"></i>
-                    </a>
-                </div>
-            </div>`;
-        
-        if (ouvert) htmlOuvert += cardHtml; else htmlFerme += cardHtml;
-    });
-    
-    document.getElementById(idOpen).innerHTML = htmlOuvert;
-    document.getElementById(idClose).innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin-top:10px;">Indisponibles :</p>${htmlFerme}` : "";
-}
     function handleFileSelected() {
         document.getElementById('ordo-zone').style.display = 'block';
         generateWA('pharmaciesOuvertesOrdo', 'pharmaciesFermeesOrdo', "Je souhaiterais savoir si vous avez les produits de l'ordonnance que *je vous joins en photo à l'instant*.");
@@ -198,7 +180,7 @@ function generateWA(idOpen, idClose, customText) {
 
     function generateWA(idOpen, idClose, customText) {
         const hour = new Date().getHours();
-        const isNight = (hour >= 23 || hour < 8);
+        const isNight = (hour >= 21 || hour < 8);
         const isSunday = (new Date().getDay() === 0);
         let htmlOuvert = ""; let htmlFerme = "";
 
@@ -206,10 +188,23 @@ function generateWA(idOpen, idClose, customText) {
             const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
             const cleanNum = p.telephone.replace(/\D/g, '');
             const msg = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`;
-            const cardHtml = `<div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.4;'}">
-                <span>${p.nom} ${ouvert ? '' : '(Fermé)'}</span>
-                <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${encodeURIComponent(msg)}" target="_blank"` : ''}><i class="fab fa-whatsapp" style="color:${ouvert ? 'var(--whatsapp)' : 'grey'}; font-size:1.3rem;"></i></a>
-            </div>`;
+            
+            // Correction URL Maps dynamique
+            const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
+            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+
+            const cardHtml = `
+                <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.4;'}">
+                    <span style="font-weight:bold; font-size:0.85rem;">${p.nom}</span>
+                    <div style="display:flex; gap:15px; align-items:center;">
+                        <a href="${mapUrl}" target="_blank" style="color:var(--primary); font-size:1.2rem;">
+                            <i class="fas fa-map-marker-alt ${ouvert ? 'pulse-maps' : ''}"></i>
+                        </a>
+                        <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${encodeURIComponent(msg)}" target="_blank"` : ''}>
+                            <i class="fab fa-whatsapp" style="color:${ouvert ? 'var(--whatsapp)' : 'grey'}; font-size:1.4rem;"></i>
+                        </a>
+                    </div>
+                </div>`;
             if (ouvert) htmlOuvert += cardHtml; else htmlFerme += cardHtml;
         });
         document.getElementById(idOpen).innerHTML = htmlOuvert;
@@ -218,20 +213,21 @@ function generateWA(idOpen, idClose, customText) {
 
     function renderList() {
         const container = document.getElementById('listContainer');
+        if(!container) return;
         container.innerHTML = "";
         const sections = [
-            { title: '🌙 Gardes de Nuit', date: config.date_nuit, list: pharmacies.filter(p => p.nuit), border: 'nuit-border', color: 'var(--violet-nuit)' },
-            { title: '☀️ Gardes du Dimanche', date: config.date_dimanche, list: pharmacies.filter(p => p.dimanche && !p.nuit), border: 'dimanche-border', color: 'var(--rouge-dimanche)' },
-            { title: '🏥 Autres Pharmacies', date: '', list: pharmacies.filter(p => !p.nuit && !p.dimanche), border: '', color: 'grey' }
+            { title: '🌙 Gardes de Nuit', list: pharmacies.filter(p => p.nuit), border: 'nuit-border', color: 'var(--violet-nuit)' },
+            { title: '🏥 Toutes les Pharmacies', list: pharmacies, border: '', color: 'var(--accent)' }
         ];
         sections.forEach(s => {
             if(s.list.length > 0) {
                 const h = document.createElement('div');
                 h.className = 'section-header';
                 h.style.color = s.color;
-                h.innerHTML = `<span>${s.title}</span> <span>${s.date || ""}</span>`;
+                h.innerHTML = `<span>${s.title}</span>`;
                 container.appendChild(h);
                 s.list.forEach(p => {
+                    const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
                     const item = document.createElement('div');
                     item.className = `pharma-item ${s.border}`;
                     item.innerHTML = `
@@ -241,7 +237,7 @@ function generateWA(idOpen, idClose, customText) {
                         </div>
                         <div style="display:flex; gap:20px; font-size:1.3rem;">
                             <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--whatsapp)"></i></a>
-                            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier + ' Keur Massar')}" target="_blank" style="color:var(--primary);">
+                            <a href="https://www.google.com/maps/search/?api=1&query=${query}" target="_blank" style="color:var(--primary);">
                                 <i class="fas fa-map-marker-alt"></i>
                             </a>
                         </div>`;
@@ -261,42 +257,8 @@ function generateWA(idOpen, idClose, customText) {
     function resetSearch() { document.getElementById('searchInput').value = ""; document.getElementById('broadcast-zone').style.display = 'none'; }
     function resetOrdo() { document.getElementById('ordo-zone').style.display = 'none'; document.getElementById('fileInput').value = ""; }
 
-    // --- LOGIQUE PWA ---
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('Service Worker actif !'))
-                .catch(err => console.error('Erreur SW:', err));
-        });
-    }
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        if (installBtn) installBtn.style.display = 'flex';
-    });
-
-    if (installBtn) {
-        installBtn.onclick = async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') installBtn.style.display = 'none';
-                deferredPrompt = null;
-            } else {
-                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-                if (isIOS) {
-                    alert("Sur iPhone, appuyez sur le bouton de partage (carré avec flèche) puis sur 'Sur l'écran d'accueil'.");
-                } else {
-                    alert("L'application est déjà prête ou votre navigateur ne supporte pas l'installation directe.");
-                }
-            }
-        };
-    }
-
-    // Initialisation finale
+    window.onload = loadData;
     if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
-    loadData();
 </script>
 </body>
 </html>
