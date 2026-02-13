@@ -15,7 +15,7 @@
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        /* Styles des Thèmes */
+        /* Couleurs des thèmes */
         body.dark-theme { --bg: #0f172a; --text: #ffffff; --card: rgba(255, 255, 255, 0.08); --nav: #0f172a; --input-bg: rgba(255,255,255,0.05); }
         body.light-theme { --bg: #f8fafc; --text: #1e293b; --card: #ffffff; --nav: #f8fafc; --input-bg: rgba(0,0,0,0.05); }
         body.rose-theme { --bg: #fdf2f8; --text: #831843; --card: #fbcfe8; --nav: #fdf2f8; --input-bg: rgba(255,255,255,0.5); }
@@ -26,10 +26,10 @@
             padding-bottom: 90px; overflow-x: hidden; transition: 0.3s;
         }
 
-        header { display: flex; flex-direction: column; align-items: center; padding: 15px; flex-shrink: 0; }
+        header { display: flex; flex-direction: column; align-items: center; padding: 15px; }
         .logo-img { width: 60px; height: 60px; border-radius: 15px; border: 2px solid var(--accent); box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
 
-        .news-ticker { background: rgba(0,0,0,0.1); border-bottom: 1px solid var(--accent); padding: 8px 0; overflow: hidden; white-space: nowrap; flex-shrink: 0; }
+        .news-ticker { background: rgba(0,0,0,0.1); border-bottom: 1px solid var(--accent); padding: 8px 0; overflow: hidden; white-space: nowrap; }
         .ticker-wrapper { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; font-size: 0.8rem; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
 
@@ -54,10 +54,16 @@
 
         .broadcast-item { background: rgba(0,0,0,0.05); border-radius: 12px; padding: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,255,136,0.1); }
         
-        @keyframes pulse-blue { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(0, 242, 254, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 242, 254, 0); } }
+        @keyframes pulse-blue {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(0, 242, 254, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 242, 254, 0); }
+        }
         .pulse-maps { animation: pulse-blue 2s infinite; border-radius: 50%; }
 
+        .help-section { padding: 5px; }
         .help-card { background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(0, 255, 136, 0.1); }
+        .help-card h4 { margin-top: 0; color: var(--accent); display: flex; align-items: center; gap: 10px; }
         .step { margin-bottom: 10px; font-size: 0.85rem; line-height: 1.4; display: flex; gap: 10px; }
         .step-num { background: var(--accent); color: #0f172a; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 0.7rem; }
 
@@ -81,7 +87,7 @@
 </header>
 
 <div class="news-ticker">
-    <div class="ticker-wrapper">✨ PharmaTic : Votre santé, notre priorité à Keur Massar ! ✨</div>
+    <div class="ticker-wrapper" id="tickerText">✨ PharmaTic : Votre santé, notre priorité à Keur Massar ! ✨</div>
 </div>
 
 <div class="content-area">
@@ -107,8 +113,9 @@
             <button onclick="document.getElementById('fileInput').click()" style="width:100%; padding:18px; background:none; border:1.5px dashed var(--accent); border-radius:12px; color:inherit; cursor:pointer;"><i class="fas fa-camera"></i> PRENDRE PHOTO ORDONNANCE</button>
             <div id="ordo-zone" style="display:none; margin-top:15px;">
                 <button class="close-btn" onclick="resetOrdo()"><i class="fas fa-times"></i></button>
+                <p style="font-size: 0.8rem; color: var(--accent); font-weight: bold; text-align:center;">📸 PHOTO PRÊTE</p>
                 <div id="pharmaciesOuvertesOrdo"></div>
-                <div id="pharmaciesFermeesOrdo" style="margin-top: 10px;"></div>
+                <div id="pharmaciesFermeesOrdo" style="margin-top: 15px;"></div>
             </div>
         </div>
     </div>
@@ -118,23 +125,26 @@
     </div>
 
     <div id="installer" class="tab-content">
-        <div class="card" style="text-align:center; padding: 25px 15px;">
-             <i class="fas fa-mobile-alt" style="font-size: 3rem; color: var(--accent); margin-bottom: 10px;"></i>
-             <h3>Installer l'application</h3>
-             <button id="pwaBtn" class="download-btn"><i class="fas fa-download"></i> INSTALLER MAINTENANT</button>
-             <p style="font-size: 0.7rem; opacity: 0.7; margin-top: 15px;">Si le bouton ne fonctionne pas, suivez ces guides :</p>
-        </div>
+        <div class="help-section">
+            <div class="card" style="text-align:center; padding: 25px 15px;">
+                 <i class="fas fa-mobile-alt" style="font-size: 3rem; color: var(--accent); margin-bottom: 10px;"></i>
+                 <h3>Installer l'application</h3>
+                 <button id="pwaBtn" class="download-btn"><i class="fas fa-download"></i> INSTALLER MAINTENANT</button>
+                 <p style="font-size: 0.7rem; opacity: 0.7; margin-top: 15px;">Si le bouton ne fonctionne pas, suivez ces guides :</p>
+            </div>
 
-        <div class="help-card">
-            <h4><i class="fab fa-apple"></i> Sur iPhone (Safari)</h4>
-            <div class="step"><span class="step-num">1</span> <span>Appuyez sur <b>Partager</b> <i class="fas fa-share-square"></i> (en bas).</span></div>
-            <div class="step"><span class="step-num">2</span> <span>Cliquez sur <b>"Sur l'écran d'accueil"</b>.</span></div>
-        </div>
+            <div class="help-card">
+                <h4><i class="fab fa-apple"></i> Sur iPhone (Safari)</h4>
+                <div class="step"><span class="step-num">1</span> <span>Appuyez sur <b>Partager</b> <i class="fas fa-share-square"></i> (en bas).</span></div>
+                <div class="step"><span class="step-num">2</span> <span>Cliquez sur <b>"Sur l'écran d'accueil"</b>.</span></div>
+                <div class="step"><span class="step-num">3</span> <span>Appuyez sur <b>Ajouter</b>.</span></div>
+            </div>
 
-        <div class="help-card">
-            <h4><i class="fab fa-android"></i> Sur Android (Chrome)</h4>
-            <div class="step"><span class="step-num">1</span> <span>Appuyez sur les <b>3 points</b> <i class="fas fa-ellipsis-v"></i>.</span></div>
-            <div class="step"><span class="step-num">2</span> <span>Sélectionnez <b>"Installer l'application"</b>.</span></div>
+            <div class="help-card">
+                <h4><i class="fab fa-android"></i> Sur Android (Chrome)</h4>
+                <div class="step"><span class="step-num">1</span> <span>Appuyez sur les <b>3 points</b> <i class="fas fa-ellipsis-v"></i> en haut.</span></div>
+                <div class="step"><span class="step-num">2</span> <span>Sélectionnez <b>"Installer l'application"</b>.</span></div>
+            </div>
         </div>
     </div>
 </div>
@@ -152,24 +162,23 @@
     let pharmacies = [];
     let config = {};
     let deferredPrompt;
+    const installBtn = document.getElementById('pwaBtn');
 
     async function loadData() {
         try {
-            const res = await fetch('pharmacies.json');
+            const res = await fetch('src/data/pharmacies.json');
             const data = await res.json();
             config = data.config;
             pharmacies = data.pharmacies;
             renderList();
             updateUI();
-        } catch (e) { console.error("Erreur chargement JSON:", e); }
+        } catch (e) { console.error(e); }
     }
 
     function updateUI() {
         const activeGarde = pharmacies.filter(p => p.nuit);
         if(activeGarde.length > 0) {
             document.getElementById('statusText').innerText = "📍 " + activeGarde[0].nom;
-        } else {
-            document.getElementById('statusText').innerText = "Vérification...";
         }
     }
 
@@ -178,13 +187,13 @@
         if (val.length > 2) {
             document.getElementById('broadcast-zone').style.display = 'block';
             document.getElementById('medLabel').innerText = "📦 " + val;
-            generateWA('pharmaciesOuvertesMed', 'pharmaciesFermeesMed', `Bonjour, avez-vous le médicament : *${val}* ?`);
+            generateWA('pharmaciesOuvertesMed', 'pharmaciesFermeesMed', `Auriez-vous la gentillesse de me confirmer si vous avez : *${val}* ?`);
         } else { document.getElementById('broadcast-zone').style.display = 'none'; }
     }
 
     function handleFileSelected() {
         document.getElementById('ordo-zone').style.display = 'block';
-        generateWA('pharmaciesOuvertesOrdo', 'pharmaciesFermeesOrdo', "Bonjour, avez-vous les produits de cette ordonnance ? (Photo jointe)");
+        generateWA('pharmaciesOuvertesOrdo', 'pharmaciesFermeesOrdo', "Je souhaiterais savoir si vous avez les produits de l'ordonnance que je vous joins en photo.");
     }
 
     function generateWA(idOpen, idClose, customText) {
@@ -195,11 +204,8 @@
 
         pharmacies.forEach(p => {
             const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
-            
-            // PRIORITÉ AU MOBILE POUR TOUTE LA PARTIE RECHERCHE
-            const waNum = p.whatsapp ? p.whatsapp.replace(/\D/g, '') : null;
-            
-            const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n\n${customText}`);
+            const cleanNum = p.telephone.replace(/\D/g, '');
+            const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`);
             const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
             const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
 
@@ -207,10 +213,9 @@
                 <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.5;'}">
                     <span style="font-weight:bold; font-size:0.85rem;">${p.nom}</span>
                     <div style="display:flex; gap:18px; align-items:center;">
-                        ${waNum ? `
-                        <a ${ouvert ? `href="https://wa.me/${waNum}?text=${msg}" target="_blank"` : ''}>
+                        <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${msg}" target="_blank"` : ''}>
                             <i class="fab fa-whatsapp" style="color:${ouvert ? 'var(--whatsapp)' : '#ccc'}; font-size:1.5rem;"></i>
-                        </a>` : `<i class="fab fa-whatsapp" style="color:#ccc; font-size:1.5rem; opacity:0.3;" title="WhatsApp non disponible"></i>`}
+                        </a>
                         <a href="${mapUrl}" target="_blank" style="color:var(--primary); font-size:1.2rem;">
                             <i class="fas fa-map-marker-alt ${ouvert ? 'pulse-maps' : ''}"></i>
                         </a>
@@ -228,36 +233,42 @@
         container.innerHTML = "";
 
         const sections = [
-            { title: '🌙 Gardes de Nuit', date: config.date_nuit, list: pharmacies.filter(p => p.nuit), border: 'nuit-border', color: 'var(--violet-nuit)' },
-            { title: '☀️ Gardes du Dimanche', date: config.date_dimanche, list: pharmacies.filter(p => p.dimanche), border: 'dimanche-border', color: 'var(--rouge-dimanche)' },
-            { title: '🏥 Toutes les Pharmacies', date: '', list: pharmacies, border: '', color: 'var(--accent)' }
+            { title: '🌙 Gardes de Nuit', list: pharmacies.filter(p => p.nuit), border: 'nuit-border', color: 'var(--violet-nuit)' },
+            { title: '☀️ Gardes du Dimanche', list: pharmacies.filter(p => p.dimanche), border: 'dimanche-border', color: 'var(--rouge-dimanche)' },
+            { title: '🏥 Toutes les Pharmacies', list: pharmacies, border: '', color: 'var(--accent)' }
         ];
 
         sections.forEach(s => {
             const h = document.createElement('div');
             h.className = 'section-header';
             h.style.color = s.color;
-            h.innerHTML = `<span>${s.title} <small style="font-size:0.6rem; opacity:0.7; margin-left:5px;">${s.date || ''}</small></span>`;
+            h.innerHTML = `<span>${s.title}</span>`;
             container.appendChild(h);
 
-            s.list.forEach(p => {
-                const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
-                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
-                const item = document.createElement('div');
-                item.className = `pharma-item ${s.border}`;
-                item.innerHTML = `
-                    <div>
-                        <div style="font-weight:bold;">${p.nom}</div>
-                        <div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div>
-                    </div>
-                    <div style="display:flex; gap:20px; font-size:1.3rem;">
-                        <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--whatsapp)"></i></a>
-                        <a href="${mapUrl}" target="_blank" style="color:var(--primary);">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </a>
-                    </div>`;
-                container.appendChild(item);
-            });
+            if (s.title === '☀️ Gardes du Dimanche' && config.date_dimanche && config.date_dimanche.includes("08 Février")) {
+                const msg = document.createElement('div');
+                msg.style = "padding:20px; text-align:center; font-size:0.8rem; opacity:0.7; background:rgba(255,255,255,0.05); border-radius:15px; margin:10px 0;";
+                msg.innerHTML = "⏳ Mise à jour des gardes du dimanche 15 février en cours... <br>Disponible demain In Shaa Allah.";
+                container.appendChild(msg);
+            } else {
+                s.list.forEach(p => {
+                    const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
+                    const item = document.createElement('div');
+                    item.className = `pharma-item ${s.border}`;
+                    item.innerHTML = `
+                        <div>
+                            <div style="font-weight:bold;">${p.nom}</div>
+                            <div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div>
+                        </div>
+                        <div style="display:flex; gap:20px; font-size:1.3rem;">
+                            <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--whatsapp)"></i></a>
+                            <a href="https://www.google.com/maps/search/?api=1&query=${query}" target="_blank" style="color:var(--primary);">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </a>
+                        </div>`;
+                    container.appendChild(item);
+                });
+            }
         });
     }
 
@@ -271,22 +282,35 @@
     function resetSearch() { document.getElementById('searchInput').value = ""; document.getElementById('broadcast-zone').style.display = 'none'; }
     function resetOrdo() { document.getElementById('ordo-zone').style.display = 'none'; document.getElementById('fileInput').value = ""; }
 
-    // Logique PWA
+    // --- LOGIQUE PWA ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js?v=1.1')
+                .then(reg => { reg.update(); })
+                .catch(err => console.error(err));
+        });
+    }
+
     window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault(); deferredPrompt = e;
+        e.preventDefault();
+        deferredPrompt = e;
+        if (installBtn) installBtn.style.display = 'flex';
     });
 
-    document.getElementById('pwaBtn').addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') deferredPrompt = null;
-        } else {
-            alert("Veuillez utiliser le menu de votre navigateur pour installer l'application.");
-        }
-    });
+    if (installBtn) {
+        installBtn.onclick = async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') { installBtn.style.display = 'none'; deferredPrompt = null; }
+            } else {
+                alert("Instructions d'installation :\n\n- Android : Menu Chrome > 'Installer l'application'.\n- iPhone : Partager > 'Sur l'écran d'accueil'.");
+            }
+        };
+    }
 
     window.onload = loadData;
+    if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
 </script>
 </body>
 </html>
