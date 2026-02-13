@@ -47,18 +47,25 @@
         .close-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.1); border: none; color: inherit; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; z-index: 10; }
 
         .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid transparent; }
+        .nuit-border { border-left-color: var(--violet-nuit); }
+        .dimanche-border { border-left-color: var(--rouge-dimanche); }
         
         .section-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 800; margin: 20px 5px 10px; text-transform: uppercase; }
 
         .broadcast-item { background: rgba(0,0,0,0.05); border-radius: 12px; padding: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,255,136,0.1); }
         
-        /* Animation Pulse pour la Map */
         @keyframes pulse-blue {
             0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.7); }
             70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(0, 242, 254, 0); }
             100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 242, 254, 0); }
         }
-        .pulse-maps { animation: pulse-blue 2s infinite; display: inline-block; border-radius: 50%; }
+        .pulse-maps { animation: pulse-blue 2s infinite; border-radius: 50%; }
+
+        .help-section { padding: 5px; }
+        .help-card { background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(0, 255, 136, 0.1); }
+        .help-card h4 { margin-top: 0; color: var(--accent); display: flex; align-items: center; gap: 10px; }
+        .step { margin-bottom: 10px; font-size: 0.85rem; line-height: 1.4; display: flex; gap: 10px; }
+        .step-num { background: var(--accent); color: #0f172a; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 0.7rem; }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 12px 0 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.7rem; text-decoration: none; cursor: pointer; gap: 4px; }
@@ -118,11 +125,26 @@
     </div>
 
     <div id="installer" class="tab-content">
-        <div class="card" style="text-align:center; padding: 30px 15px;">
-            <i class="fas fa-mobile-alt" style="font-size: 4rem; color: var(--accent); margin-bottom: 15px;"></i>
-            <h3>Installer PharmaTic</h3>
-            <p style="font-size:0.85rem; opacity:0.8; line-height:1.5;">Ajoutez l'application sur votre écran d'accueil.</p>
-            <button id="pwaBtn" class="download-btn"><i class="fas fa-download"></i> INSTALLER MAINTENANT</button>
+        <div class="help-section">
+            <div class="card" style="text-align:center; padding: 25px 15px;">
+                 <i class="fas fa-mobile-alt" style="font-size: 3rem; color: var(--accent); margin-bottom: 10px;"></i>
+                 <h3>Installer l'application</h3>
+                 <button id="pwaBtn" class="download-btn"><i class="fas fa-download"></i> INSTALLER MAINTENANT</button>
+                 <p style="font-size: 0.7rem; opacity: 0.7; margin-top: 15px;">Si le bouton ne fonctionne pas, suivez ces guides :</p>
+            </div>
+
+            <div class="help-card">
+                <h4><i class="fab fa-apple"></i> Sur iPhone (Safari)</h4>
+                <div class="step"><span class="step-num">1</span> <span>Appuyez sur <b>Partager</b> <i class="fas fa-share-square"></i> (en bas).</span></div>
+                <div class="step"><span class="step-num">2</span> <span>Cliquez sur <b>"Sur l'écran d'accueil"</b>.</span></div>
+                <div class="step"><span class="step-num">3</span> <span>Appuyez sur <b>Ajouter</b>.</span></div>
+            </div>
+
+            <div class="help-card">
+                <h4><i class="fab fa-android"></i> Sur Android (Chrome)</h4>
+                <div class="step"><span class="step-num">1</span> <span>Appuyez sur les <b>3 points</b> <i class="fas fa-ellipsis-v"></i> en haut.</span></div>
+                <div class="step"><span class="step-num">2</span> <span>Sélectionnez <b>"Installer l'application"</b>.</span></div>
+            </div>
         </div>
     </div>
 </div>
@@ -139,6 +161,8 @@
 <script>
     let pharmacies = [];
     let config = {};
+    let deferredPrompt;
+    const installBtn = document.getElementById('pwaBtn');
 
     async function loadData() {
         try {
@@ -148,7 +172,7 @@
             pharmacies = data.pharmacies;
             renderList();
             updateUI();
-        } catch (e) { console.error("Erreur JSON :", e); }
+        } catch (e) { console.error(e); }
     }
 
     function updateUI() {
@@ -156,6 +180,20 @@
         if(activeGarde.length > 0) {
             document.getElementById('statusText').innerText = "📍 " + activeGarde[0].nom;
         }
+    }
+
+    function handleSearch() {
+        const val = document.getElementById('searchInput').value;
+        if (val.length > 2) {
+            document.getElementById('broadcast-zone').style.display = 'block';
+            document.getElementById('medLabel').innerText = "📦 " + val;
+            generateWA('pharmaciesOuvertesMed', 'pharmaciesFermeesMed', `Auriez-vous la gentillesse de me confirmer si vous avez : *${val}* ?`);
+        } else { document.getElementById('broadcast-zone').style.display = 'none'; }
+    }
+
+    function handleFileSelected() {
+        document.getElementById('ordo-zone').style.display = 'block';
+        generateWA('pharmaciesOuvertesOrdo', 'pharmaciesFermeesOrdo', "Je souhaiterais savoir si vous avez les produits de l'ordonnance que je vous joins en photo.");
     }
 
     function generateWA(idOpen, idClose, customText) {
@@ -169,7 +207,7 @@
             const cleanNum = p.telephone.replace(/\D/g, '');
             const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`);
             const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
-            const mapUrl = `http://maps.google.com/?q=${query}`;
+            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
 
             const cardHtml = `
                 <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.5;'}">
@@ -195,9 +233,9 @@
         container.innerHTML = "";
 
         const sections = [
-            { title: '🌙 Gardes de Nuit', list: pharmacies.filter(p => p.nuit), color: 'var(--violet-nuit)' },
-            { title: '☀️ Gardes du Dimanche', list: pharmacies.filter(p => p.dimanche), color: 'var(--rouge-dimanche)' },
-            { title: '🏥 Toutes les Pharmacies', list: pharmacies, color: 'var(--accent)' }
+            { title: '🌙 Gardes de Nuit', list: pharmacies.filter(p => p.nuit), border: 'nuit-border', color: 'var(--violet-nuit)' },
+            { title: '☀️ Gardes du Dimanche', list: pharmacies.filter(p => p.dimanche), border: 'dimanche-border', color: 'var(--rouge-dimanche)' },
+            { title: '🏥 Toutes les Pharmacies', list: pharmacies, border: '', color: 'var(--accent)' }
         ];
 
         sections.forEach(s => {
@@ -207,7 +245,6 @@
             h.innerHTML = `<span>${s.title}</span>`;
             container.appendChild(h);
 
-            // Message si les gardes du dimanche sont périmées (ex: 08 Fev)
             if (s.title === '☀️ Gardes du Dimanche' && config.date_dimanche && config.date_dimanche.includes("08 Février")) {
                 const msg = document.createElement('div');
                 msg.style = "padding:20px; text-align:center; font-size:0.8rem; opacity:0.7; background:rgba(255,255,255,0.05); border-radius:15px; margin:10px 0;";
@@ -215,8 +252,9 @@
                 container.appendChild(msg);
             } else {
                 s.list.forEach(p => {
+                    const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
                     const item = document.createElement('div');
-                    item.className = "pharma-item";
+                    item.className = `pharma-item ${s.border}`;
                     item.innerHTML = `
                         <div>
                             <div style="font-weight:bold;">${p.nom}</div>
@@ -224,7 +262,7 @@
                         </div>
                         <div style="display:flex; gap:20px; font-size:1.3rem;">
                             <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--whatsapp)"></i></a>
-                            <a href="http://maps.google.com/?q=${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank" style="color:var(--primary);">
+                            <a href="https://www.google.com/maps/search/?api=1&query=${query}" target="_blank" style="color:var(--primary);">
                                 <i class="fas fa-map-marker-alt"></i>
                             </a>
                         </div>`;
@@ -232,20 +270,6 @@
                 });
             }
         });
-    }
-
-    function handleSearch() {
-        const val = document.getElementById('searchInput').value;
-        if (val.length > 2) {
-            document.getElementById('broadcast-zone').style.display = 'block';
-            document.getElementById('medLabel').innerText = "📦 " + val;
-            generateWA('pharmaciesOuvertesMed', 'pharmaciesFermeesMed', `Auriez-vous la gentillesse de me confirmer si vous avez : *${val}* ?`);
-        } else { document.getElementById('broadcast-zone').style.display = 'none'; }
-    }
-
-    function handleFileSelected() {
-        document.getElementById('ordo-zone').style.display = 'block';
-        generateWA('pharmaciesOuvertesOrdo', 'pharmaciesFermeesOrdo', "Je souhaiterais savoir si vous avez les produits de l'ordonnance que je vous joins en photo.");
     }
 
     function switchTab(id, el) {
@@ -258,46 +282,35 @@
     function resetSearch() { document.getElementById('searchInput').value = ""; document.getElementById('broadcast-zone').style.display = 'none'; }
     function resetOrdo() { document.getElementById('ordo-zone').style.display = 'none'; document.getElementById('fileInput').value = ""; }
 
-    window.onload = loadData;
-    // --- LOGIQUE PWA (INSTALLATION) ---
-let deferredPrompt;
-const installBtn = document.getElementById('pwaBtn');
+    // --- LOGIQUE PWA ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js?v=1.1')
+                .then(reg => { reg.update(); })
+                .catch(err => console.error(err));
+        });
+    }
 
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        // L'astuce du ?v=1.1 force le navigateur à recharger le fichier sw.js
-        navigator.serviceWorker.register('sw.js?v=1.1')
-            .then(reg => {
-                console.log('SW prêt !');
-                reg.update(); 
-            })
-            .catch(err => console.log('Erreur SW:', err));
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (installBtn) installBtn.style.display = 'flex';
     });
-}
 
-// C'est cet événement qui "allume" ton bouton
-window.addEventListener('beforeinstallprompt', (e) => {
-    console.log('Le navigateur autorise l\'installation !');
-    e.preventDefault();
-    deferredPrompt = e;
-    // Si l'installation est possible, on affiche le bouton
-    if (installBtn) installBtn.style.display = 'flex';
-});
-
-if (installBtn) {
-    installBtn.onclick = async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                installBtn.style.display = 'none';
-                deferredPrompt = null;
+    if (installBtn) {
+        installBtn.onclick = async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') { installBtn.style.display = 'none'; deferredPrompt = null; }
+            } else {
+                alert("Instructions d'installation :\n\n- Android : Menu Chrome > 'Installer l'application'.\n- iPhone : Partager > 'Sur l'écran d'accueil'.");
             }
-        } else {
-            alert("L'installation n'est pas encore prête.\n\nAssurez-vous d'être sur Chrome (Android) ou Safari (iPhone) et attendez quelques secondes.");
-        }
-    };
-}
+        };
+    }
+
+    window.onload = loadData;
+    if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
 </script>
 </body>
 </html>
