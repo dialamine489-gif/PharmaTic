@@ -47,14 +47,12 @@
         .close-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.1); border: none; color: inherit; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; z-index: 10; }
 
         .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid transparent; }
-        .nuit-border { border-left-color: var(--violet-nuit); }
-        .dimanche-border { border-left-color: var(--rouge-dimanche); }
         
         .section-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 800; margin: 20px 5px 10px; text-transform: uppercase; }
 
         .broadcast-item { background: rgba(0,0,0,0.05); border-radius: 12px; padding: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,255,136,0.1); }
         
-        /* Animation Pulse */
+        /* Animation Pulse pour la Map */
         @keyframes pulse-blue {
             0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.7); }
             70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(0, 242, 254, 0); }
@@ -123,7 +121,7 @@
         <div class="card" style="text-align:center; padding: 30px 15px;">
             <i class="fas fa-mobile-alt" style="font-size: 4rem; color: var(--accent); margin-bottom: 15px;"></i>
             <h3>Installer PharmaTic</h3>
-            <p style="font-size:0.85rem; opacity:0.8; line-height:1.5;">Pour un accès rapide, ajoutez l'application sur votre écran d'accueil.</p>
+            <p style="font-size:0.85rem; opacity:0.8; line-height:1.5;">Ajoutez l'application sur votre écran d'accueil.</p>
             <button id="pwaBtn" class="download-btn"><i class="fas fa-download"></i> INSTALLER MAINTENANT</button>
         </div>
     </div>
@@ -141,7 +139,6 @@
 <script>
     let pharmacies = [];
     let config = {};
-    let deferredPrompt = null;
 
     async function loadData() {
         try {
@@ -149,12 +146,9 @@
             const data = await res.json();
             config = data.config;
             pharmacies = data.pharmacies;
-        } catch (e) { 
-            console.error("Erreur de chargement JSON, chargement secours...");
-            pharmacies = [{ nom: "Pharmacie Pascale", telephone: "221776779440", quartier: "Keur Massar", nuit: true, dimanche: true }];
-        }
-        renderList();
-        updateUI();
+            renderList();
+            updateUI();
+        } catch (e) { console.error("Erreur JSON :", e); }
     }
 
     function updateUI() {
@@ -162,20 +156,6 @@
         if(activeGarde.length > 0) {
             document.getElementById('statusText').innerText = "📍 " + activeGarde[0].nom;
         }
-    }
-
-    function handleSearch() {
-        const val = document.getElementById('searchInput').value;
-        if (val.length > 2) {
-            document.getElementById('broadcast-zone').style.display = 'block';
-            document.getElementById('medLabel').innerText = "📦 " + val;
-            generateWA('pharmaciesOuvertesMed', 'pharmaciesFermeesMed', `Auriez-vous la gentillesse de me confirmer si vous avez : *${val}* ?`);
-        } else { document.getElementById('broadcast-zone').style.display = 'none'; }
-    }
-
-    function handleFileSelected() {
-        document.getElementById('ordo-zone').style.display = 'block';
-        generateWA('pharmaciesOuvertesOrdo', 'pharmaciesFermeesOrdo', "Je souhaiterais savoir si vous avez les produits de l'ordonnance que *je vous joins en photo à l'instant*.");
     }
 
     function generateWA(idOpen, idClose, customText) {
@@ -187,21 +167,19 @@
         pharmacies.forEach(p => {
             const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
             const cleanNum = p.telephone.replace(/\D/g, '');
-            const msg = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`;
-            
-            // Correction URL Maps dynamique
+            const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`);
             const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
-            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+            const mapUrl = `http://maps.google.com/?q=${query}`;
 
             const cardHtml = `
-                <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.4;'}">
+                <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.5;'}">
                     <span style="font-weight:bold; font-size:0.85rem;">${p.nom}</span>
-                    <div style="display:flex; gap:15px; align-items:center;">
+                    <div style="display:flex; gap:18px; align-items:center;">
+                        <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${msg}" target="_blank"` : ''}>
+                            <i class="fab fa-whatsapp" style="color:${ouvert ? 'var(--whatsapp)' : '#ccc'}; font-size:1.5rem;"></i>
+                        </a>
                         <a href="${mapUrl}" target="_blank" style="color:var(--primary); font-size:1.2rem;">
                             <i class="fas fa-map-marker-alt ${ouvert ? 'pulse-maps' : ''}"></i>
-                        </a>
-                        <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${encodeURIComponent(msg)}" target="_blank"` : ''}>
-                            <i class="fab fa-whatsapp" style="color:${ouvert ? 'var(--whatsapp)' : 'grey'}; font-size:1.4rem;"></i>
                         </a>
                     </div>
                 </div>`;
@@ -215,21 +193,30 @@
         const container = document.getElementById('listContainer');
         if(!container) return;
         container.innerHTML = "";
+
         const sections = [
-            { title: '🌙 Gardes de Nuit', list: pharmacies.filter(p => p.nuit), border: 'nuit-border', color: 'var(--violet-nuit)' },
-            { title: '🏥 Toutes les Pharmacies', list: pharmacies, border: '', color: 'var(--accent)' }
+            { title: '🌙 Gardes de Nuit', list: pharmacies.filter(p => p.nuit), color: 'var(--violet-nuit)' },
+            { title: '☀️ Gardes du Dimanche', list: pharmacies.filter(p => p.dimanche), color: 'var(--rouge-dimanche)' },
+            { title: '🏥 Toutes les Pharmacies', list: pharmacies, color: 'var(--accent)' }
         ];
+
         sections.forEach(s => {
-            if(s.list.length > 0) {
-                const h = document.createElement('div');
-                h.className = 'section-header';
-                h.style.color = s.color;
-                h.innerHTML = `<span>${s.title}</span>`;
-                container.appendChild(h);
+            const h = document.createElement('div');
+            h.className = 'section-header';
+            h.style.color = s.color;
+            h.innerHTML = `<span>${s.title}</span>`;
+            container.appendChild(h);
+
+            // Message si les gardes du dimanche sont périmées (ex: 08 Fev)
+            if (s.title === '☀️ Gardes du Dimanche' && config.date_dimanche && config.date_dimanche.includes("08 Février")) {
+                const msg = document.createElement('div');
+                msg.style = "padding:20px; text-align:center; font-size:0.8rem; opacity:0.7; background:rgba(255,255,255,0.05); border-radius:15px; margin:10px 0;";
+                msg.innerHTML = "⏳ Mise à jour des gardes du dimanche 15 février en cours... <br>Disponible demain In Shaa Allah.";
+                container.appendChild(msg);
+            } else {
                 s.list.forEach(p => {
-                    const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
                     const item = document.createElement('div');
-                    item.className = `pharma-item ${s.border}`;
+                    item.className = "pharma-item";
                     item.innerHTML = `
                         <div>
                             <div style="font-weight:bold;">${p.nom}</div>
@@ -237,7 +224,7 @@
                         </div>
                         <div style="display:flex; gap:20px; font-size:1.3rem;">
                             <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--whatsapp)"></i></a>
-                            <a href="https://www.google.com/maps/search/?api=1&query=${query}" target="_blank" style="color:var(--primary);">
+                            <a href="http://maps.google.com/?q=${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank" style="color:var(--primary);">
                                 <i class="fas fa-map-marker-alt"></i>
                             </a>
                         </div>`;
@@ -245,6 +232,20 @@
                 });
             }
         });
+    }
+
+    function handleSearch() {
+        const val = document.getElementById('searchInput').value;
+        if (val.length > 2) {
+            document.getElementById('broadcast-zone').style.display = 'block';
+            document.getElementById('medLabel').innerText = "📦 " + val;
+            generateWA('pharmaciesOuvertesMed', 'pharmaciesFermeesMed', `Auriez-vous la gentillesse de me confirmer si vous avez : *${val}* ?`);
+        } else { document.getElementById('broadcast-zone').style.display = 'none'; }
+    }
+
+    function handleFileSelected() {
+        document.getElementById('ordo-zone').style.display = 'block';
+        generateWA('pharmaciesOuvertesOrdo', 'pharmaciesFermeesOrdo', "Je souhaiterais savoir si vous avez les produits de l'ordonnance que je vous joins en photo.");
     }
 
     function switchTab(id, el) {
@@ -258,7 +259,6 @@
     function resetOrdo() { document.getElementById('ordo-zone').style.display = 'none'; document.getElementById('fileInput').value = ""; }
 
     window.onload = loadData;
-    if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
 </script>
 </body>
 </html>
