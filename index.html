@@ -204,7 +204,10 @@
 
         pharmacies.forEach(p => {
             const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
-            const cleanNum = p.telephone.replace(/\D/g, '');
+            
+            // MODIFICATION : On utilise le champ 'whatsapp' s'il existe, sinon on nettoie le 'telephone'
+            const cleanNum = (p.whatsapp && p.whatsapp !== "") ? p.whatsapp.replace(/\D/g, '') : p.telephone.replace(/\D/g, '');
+            
             const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`);
             const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
             const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
@@ -233,16 +236,17 @@
         container.innerHTML = "";
 
         const sections = [
-            { title: '🌙 Gardes de Nuit', list: pharmacies.filter(p => p.nuit), border: 'nuit-border', color: 'var(--violet-nuit)' },
-            { title: '☀️ Gardes du Dimanche', list: pharmacies.filter(p => p.dimanche), border: 'dimanche-border', color: 'var(--rouge-dimanche)' },
-            { title: '🏥 Toutes les Pharmacies', list: pharmacies, border: '', color: 'var(--accent)' }
+            { title: '🌙 Gardes de Nuit', date: config.date_nuit, list: pharmacies.filter(p => p.nuit), border: 'nuit-border', color: 'var(--violet-nuit)' },
+            { title: '☀️ Gardes du Dimanche', date: config.date_dimanche, list: pharmacies.filter(p => p.dimanche), border: 'dimanche-border', color: 'var(--rouge-dimanche)' },
+            { title: '🏥 Toutes les Pharmacies', date: '', list: pharmacies, border: '', color: 'var(--accent)' }
         ];
 
         sections.forEach(s => {
             const h = document.createElement('div');
             h.className = 'section-header';
             h.style.color = s.color;
-            h.innerHTML = `<span>${s.title}</span>`;
+            // MODIFICATION : Affichage de la date à côté du titre
+            h.innerHTML = `<span>${s.title} <small style="font-size:0.6rem; opacity:0.7; margin-left:5px;">${s.date || ''}</small></span>`;
             container.appendChild(h);
 
             if (s.title === '☀️ Gardes du Dimanche' && config.date_dimanche && config.date_dimanche.includes("08 Février")) {
