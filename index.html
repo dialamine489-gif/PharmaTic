@@ -157,14 +157,40 @@
         }
     }
 
-    function handleSearch() {
-        const val = document.getElementById('searchInput').value;
-        if (val.length > 2) {
-            document.getElementById('broadcast-zone').style.display = 'block';
-            document.getElementById('medLabel').innerText = "📦 " + val;
-            generateWA('pharmaciesOuvertesMed', 'pharmaciesFermeesMed', `Auriez-vous la gentillesse de me confirmer si vous avez : *${val}* ?`);
-        } else { document.getElementById('broadcast-zone').style.display = 'none'; }
-    }
+  function generateWA(idOpen, idClose, customText) {
+    const hour = new Date().getHours();
+    // Ajustement pour le Sénégal : Garde à partir de 21h
+    const isNight = (hour >= 21 || hour < 8); 
+    const isSunday = (new Date().getDay() === 0);
+    let htmlOuvert = ""; let htmlFerme = "";
+
+    pharmacies.forEach(p => {
+        const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
+        const cleanNum = p.telephone.replace(/\D/g, '');
+        const msg = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`;
+        
+        // Construction de l'URL Google Maps
+        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier + ' Keur Massar')}`;
+
+        const cardHtml = `
+            <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.4;'}">
+                <span>${p.nom} ${ouvert ? '' : '(Fermé)'}</span>
+                <div style="display:flex; gap:15px; align-items:center;">
+                    <a href="${mapUrl}" target="_blank" style="color:var(--primary); font-size:1.2rem;">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </a>
+                    <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${encodeURIComponent(msg)}" target="_blank"` : ''}>
+                        <i class="fab fa-whatsapp" style="color:${ouvert ? 'var(--whatsapp)' : 'grey'}; font-size:1.3rem;"></i>
+                    </a>
+                </div>
+            </div>`;
+        
+        if (ouvert) htmlOuvert += cardHtml; else htmlFerme += cardHtml;
+    });
+    
+    document.getElementById(idOpen).innerHTML = htmlOuvert;
+    document.getElementById(idClose).innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin-top:10px;">Indisponibles :</p>${htmlFerme}` : "";
+}
 
     function handleFileSelected() {
         document.getElementById('ordo-zone').style.display = 'block';
