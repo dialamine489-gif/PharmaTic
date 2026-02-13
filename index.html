@@ -206,7 +206,7 @@
             const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
             
             // MODIFICATION : On utilise le champ 'whatsapp' s'il existe, sinon on nettoie le 'telephone'
-           const cleanNum = (p.whatsapp && p.whatsapp.trim() !== "") ? p.whatsapp.replace(/\D/g, '') : p.telephone.replace(/\D/g, '');
+         const cleanNum = (p.whatsapp && String(p.whatsapp).trim() !== "") ? String(p.whatsapp).replace(/\D/g, '') : String(p.telephone).replace(/\D/g, '');
             
             const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`);
             const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
