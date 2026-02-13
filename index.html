@@ -63,8 +63,6 @@
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 12px 0 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.7rem; text-decoration: none; cursor: pointer; gap: 4px; }
         .nav-item.active { color: var(--accent); }
-
-        .download-btn { background: var(--accent); color: #0f172a; border: none; padding: 16px; border-radius: 50px; font-weight: 900; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; text-transform: uppercase; }
     </style>
 </head>
 <body class="dark-theme">
@@ -116,23 +114,11 @@
     <div id="pharmacies-tab" class="tab-content">
         <div id="listContainer"></div>
     </div>
-
-    <div id="installer" class="tab-content">
-        <div class="help-section">
-            <div class="card" style="text-align:center; padding: 25px 15px;">
-                 <i class="fas fa-mobile-alt" style="font-size: 3rem; color: var(--accent); margin-bottom: 10px;"></i>
-                 <h3>Installer l'application</h3>
-                 <button id="pwaBtn" class="download-btn"><i class="fas fa-download"></i> INSTALLER MAINTENANT</button>
-                 <p style="font-size: 0.7rem; opacity: 0.7; margin-top: 15px;">Si le bouton ne fonctionne pas, suivez ces guides :</p>
-            </div>
-        </div>
-    </div>
 </div>
 
 <nav class="bottom-nav">
     <div class="nav-item active" onclick="switchTab('recherche', this)"><i class="fas fa-search"></i><span>Recherche</span></div>
     <div class="nav-item" onclick="switchTab('pharmacies-tab', this)"><i class="fas fa-hospital"></i><span>Pharmacies</span></div>
-    <div class="nav-item" onclick="switchTab('installer', this)"><i class="fas fa-download"></i><span>Installer</span></div>
     <a href="https://wa.me/221776779440" target="_blank" class="nav-item"><i class="fas fa-info-circle"></i><span>Aide</span></a>
 </nav>
 
@@ -183,7 +169,7 @@
         pharmacies.forEach(p => {
             const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
             
-            // On utilise p.whatsapp pour WhatsApp s'il existe
+            // CORRECTION ICI : On utilise p.whatsapp UNIQUEMENT pour WhatsApp
             const waNum = p.whatsapp ? p.whatsapp.replace(/\D/g, '') : null;
             
             const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`);
@@ -197,7 +183,7 @@
                         ${waNum ? `
                         <a ${ouvert ? `href="https://wa.me/${waNum}?text=${msg}" target="_blank"` : ''}>
                             <i class="fab fa-whatsapp" style="color:${ouvert ? 'var(--whatsapp)' : '#ccc'}; font-size:1.5rem;"></i>
-                        </a>` : `<i class="fab fa-whatsapp" style="color:#ccc; font-size:1.5rem; opacity:0.3;"></i>`}
+                        </a>` : `<i class="fab fa-whatsapp" style="color:#ccc; font-size:1.5rem; opacity:0.3;" title="Pas de WhatsApp"></i>`}
                         <a href="${mapUrl}" target="_blank" style="color:var(--primary); font-size:1.2rem;">
                             <i class="fas fa-map-marker-alt ${ouvert ? 'pulse-maps' : ''}"></i>
                         </a>
@@ -214,17 +200,37 @@
         if(!container) return;
         container.innerHTML = "";
 
+        // MODIFICATION ICI : On intègre les dates de "config" dans les titres
         const sections = [
-            { title: '🌙 Gardes de Nuit', list: pharmacies.filter(p => p.nuit), border: 'nuit-border', color: 'var(--violet-nuit)' },
-            { title: '☀️ Gardes du Dimanche', list: pharmacies.filter(p => p.dimanche), border: 'dimanche-border', color: 'var(--rouge-dimanche)' },
-            { title: '🏥 Toutes les Pharmacies', list: pharmacies, border: '', color: 'var(--accent)' }
+            { 
+                title: '🌙 Gardes de Nuit', 
+                date: config.date_nuit ? `(${config.date_nuit})` : '',
+                list: pharmacies.filter(p => p.nuit), 
+                border: 'nuit-border', 
+                color: 'var(--violet-nuit)' 
+            },
+            { 
+                title: '☀️ Gardes du Dimanche', 
+                date: config.date_dimanche ? `(${config.date_dimanche})` : '',
+                list: pharmacies.filter(p => p.dimanche), 
+                border: 'dimanche-border', 
+                color: 'var(--rouge-dimanche)' 
+            },
+            { 
+                title: '🏥 Toutes les Pharmacies', 
+                date: '',
+                list: pharmacies, 
+                border: '', 
+                color: 'var(--accent)' 
+            }
         ];
 
         sections.forEach(s => {
             const h = document.createElement('div');
             h.className = 'section-header';
             h.style.color = s.color;
-            h.innerHTML = `<span>${s.title}</span>`;
+            // On affiche le titre et la date en petit
+            h.innerHTML = `<span>${s.title} <small style="font-size:0.6rem; opacity:0.8; margin-left:5px;">${s.date}</small></span>`;
             container.appendChild(h);
 
             s.list.forEach(p => {
