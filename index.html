@@ -15,7 +15,6 @@
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        /* Couleurs des thèmes */
         body.dark-theme { --bg: #0f172a; --text: #ffffff; --card: rgba(255, 255, 255, 0.08); --nav: #0f172a; --input-bg: rgba(255,255,255,0.05); }
         body.light-theme { --bg: #f8fafc; --text: #1e293b; --card: #ffffff; --nav: #f8fafc; --input-bg: rgba(0,0,0,0.05); }
         body.rose-theme { --bg: #fdf2f8; --text: #831843; --card: #fbcfe8; --nav: #fdf2f8; --input-bg: rgba(255,255,255,0.5); }
@@ -60,12 +59,6 @@
             100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 242, 254, 0); }
         }
         .pulse-maps { animation: pulse-blue 2s infinite; border-radius: 50%; }
-
-        .help-section { padding: 5px; }
-        .help-card { background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(0, 255, 136, 0.1); }
-        .help-card h4 { margin-top: 0; color: var(--accent); display: flex; align-items: center; gap: 10px; }
-        .step { margin-bottom: 10px; font-size: 0.85rem; line-height: 1.4; display: flex; gap: 10px; }
-        .step-num { background: var(--accent); color: #0f172a; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 0.7rem; }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 12px 0 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.7rem; text-decoration: none; cursor: pointer; gap: 4px; }
@@ -132,19 +125,6 @@
                  <button id="pwaBtn" class="download-btn"><i class="fas fa-download"></i> INSTALLER MAINTENANT</button>
                  <p style="font-size: 0.7rem; opacity: 0.7; margin-top: 15px;">Si le bouton ne fonctionne pas, suivez ces guides :</p>
             </div>
-
-            <div class="help-card">
-                <h4><i class="fab fa-apple"></i> Sur iPhone (Safari)</h4>
-                <div class="step"><span class="step-num">1</span> <span>Appuyez sur <b>Partager</b> <i class="fas fa-share-square"></i> (en bas).</span></div>
-                <div class="step"><span class="step-num">2</span> <span>Cliquez sur <b>"Sur l'écran d'accueil"</b>.</span></div>
-                <div class="step"><span class="step-num">3</span> <span>Appuyez sur <b>Ajouter</b>.</span></div>
-            </div>
-
-            <div class="help-card">
-                <h4><i class="fab fa-android"></i> Sur Android (Chrome)</h4>
-                <div class="step"><span class="step-num">1</span> <span>Appuyez sur les <b>3 points</b> <i class="fas fa-ellipsis-v"></i> en haut.</span></div>
-                <div class="step"><span class="step-num">2</span> <span>Sélectionnez <b>"Installer l'application"</b>.</span></div>
-            </div>
         </div>
     </div>
 </div>
@@ -161,12 +141,10 @@
 <script>
     let pharmacies = [];
     let config = {};
-    let deferredPrompt;
-    const installBtn = document.getElementById('pwaBtn');
 
     async function loadData() {
         try {
-            const res = await fetch('src/data/pharmacies.json');
+            const res = await fetch('pharmacies.json');
             const data = await res.json();
             config = data.config;
             pharmacies = data.pharmacies;
@@ -204,7 +182,10 @@
 
         pharmacies.forEach(p => {
             const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
-            const cleanNum = p.telephone.replace(/\D/g, '');
+            
+            // On utilise p.whatsapp pour WhatsApp s'il existe
+            const waNum = p.whatsapp ? p.whatsapp.replace(/\D/g, '') : null;
+            
             const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`);
             const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
             const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
@@ -213,9 +194,10 @@
                 <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.5;'}">
                     <span style="font-weight:bold; font-size:0.85rem;">${p.nom}</span>
                     <div style="display:flex; gap:18px; align-items:center;">
-                        <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${msg}" target="_blank"` : ''}>
+                        ${waNum ? `
+                        <a ${ouvert ? `href="https://wa.me/${waNum}?text=${msg}" target="_blank"` : ''}>
                             <i class="fab fa-whatsapp" style="color:${ouvert ? 'var(--whatsapp)' : '#ccc'}; font-size:1.5rem;"></i>
-                        </a>
+                        </a>` : `<i class="fab fa-whatsapp" style="color:#ccc; font-size:1.5rem; opacity:0.3;"></i>`}
                         <a href="${mapUrl}" target="_blank" style="color:var(--primary); font-size:1.2rem;">
                             <i class="fas fa-map-marker-alt ${ouvert ? 'pulse-maps' : ''}"></i>
                         </a>
@@ -245,30 +227,24 @@
             h.innerHTML = `<span>${s.title}</span>`;
             container.appendChild(h);
 
-            if (s.title === '☀️ Gardes du Dimanche' && config.date_dimanche && config.date_dimanche.includes("08 Février")) {
-                const msg = document.createElement('div');
-                msg.style = "padding:20px; text-align:center; font-size:0.8rem; opacity:0.7; background:rgba(255,255,255,0.05); border-radius:15px; margin:10px 0;";
-                msg.innerHTML = "⏳ Mise à jour des gardes du dimanche 15 février en cours... <br>Disponible demain In Shaa Allah.";
-                container.appendChild(msg);
-            } else {
-                s.list.forEach(p => {
-                    const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
-                    const item = document.createElement('div');
-                    item.className = `pharma-item ${s.border}`;
-                    item.innerHTML = `
-                        <div>
-                            <div style="font-weight:bold;">${p.nom}</div>
-                            <div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div>
-                        </div>
-                        <div style="display:flex; gap:20px; font-size:1.3rem;">
-                            <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--whatsapp)"></i></a>
-                            <a href="https://www.google.com/maps/search/?api=1&query=${query}" target="_blank" style="color:var(--primary);">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </a>
-                        </div>`;
-                    container.appendChild(item);
-                });
-            }
+            s.list.forEach(p => {
+                const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
+                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+                const item = document.createElement('div');
+                item.className = `pharma-item ${s.border}`;
+                item.innerHTML = `
+                    <div>
+                        <div style="font-weight:bold;">${p.nom}</div>
+                        <div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div>
+                    </div>
+                    <div style="display:flex; gap:20px; font-size:1.3rem;">
+                        <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--whatsapp)"></i></a>
+                        <a href="${mapUrl}" target="_blank" style="color:var(--primary);">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </a>
+                    </div>`;
+                container.appendChild(item);
+            });
         });
     }
 
@@ -282,35 +258,7 @@
     function resetSearch() { document.getElementById('searchInput').value = ""; document.getElementById('broadcast-zone').style.display = 'none'; }
     function resetOrdo() { document.getElementById('ordo-zone').style.display = 'none'; document.getElementById('fileInput').value = ""; }
 
-    // --- LOGIQUE PWA ---
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.1')
-                .then(reg => { reg.update(); })
-                .catch(err => console.error(err));
-        });
-    }
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        if (installBtn) installBtn.style.display = 'flex';
-    });
-
-    if (installBtn) {
-        installBtn.onclick = async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') { installBtn.style.display = 'none'; deferredPrompt = null; }
-            } else {
-                alert("Instructions d'installation :\n\n- Android : Menu Chrome > 'Installer l'application'.\n- iPhone : Partager > 'Sur l'écran d'accueil'.");
-            }
-        };
-    }
-
     window.onload = loadData;
-    if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
 </script>
 </body>
 </html>
