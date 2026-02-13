@@ -157,9 +157,9 @@
         }
     }
 
-  function generateWA(idOpen, idClose, customText) {
+function generateWA(idOpen, idClose, customText) {
     const hour = new Date().getHours();
-    // Ajustement pour le Sénégal : Garde à partir de 21h
+    // Ajustement Sénégal : Garde à partir de 21h
     const isNight = (hour >= 21 || hour < 8); 
     const isSunday = (new Date().getDay() === 0);
     let htmlOuvert = ""; let htmlFerme = "";
@@ -169,15 +169,15 @@
         const cleanNum = p.telephone.replace(/\D/g, '');
         const msg = `🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`;
         
-        // Construction de l'URL Google Maps
-        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier + ' Keur Massar')}`;
+        // URL Corrigée (sans l'accolade erronée)
+        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + (p.quartier || '') + ' Keur Massar')}`;
 
         const cardHtml = `
             <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.4;'}">
                 <span>${p.nom} ${ouvert ? '' : '(Fermé)'}</span>
                 <div style="display:flex; gap:15px; align-items:center;">
                     <a href="${mapUrl}" target="_blank" style="color:var(--primary); font-size:1.2rem;">
-                        <i class="fas fa-map-marker-alt"></i>
+                        <i class="fas fa-map-marker-alt ${ouvert ? 'pulse-maps' : ''}"></i>
                     </a>
                     <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${encodeURIComponent(msg)}" target="_blank"` : ''}>
                         <i class="fab fa-whatsapp" style="color:${ouvert ? 'var(--whatsapp)' : 'grey'}; font-size:1.3rem;"></i>
@@ -191,7 +191,6 @@
     document.getElementById(idOpen).innerHTML = htmlOuvert;
     document.getElementById(idClose).innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin-top:10px;">Indisponibles :</p>${htmlFerme}` : "";
 }
-
     function handleFileSelected() {
         document.getElementById('ordo-zone').style.display = 'block';
         generateWA('pharmaciesOuvertesOrdo', 'pharmaciesFermeesOrdo', "Je souhaiterais savoir si vous avez les produits de l'ordonnance que *je vous joins en photo à l'instant*.");
