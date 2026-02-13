@@ -23,3 +23,11 @@ self.addEventListener('fetch', (event) => {
         })
     );
 });
+// Force le nouveau Service Worker à s'activer immédiatement
+self.addEventListener('install', (event) => {
+    self.skipWaiting(); 
+});
+
+self.addEventListener('activate', (event) => {
+    event.waitUntil(clients.claim()); 
+});

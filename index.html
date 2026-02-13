@@ -259,6 +259,45 @@
     function resetOrdo() { document.getElementById('ordo-zone').style.display = 'none'; document.getElementById('fileInput').value = ""; }
 
     window.onload = loadData;
+    // --- LOGIQUE PWA (INSTALLATION) ---
+let deferredPrompt;
+const installBtn = document.getElementById('pwaBtn');
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        // L'astuce du ?v=1.1 force le navigateur à recharger le fichier sw.js
+        navigator.serviceWorker.register('sw.js?v=1.1')
+            .then(reg => {
+                console.log('SW prêt !');
+                reg.update(); 
+            })
+            .catch(err => console.log('Erreur SW:', err));
+    });
+}
+
+// C'est cet événement qui "allume" ton bouton
+window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('Le navigateur autorise l\'installation !');
+    e.preventDefault();
+    deferredPrompt = e;
+    // Si l'installation est possible, on affiche le bouton
+    if (installBtn) installBtn.style.display = 'flex';
+});
+
+if (installBtn) {
+    installBtn.onclick = async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installBtn.style.display = 'none';
+                deferredPrompt = null;
+            }
+        } else {
+            alert("L'installation n'est pas encore prête.\n\nAssurez-vous d'être sur Chrome (Android) ou Safari (iPhone) et attendez quelques secondes.");
+        }
+    };
+}
 </script>
 </body>
 </html>
