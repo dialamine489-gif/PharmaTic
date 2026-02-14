@@ -310,13 +310,25 @@ async function loadData() {
     function resetOrdo() { document.getElementById('ordo-zone').style.display = 'none'; document.getElementById('fileInput').value = ""; }
 
     // --- LOGIQUE PWA ---
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.1')
-                .then(reg => { reg.update(); })
-                .catch(err => console.error(err));
+   if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js?v=1.4').then(reg => {
+            reg.onupdatefound = () => {
+                const installingWorker = reg.installing;
+                installingWorker.onstatechange = () => {
+                    if (installingWorker.state === 'installed') {
+                        if (navigator.serviceWorker.controller) {
+                            // On ne met pas de bouton "Fermer", on informe et on reload
+                            // Cela évite la boucle infinie.
+                            alert("Mise à jour installée ! L'application va redémarrer.");
+                            window.location.reload();
+                        }
+                    }
+                };
+            };
         });
-    }
+    });
+}
 
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
