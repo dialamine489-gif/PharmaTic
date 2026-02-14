@@ -179,36 +179,41 @@ async function loadData() {
         }
     }
 
-    // --- ENREGISTREMENT DU SERVICE WORKER ---
-   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        // On enregistre avec la nouvelle version
-        navigator.serviceWorker.register('sw.js?v=1.5').then(reg => {
-            
-            // Détection d'une mise à jour
-            reg.onupdatefound = () => {
-                const installingWorker = reg.installing;
-                installingWorker.onstatechange = () => {
-                    if (installingWorker.state === 'installed') {
-                        if (navigator.serviceWorker.controller) {
-                            // UNE MISE À JOUR EST DISPONIBLE
-                            // On force le reload immédiatement sans demander
-                            // C'est plus fluide pour l'utilisateur
-                            window.location.reload();
-                        }
-                    }
-                };
-            };
-        });
-    });
-
-    // Sécurité supplémentaire : On s'assure que le nouveau SW prend le contrôle
+   // --- ENREGISTREMENT UNIQUE DU SERVICE WORKER ---
+if ('serviceWorker' in navigator) {
     let refreshing = false;
+
+    // 1. Gère le rechargement automatique une fois que le SW est prêt
     navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (!refreshing) {
             window.location.reload();
             refreshing = true;
         }
+    });
+
+    window.addEventListener('load', () => {
+        // UTILISE UNE SEULE VERSION ICI (ex: v=1.6)
+        navigator.serviceWorker.register('sw.js?v=1.6').then(reg => {
+            
+            // Si un worker attend déjà (cas où l'utilisateur a fermé l'app avant la fin)
+            if (reg.waiting) {
+                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+            }
+
+            // Si un nouveau worker est en train de s'installer
+            reg.onupdatefound = () => {
+                const installingWorker = reg.installing;
+                installingWorker.onstatechange = () => {
+                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // On force l'activation immédiate
+                        installingWorker.postMessage({ type: 'SKIP_WAITING' });
+                        
+                        // Optionnel : afficher ton message "Mise à jour disponible" ici 
+                        // si tu ne veux pas que ça recharge sans prévenir.
+                    }
+                };
+            };
+        });
     });
 }
     function updateUI() {

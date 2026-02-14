@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pharmatic-v1.5';
+const CACHE_NAME = 'pharmatic-v1.6';
 const ASSETS = [
   './',
   './index.html',
@@ -35,4 +35,9 @@ self.addEventListener('fetch', (e) => {
       return caches.match(e.request);
     })
   );
+});
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
