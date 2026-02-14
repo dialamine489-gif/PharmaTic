@@ -182,7 +182,7 @@ async function loadData() {
     // --- ENREGISTREMENT DU SERVICE WORKER ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.3').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.4').then(reg => {
                 // Détecte si une nouvelle version du code est disponible
                 reg.onupdatefound = () => {
                     const installingWorker = reg.installing;
