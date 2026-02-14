@@ -8,21 +8,30 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* Ce code s'active uniquement sur les écrans larges (PC/Laptop) */
+/* --- ADAPTATION MOBILE-FIRST POUR PC --- */
 @media (min-width: 768px) {
     body {
         max-width: 450px;
         margin: 0 auto;
         border-left: 1px solid rgba(255,255,255,0.1);
         border-right: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 0 50px rgba(0,0,0,0.8);
         position: relative;
+        min-height: 100vh;
     }
 
-    /* On force la barre de navigation à rester DANS le cadre de l'app */
+    /* FIX DE LA BARRE DE NAVIGATION */
     .bottom-nav {
-        width: 450px;   /* Même largeur que le body */
-        left: 50%;      /* On la place au milieu */
-        right: auto;
-        transform: translateX(-50%); /* On la centre parfaitement */
+        width: 450px;           /* On lui donne la même largeur que le body */
+        left: 50% !important;   /* On la place au milieu */
+        right: auto !important;
+        transform: translateX(-50%); /* On la centre parfaitement par rapport au milieu */
+    }
+
+    /* FIX DU BANDEAU DÉFILANT */
+    .news-ticker {
+        width: 450px;
+        margin: 0 auto;
     }
 }
 
