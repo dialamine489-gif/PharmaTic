@@ -179,43 +179,6 @@ async function loadData() {
         }
     }
 
-   // --- ENREGISTREMENT UNIQUE DU SERVICE WORKER ---
-if ('serviceWorker' in navigator) {
-    let refreshing = false;
-
-    // 1. Gère le rechargement automatique une fois que le SW est prêt
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
-            window.location.reload();
-            refreshing = true;
-        }
-    });
-
-    window.addEventListener('load', () => {
-        // UTILISE UNE SEULE VERSION ICI (ex: v=1.6)
-        navigator.serviceWorker.register('sw.js?v=1.6').then(reg => {
-            
-            // Si un worker attend déjà (cas où l'utilisateur a fermé l'app avant la fin)
-            if (reg.waiting) {
-                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-            }
-
-            // Si un nouveau worker est en train de s'installer
-            reg.onupdatefound = () => {
-                const installingWorker = reg.installing;
-                installingWorker.onstatechange = () => {
-                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        // On force l'activation immédiate
-                        installingWorker.postMessage({ type: 'SKIP_WAITING' });
-                        
-                        // Optionnel : afficher ton message "Mise à jour disponible" ici 
-                        // si tu ne veux pas que ça recharge sans prévenir.
-                    }
-                };
-            };
-        });
-    });
-}
     function updateUI() {
         const activeGarde = pharmacies.filter(p => p.nuit);
         if(activeGarde.length > 0) {
@@ -327,27 +290,41 @@ if ('serviceWorker' in navigator) {
     function resetSearch() { document.getElementById('searchInput').value = ""; document.getElementById('broadcast-zone').style.display = 'none'; }
     function resetOrdo() { document.getElementById('ordo-zone').style.display = 'none'; document.getElementById('fileInput').value = ""; }
 
-    // --- LOGIQUE PWA ---
-   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=1.4').then(reg => {
-            reg.onupdatefound = () => {
-                const installingWorker = reg.installing;
-                installingWorker.onstatechange = () => {
-                    if (installingWorker.state === 'installed') {
-                        if (navigator.serviceWorker.controller) {
-                            // On ne met pas de bouton "Fermer", on informe et on reload
-                            // Cela évite la boucle infinie.
-                            alert("Mise à jour installée ! L'application va redémarrer.");
-                            window.location.reload();
-                        }
-                    }
-                };
-            };
-        });
-    });
-}
+// --- GESTION DE LA MISE À JOUR ET DU SERVICE WORKER ---
+    if ('serviceWorker' in navigator) {
+        let refreshing = false;
 
+        // Détecte le changement de contrôleur pour recharger une seule fois
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+                window.location.reload();
+                refreshing = true;
+            }
+        });
+
+        window.addEventListener('load', () => {
+            // ON UTILISE LA VERSION 1.6 PARTOUT
+            navigator.serviceWorker.register('sw.js?v=1.6').then(reg => {
+                
+                // Si une mise à jour attend déjà
+                if (reg.waiting) {
+                    reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
+
+                reg.onupdatefound = () => {
+                    const installingWorker = reg.installing;
+                    installingWorker.onstatechange = () => {
+                        if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // On force l'activation. Le controllerchange fera le reload.
+                            installingWorker.postMessage({ type: 'SKIP_WAITING' });
+                        }
+                    };
+                };
+            });
+        });
+    }
+
+    // --- LOGIQUE D'INSTALLATION PWA ---
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
