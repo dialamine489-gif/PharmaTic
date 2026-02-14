@@ -180,24 +180,37 @@ async function loadData() {
     }
 
     // --- ENREGISTREMENT DU SERVICE WORKER ---
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.5').then(reg => {
-                // Détecte si une nouvelle version du code est disponible
-                reg.onupdatefound = () => {
-                    const installingWorker = reg.installing;
-                    installingWorker.onstatechange = () => {
-                        if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            // On prévient l'utilisateur et on rafraîchit
-                            alert("Mise à jour de PharmaTic disponible !");
+   if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        // On enregistre avec la nouvelle version
+        navigator.serviceWorker.register('sw.js?v=1.5').then(reg => {
+            
+            // Détection d'une mise à jour
+            reg.onupdatefound = () => {
+                const installingWorker = reg.installing;
+                installingWorker.onstatechange = () => {
+                    if (installingWorker.state === 'installed') {
+                        if (navigator.serviceWorker.controller) {
+                            // UNE MISE À JOUR EST DISPONIBLE
+                            // On force le reload immédiatement sans demander
+                            // C'est plus fluide pour l'utilisateur
                             window.location.reload();
                         }
-                    };
+                    }
                 };
-            });
+            };
         });
-    }
+    });
 
+    // Sécurité supplémentaire : On s'assure que le nouveau SW prend le contrôle
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+            window.location.reload();
+            refreshing = true;
+        }
+    });
+}
     function updateUI() {
         const activeGarde = pharmacies.filter(p => p.nuit);
         if(activeGarde.length > 0) {
