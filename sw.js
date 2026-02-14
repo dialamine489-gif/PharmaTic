@@ -3,7 +3,8 @@ const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon.jpeg'
+  './icon.jpeg',
+  './src/data/pharmacies.json'
 ];
 
 // Installation : Mise en cache des fichiers essentiels
@@ -18,8 +19,13 @@ self.addEventListener('install', (event) => {
 // Fetch : Permet à l'application de charger depuis le cache
 self.addEventListener('fetch', (event) => {
     event.respondWith(
-        caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
+        caches.match(event.request).then((cachedResponse) => {
+            // Si le fichier est dans le cache, on le retourne immédiatement
+            if (cachedResponse) {
+                return cachedResponse;
+            }
+            // Sinon, on va sur le réseau
+            return fetch(event.request);
         })
     );
 });
