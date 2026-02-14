@@ -1,39 +1,38 @@
-const CACHE_NAME = 'pharmatic-v1';
+const CACHE_NAME = 'pharmatic-v1.3';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icon.jpeg',
-  './src/data/pharmacies.json'
+  './src/data/pharmacies.json',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'
 ];
 
-// Installation : Mise en cache des fichiers essentiels
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS);
-        })
-    );
+// Installation et mise en cache
+self.addEventListener('install', (e) => {
+  self.skipWaiting();
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+  );
 });
 
-// Fetch : Permet à l'application de charger depuis le cache
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request).then((cachedResponse) => {
-            // Si le fichier est dans le cache, on le retourne immédiatement
-            if (cachedResponse) {
-                return cachedResponse;
-            }
-            // Sinon, on va sur le réseau
-            return fetch(event.request);
-        })
-    );
-});
-// Force le nouveau Service Worker à s'activer immédiatement
-self.addEventListener('install', (event) => {
-    self.skipWaiting(); 
+// Nettoyage des vieux fichiers
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then(keys => Promise.all(
+      keys.map(key => {
+        if(key !== CACHE_NAME) return caches.delete(key);
+      })
+    ))
+  );
+  return self.clients.claim();
 });
 
-self.addEventListener('activate', (event) => {
-    event.waitUntil(clients.claim()); 
+// STRATÉGIE : On tente le réseau d'abord pour avoir le JSON frais
+self.addEventListener('fetch', (e) => {
+  e.respondWith(
+    fetch(e.request).catch(() => {
+      return caches.match(e.request);
+    })
+  );
 });
