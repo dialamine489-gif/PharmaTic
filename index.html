@@ -7,6 +7,22 @@
     <title>PharmaTic - Keur Massar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Adaptation pour ordinateur (Laptop/Desktop) */
+@media (min-width: 768px) {
+    body {
+        max-width: 480px;      /* On limite la largeur à la taille d'un téléphone */
+        margin: 0 auto;        /* On centre l'application au milieu de l'écran */
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.5); /* Effet d'ombre sur les côtés */
+    }
+
+    .bottom-nav {
+        max-width: 480px;      /* La barre de navigation doit aussi être limitée */
+        left: 50%;
+        transform: translateX(-50%); /* Centrage parfait de la nav */
+    }
+}
         :root {
             --primary: #00f2fe; --accent: #00ff88;
             --rouge-dimanche: #ff4d4d; --violet-nuit: #a855f7;
