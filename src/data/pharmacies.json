@@ -137,7 +137,7 @@
       "lng": -17.3100,
       "partenaire": false,
       "nuit": false,
-      "dimanche": true
+      "dimanche":false
     },
     {
       "id": 10,
@@ -212,7 +212,7 @@
       "lng": -17.3150,
       "partenaire": false,
       "nuit": false,
-      "dimanche": true
+      "dimanche": false
     },
     {
       "id": 15,
