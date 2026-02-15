@@ -31,7 +31,7 @@
       "lat": 14.7820,
       "lng": -17.3055,
       "partenaire": false,
-      "nuit": false,
+      "nuit": true,
       "dimanche": false
     },
     {
@@ -139,21 +139,7 @@
       "nuit": false,
       "dimanche":false
     },
-    {
-      "id": 10,
-      "nom": "Pharmacie Elimane Aly Dramane (PA)",
-      "quartier": "Unité 3",
-      "adresse": "Unité 3, n°156, Parcelles Assainies de Malika",
-      "telephone": "338000000",
-      "whatsapp": "",
-      "ouverture": "08:00",
-      "fermeture": "22:30",
-      "lat": 14.7825,
-      "lng": -17.3050,
-      "partenaire": false,
-      "nuit": false,
-      "dimanche": false
-    },
+  
     {
       "id": 11,
       "nom": "Pharmacie Ainoumadi",
@@ -271,7 +257,7 @@
       "lat": 14.7800,
       "lng": -17.3300,
       "partenaire": false,
-      "nuit": true,
+      "nuit": false,
       "dimanche": true
     },
     {
