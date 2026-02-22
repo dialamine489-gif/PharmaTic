@@ -1,7 +1,7 @@
 {
   "config": {
-    "date_nuit": "Du 14 au 20 Février 2026",
-    "date_dimanche": "Dimanche 15 Février 2026"
+    "date_nuit": "Du 21 au 27 Février 2026",
+    "date_dimanche": "Dimanche 22 Février 2026"
   },
   "pharmacies": [
     {
@@ -32,7 +32,7 @@
       "lng": -17.3055,
       "partenaire": false,
       "nuit": false,
-      "dimanche": false
+      "dimanche": true
     },
     {
       "id": 3,
@@ -76,8 +76,8 @@
       "lat": 14.7695,
       "lng": -17.3138,
       "partenaire": false,
-      "nuit": false,
-      "dimanche": false
+      "nuit": true,
+      "dimanche": true
     },
     {
       "id": 6,
@@ -271,7 +271,7 @@
       "lat": 14.7800,
       "lng": -17.3300,
       "partenaire": false,
-      "nuit": true,
+      "nuit": false,
       "dimanche": true
     },
     {
@@ -287,7 +287,7 @@
       "lng": -17.3257,
       "partenaire": false,
       "nuit": false,
-      "dimanche": false
+      "dimanche": true
     },
     {
       "id": 20,
@@ -332,7 +332,7 @@
       "lng": -17.3350,
       "partenaire": false,
       "nuit": false,
-      "dimanche": false
+      "dimanche": true
     },
     {
       "id": 23,
