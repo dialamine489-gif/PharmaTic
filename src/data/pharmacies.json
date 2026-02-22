@@ -17,7 +17,7 @@
       "lng": -17.3216,
       "partenaire": true,
       "nuit": false,
-      "dimanche": true
+      "dimanche": false
     },
 
     {
@@ -33,7 +33,7 @@
       "lng": -17.3100,
       "partenaire": false,
       "nuit": false,
-      "dimanche": true
+      "dimanche": false
     },
     {
       "id": 4,
@@ -78,7 +78,7 @@
       "lng": -17.3040,
       "partenaire": false,
       "nuit": false,
-      "dimanche": true
+      "dimanche": false
     },
     {
       "id": 7,
@@ -258,7 +258,7 @@
       "lng": -17.3300,
       "partenaire": false,
       "nuit": false,
-      "dimanche": true
+      "dimanche": false
     },
     {
       "id": 19,
