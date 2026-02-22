@@ -19,21 +19,7 @@
       "nuit": false,
       "dimanche": true
     },
-    {
-      "id": 2,
-      "nom": "Pharmacie Elimane Aly DRAMANE",
-      "quartier": "Unité 3",
-      "adresse": "Magasins A32 et A34 à l’unité 3",
-      "telephone": "338712525",
-      "whatsapp": "",
-      "ouverture": "08:00",
-      "fermeture": "23:00",
-      "lat": 14.7820,
-      "lng": -17.3055,
-      "partenaire": false,
-      "nuit": false,
-      "dimanche": true
-    },
+
     {
       "id": 3,
       "nom": "Pharmacie Mingue",
@@ -152,7 +138,7 @@
       "lng": -17.3050,
       "partenaire": false,
       "nuit": false,
-      "dimanche": false
+      "dimanche": true
     },
     {
       "id": 11,
