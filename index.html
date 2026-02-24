@@ -107,7 +107,6 @@
     border-left: 1px solid rgba(255,255,255,0.1);
     border-right: 1px solid rgba(255,255,255,0.1);
 
-}
 .badge-closing {
     background: #f59e0b; /* Orange */
     color: white;
@@ -116,9 +115,10 @@
     font-size: 0.6rem;
     font-weight: bold;
     margin-left: 8px;
+    white-space: nowrap; /* EMPÊCHE LE TEXTE DU BADGE DE SE COUPER */
     animation: blink 2s infinite;
+    display: inline-block;
 }
-
 @keyframes blink {
     0% { opacity: 1; }
     50% { opacity: 0.6; }
@@ -252,46 +252,31 @@ async function loadData() {
         generateWA('pharmaciesOuvertesOrdo', 'pharmaciesFermeesOrdo', "Je souhaiterais savoir si vous avez les produits de l'ordonnance que je vous joins en photo.");
     }
 
-    function generateWA(idOpen, idClose, customText) {
+function generateWA(idOpen, idClose, customText) {
     const now = new Date();
     const hour = now.getHours();
     const isSunday = (now.getDay() === 0);
-    
-    // Nouvelles règles de temps
-    const isNightTime = (hour >= 22 || hour < 8); // Fermeture générale à 22h
-    const isClosingSoon = (hour === 21); // Entre 21h et 22h
+    const isNightTime = (hour >= 22 || hour < 8);
+    const isClosingSoon = (hour >= 21 && hour < 22);
     
     let htmlOuvert = ""; let htmlFerme = "";
 
     pharmacies.forEach(p => {
-        // Une pharmacie est considérée "ouverte" si :
-        // 1. C'est la nuit et elle est de garde (nuit)
-        // 2. C'est dimanche et elle est de garde (dimanche)
-        // 3. C'est la journée (8h-22h) et ce n'est pas dimanche
-        const ouvert = (isNightTime && p.nuit) || 
-                       (isSunday && p.dimanche) || 
-                       (!isNightTime && !isSunday);
-        
-        // Création du badge "Ferme bientôt"
-        let closingBadge = "";
-        if (ouvert && isClosingSoon && !p.nuit && !isSunday) {
-            closingBadge = `<span class="badge-closing">⌛ FERME À 22H</span>`;
-        }
+        const ouvert = (isNightTime && p.nuit) || (isSunday && p.dimanche) || (!isNightTime && !isSunday);
+        let closingBadge = (ouvert && isClosingSoon && !p.nuit && !isSunday) ? `<span class="badge-closing">⌛ FERME À 22H</span>` : "";
 
         const cleanNum = (p.whatsapp && p.whatsapp.length > 5) ? p.whatsapp.replace(/\D/g, '') : p.telephone.replace(/\D/g, '');
         const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`);
-        
-        // Correction du lien Google Maps (avec backticks)
         const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
         const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
 
         const cardHtml = `
             <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.5;'}">
-                <div>
-                    <span style="font-weight:bold; font-size:0.85rem;">${p.nom}</span>
+                <div style="display: flex; align-items: center; flex: 1; min-width: 0; margin-right: 10px;">
+                    <span style="font-weight:bold; font-size:0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nom}</span>
                     ${closingBadge}
                 </div>
-                <div style="display:flex; gap:18px; align-items:center;">
+                <div style="display:flex; gap:18px; align-items:center; flex-shrink: 0;">
                     <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${msg}" target="_blank"` : ''}>
                         <i class="fab fa-whatsapp" style="color:${ouvert ? 'var(--whatsapp)' : '#ccc'}; font-size:1.5rem;"></i>
                     </a>
@@ -378,7 +363,7 @@ async function loadData() {
 
         window.addEventListener('load', () => {
             // ON UTILISE LA VERSION 1.6 PARTOUT
-            navigator.serviceWorker.register('sw.js?v=1.11').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.12').then(reg => {
                 
                 // Si une mise à jour attend déjà
                 if (reg.waiting) {
