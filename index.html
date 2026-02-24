@@ -265,28 +265,26 @@ function generateWA(idOpen, idClose, customText) {
         const ouvert = (isNightTime && p.nuit) || (isSunday && p.dimanche) || (!isNightTime && !isSunday);
         let closingBadge = (ouvert && isClosingSoon && !p.nuit && !isSunday) ? `<span class="badge-closing">⌛ FERME À 22H</span>` : "";
 
-        // Préparation des données
+        // Nettoyage données
         const hasWhatsApp = (p.whatsapp && p.whatsapp.length > 5);
         const cleanNum = hasWhatsApp ? p.whatsapp.replace(/\D/g, '') : "";
         const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`);
         
-        // CORRECTION URL MAPS
+        // CORRECTION DE L'URL MAPS (Utilisation de ${query})
         const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
         const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
 
         // GESTION DU BOUTON WHATSAPP
         let waContent = "";
         if (!ouvert) {
-            // Pharmacie fermée : icône grise inactive
-            waContent = `<i class="fab fa-whatsapp" style="color:#ccc; font-size:1.5rem;"></i>`;
+            waContent = `<a><i class="fab fa-whatsapp" style="color:#ccc; font-size:1.5rem;"></i></a>`;
         } else if (hasWhatsApp) {
-            // Ouverte + WhatsApp : lien direct
             waContent = `<a href="https://wa.me/${cleanNum}?text=${msg}" target="_blank">
                             <i class="fab fa-whatsapp" style="color:var(--whatsapp); font-size:1.5rem;"></i>
                          </a>`;
         } else {
-            // Ouverte + Pas de WhatsApp : Alerte au clic
-            waContent = `<a href="javascript:void(0)" onclick="alert('🚧 Service bientôt disponible pour cette pharmacie. Utilisez l\\'appel direct dans l\\'onglet Pharmacies.')" style="cursor:pointer;">
+            // Version ultra-sécurisée de l'alerte (pas d'apostrophe, pas de caractères spéciaux)
+            waContent = `<a href="javascript:void(0)" onclick="alert('Service bientot disponible. Utilisez le bouton appel dans l onglet Pharmacies.')" style="cursor:pointer;">
                             <i class="fab fa-whatsapp" style="color:#ccc; font-size:1.5rem;"></i>
                          </a>`;
         }
@@ -381,7 +379,7 @@ function generateWA(idOpen, idClose, customText) {
 
         window.addEventListener('load', () => {
             // ON UTILISE LA VERSION 1.6 PARTOUT
-            navigator.serviceWorker.register('sw.js?v=1.14').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.15').then(reg => {
                 
                 // Si une mise à jour attend déjà
                 if (reg.waiting) {
