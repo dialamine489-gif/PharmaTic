@@ -106,6 +106,23 @@
     position: relative;
     border-left: 1px solid rgba(255,255,255,0.1);
     border-right: 1px solid rgba(255,255,255,0.1);
+
+}
+.badge-closing {
+    background: #f59e0b; /* Orange */
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    margin-left: 8px;
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
 }
     </style>
 </head>
@@ -128,7 +145,7 @@
 <div class="content-area">
     <div id="recherche" class="tab-content active">
         <div class="card" style="border-left: 5px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1);">
-            <h3 style="margin:0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-moon"></i> En garde actuellement</h3>
+            <h3 style="margin:0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-moon"></i> Garde de nuit</h3>
             <div id="statusText" style="font-weight: bold; margin-top: 5px; font-size: 1.1rem;">Vérification...</div>
         </div>
 
@@ -236,38 +253,60 @@ async function loadData() {
     }
 
     function generateWA(idOpen, idClose, customText) {
-        const hour = new Date().getHours();
-        const isNight = (hour >= 21 || hour < 8);
-        const isSunday = (new Date().getDay() === 0);
-        let htmlOuvert = ""; let htmlFerme = "";
+    const now = new Date();
+    const hour = now.getHours();
+    const isSunday = (now.getDay() === 0);
+    
+    // Nouvelles règles de temps
+    const isNightTime = (hour >= 22 || hour < 8); // Fermeture générale à 22h
+    const isClosingSoon = (hour === 21); // Entre 21h et 22h
+    
+    let htmlOuvert = ""; let htmlFerme = "";
 
-        pharmacies.forEach(p => {
-            const ouvert = (isNight && p.nuit) || (isSunday && p.dimanche) || (!isNight && !isSunday);
-            
-            // MODIFICATION : On utilise le champ 'whatsapp' s'il existe, sinon on nettoie le 'telephone'
-       const cleanNum = (p.whatsapp && p.whatsapp.length > 5) ? p.whatsapp.replace(/\D/g, '') : p.telephone.replace(/\D/g, '');
-            
-            const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`);
-            const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
-            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+    pharmacies.forEach(p => {
+        // Une pharmacie est considérée "ouverte" si :
+        // 1. C'est la nuit et elle est de garde (nuit)
+        // 2. C'est dimanche et elle est de garde (dimanche)
+        // 3. C'est la journée (8h-22h) et ce n'est pas dimanche
+        const ouvert = (isNightTime && p.nuit) || 
+                       (isSunday && p.dimanche) || 
+                       (!isNightTime && !isSunday);
+        
+        // Création du badge "Ferme bientôt"
+        let closingBadge = "";
+        if (ouvert && isClosingSoon && !p.nuit && !isSunday) {
+            closingBadge = `<span class="badge-closing">⌛ FERME À 22H</span>`;
+        }
 
-            const cardHtml = `
-                <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.5;'}">
+        const cleanNum = (p.whatsapp && p.whatsapp.length > 5) ? p.whatsapp.replace(/\D/g, '') : p.telephone.replace(/\D/g, '');
+        const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`);
+        
+        // Correction du lien Google Maps (avec backticks)
+        const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
+        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+
+        const cardHtml = `
+            <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.5;'}">
+                <div>
                     <span style="font-weight:bold; font-size:0.85rem;">${p.nom}</span>
-                    <div style="display:flex; gap:18px; align-items:center;">
-                        <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${msg}" target="_blank"` : ''}>
-                            <i class="fab fa-whatsapp" style="color:${ouvert ? 'var(--whatsapp)' : '#ccc'}; font-size:1.5rem;"></i>
-                        </a>
-                        <a href="${mapUrl}" target="_blank" style="color:var(--primary); font-size:1.2rem;">
-                            <i class="fas fa-map-marker-alt ${ouvert ? 'pulse-maps' : ''}"></i>
-                        </a>
-                    </div>
-                </div>`;
-            if (ouvert) htmlOuvert += cardHtml; else htmlFerme += cardHtml;
-        });
-        document.getElementById(idOpen).innerHTML = htmlOuvert;
-        document.getElementById(idClose).innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin-top:10px;">Indisponibles :</p>${htmlFerme}` : "";
-    }
+                    ${closingBadge}
+                </div>
+                <div style="display:flex; gap:18px; align-items:center;">
+                    <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${msg}" target="_blank"` : ''}>
+                        <i class="fab fa-whatsapp" style="color:${ouvert ? 'var(--whatsapp)' : '#ccc'}; font-size:1.5rem;"></i>
+                    </a>
+                    <a href="${mapUrl}" target="_blank" style="color:var(--primary); font-size:1.2rem;">
+                        <i class="fas fa-map-marker-alt ${ouvert ? 'pulse-maps' : ''}"></i>
+                    </a>
+                </div>
+            </div>`;
+        
+        if (ouvert) htmlOuvert += cardHtml; else htmlFerme += cardHtml;
+    });
+    
+    document.getElementById(idOpen).innerHTML = htmlOuvert;
+    document.getElementById(idClose).innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin-top:10px;">Indisponibles :</p>${htmlFerme}` : "";
+}
 
     function renderList() {
         const container = document.getElementById('listContainer');
@@ -339,7 +378,7 @@ async function loadData() {
 
         window.addEventListener('load', () => {
             // ON UTILISE LA VERSION 1.6 PARTOUT
-            navigator.serviceWorker.register('sw.js?v=1.10').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.11').then(reg => {
                 
                 // Si une mise à jour attend déjà
                 if (reg.waiting) {
