@@ -107,6 +107,7 @@
     border-left: 1px solid rgba(255,255,255,0.1);
     border-right: 1px solid rgba(255,255,255,0.1);
 
+}
 .badge-closing {
     background: #f59e0b; /* Orange */
     color: white;
@@ -115,10 +116,9 @@
     font-size: 0.6rem;
     font-weight: bold;
     margin-left: 8px;
-    white-space: nowrap; /* EMPÊCHE LE TEXTE DU BADGE DE SE COUPER */
     animation: blink 2s infinite;
-    display: inline-block;
 }
+
 @keyframes blink {
     0% { opacity: 1; }
     50% { opacity: 0.6; }
@@ -251,7 +251,6 @@ async function loadData() {
         document.getElementById('ordo-zone').style.display = 'block';
         generateWA('pharmaciesOuvertesOrdo', 'pharmaciesFermeesOrdo', "Je souhaiterais savoir si vous avez les produits de l'ordonnance que je vous joins en photo.");
     }
-
 function generateWA(idOpen, idClose, customText) {
     const now = new Date();
     const hour = now.getHours();
@@ -259,22 +258,38 @@ function generateWA(idOpen, idClose, customText) {
     const isNightTime = (hour >= 22 || hour < 8);
     const isClosingSoon = (hour >= 21 && hour < 22);
     
-    let htmlOuvert = ""; let htmlFerme = "";
+    let htmlOuvert = ""; 
+    let htmlFerme = "";
 
     pharmacies.forEach(p => {
         const ouvert = (isNightTime && p.nuit) || (isSunday && p.dimanche) || (!isNightTime && !isSunday);
         let closingBadge = (ouvert && isClosingSoon && !p.nuit && !isSunday) ? `<span class="badge-closing">⌛ FERME À 22H</span>` : "";
 
-        const cleanNum = (p.whatsapp && p.whatsapp.length > 5) ? p.whatsapp.replace(/\D/g, '') : "";
+        // Préparation des données
+        const hasWhatsApp = (p.whatsapp && p.whatsapp.length > 5);
+        const cleanNum = hasWhatsApp ? p.whatsapp.replace(/\D/g, '') : "";
         const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`);
+        
+        // CORRECTION URL MAPS
         const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
         const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
 
-        // VERIFICATION WHATSAPP
-        const hasWhatsApp = (p.whatsapp && p.whatsapp.length > 5);
-        const waAction = hasWhatsApp 
-            ? `href="https://wa.me/${cleanNum}?text=${msg}" target="_blank"` 
-            : `onclick="alert('🚧 Le service WhatsApp est en cours de configuration pour cette pharmacie. Veuillez utiliser le bouton d\'appel dans l\'onglet Pharmacies.')" style="cursor:pointer;"`;
+        // GESTION DU BOUTON WHATSAPP
+        let waContent = "";
+        if (!ouvert) {
+            // Pharmacie fermée : icône grise inactive
+            waContent = `<i class="fab fa-whatsapp" style="color:#ccc; font-size:1.5rem;"></i>`;
+        } else if (hasWhatsApp) {
+            // Ouverte + WhatsApp : lien direct
+            waContent = `<a href="https://wa.me/${cleanNum}?text=${msg}" target="_blank">
+                            <i class="fab fa-whatsapp" style="color:var(--whatsapp); font-size:1.5rem;"></i>
+                         </a>`;
+        } else {
+            // Ouverte + Pas de WhatsApp : Alerte au clic
+            waContent = `<a href="javascript:void(0)" onclick="alert('🚧 Service bientôt disponible pour cette pharmacie. Utilisez l\\'appel direct dans l\\'onglet Pharmacies.')" style="cursor:pointer;">
+                            <i class="fab fa-whatsapp" style="color:#ccc; font-size:1.5rem;"></i>
+                         </a>`;
+        }
 
         const cardHtml = `
             <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.5;'}">
@@ -283,9 +298,7 @@ function generateWA(idOpen, idClose, customText) {
                     ${closingBadge}
                 </div>
                 <div style="display:flex; gap:18px; align-items:center; flex-shrink: 0;">
-                    <a ${ouvert ? waAction : ''}>
-                        <i class="fab fa-whatsapp" style="color:${(ouvert && hasWhatsApp) ? 'var(--whatsapp)' : '#ccc'}; font-size:1.5rem;"></i>
-                    </a>
+                    ${waContent}
                     <a href="${mapUrl}" target="_blank" style="color:var(--primary); font-size:1.2rem;">
                         <i class="fas fa-map-marker-alt ${ouvert ? 'pulse-maps' : ''}"></i>
                     </a>
@@ -298,7 +311,6 @@ function generateWA(idOpen, idClose, customText) {
     document.getElementById(idOpen).innerHTML = htmlOuvert;
     document.getElementById(idClose).innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.6; text-align:center; margin-top:10px;">Indisponibles :</p>${htmlFerme}` : "";
 }
-
     function renderList() {
         const container = document.getElementById('listContainer');
         if(!container) return;
@@ -369,7 +381,7 @@ function generateWA(idOpen, idClose, customText) {
 
         window.addEventListener('load', () => {
             // ON UTILISE LA VERSION 1.6 PARTOUT
-            navigator.serviceWorker.register('sw.js?v=1.13').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.14').then(reg => {
                 
                 // Si une mise à jour attend déjà
                 if (reg.waiting) {
