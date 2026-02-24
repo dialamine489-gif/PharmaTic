@@ -265,10 +265,16 @@ function generateWA(idOpen, idClose, customText) {
         const ouvert = (isNightTime && p.nuit) || (isSunday && p.dimanche) || (!isNightTime && !isSunday);
         let closingBadge = (ouvert && isClosingSoon && !p.nuit && !isSunday) ? `<span class="badge-closing">⌛ FERME À 22H</span>` : "";
 
-        const cleanNum = (p.whatsapp && p.whatsapp.length > 5) ? p.whatsapp.replace(/\D/g, '') : p.telephone.replace(/\D/g, '');
+        const cleanNum = (p.whatsapp && p.whatsapp.length > 5) ? p.whatsapp.replace(/\D/g, '') : "";
         const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n\nBonjour ! 👋\n${customText}\n\nMerci beaucoup ! 🙏`);
         const query = encodeURIComponent(`${p.nom} ${p.quartier} Keur Massar`);
         const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+
+        // VERIFICATION WHATSAPP
+        const hasWhatsApp = (p.whatsapp && p.whatsapp.length > 5);
+        const waAction = hasWhatsApp 
+            ? `href="https://wa.me/${cleanNum}?text=${msg}" target="_blank"` 
+            : `onclick="alert('🚧 Le service WhatsApp est en cours de configuration pour cette pharmacie. Veuillez utiliser le bouton d\'appel dans l\'onglet Pharmacies.')" style="cursor:pointer;"`;
 
         const cardHtml = `
             <div class="broadcast-item" style="${ouvert ? '' : 'opacity: 0.5;'}">
@@ -277,8 +283,8 @@ function generateWA(idOpen, idClose, customText) {
                     ${closingBadge}
                 </div>
                 <div style="display:flex; gap:18px; align-items:center; flex-shrink: 0;">
-                    <a ${ouvert ? `href="https://wa.me/${cleanNum}?text=${msg}" target="_blank"` : ''}>
-                        <i class="fab fa-whatsapp" style="color:${ouvert ? 'var(--whatsapp)' : '#ccc'}; font-size:1.5rem;"></i>
+                    <a ${ouvert ? waAction : ''}>
+                        <i class="fab fa-whatsapp" style="color:${(ouvert && hasWhatsApp) ? 'var(--whatsapp)' : '#ccc'}; font-size:1.5rem;"></i>
                     </a>
                     <a href="${mapUrl}" target="_blank" style="color:var(--primary); font-size:1.2rem;">
                         <i class="fas fa-map-marker-alt ${ouvert ? 'pulse-maps' : ''}"></i>
@@ -363,7 +369,7 @@ function generateWA(idOpen, idClose, customText) {
 
         window.addEventListener('load', () => {
             // ON UTILISE LA VERSION 1.6 PARTOUT
-            navigator.serviceWorker.register('sw.js?v=1.12').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.13').then(reg => {
                 
                 // Si une mise à jour attend déjà
                 if (reg.waiting) {
