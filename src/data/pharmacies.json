@@ -62,8 +62,8 @@
       "lat": 14.7695,
       "lng": -17.3138,
       "partenaire": false,
-      "nuit": true,
-      "dimanche": true
+      "nuit": false,
+      "dimanche": false
     },
     {
       "id": 6,
@@ -93,7 +93,7 @@
       "lng": -17.3148,
       "partenaire": false,
       "nuit": false,
-      "dimanche": false
+      "dimanche": true
     },
     {
       "id": 8,
@@ -108,7 +108,7 @@
       "lng": -17.3170,
       "partenaire": false,
       "nuit": false,
-      "dimanche": false
+      "dimanche": true
     },
     {
       "id": 9,
@@ -123,7 +123,7 @@
       "lng": -17.3100,
       "partenaire": false,
       "nuit": false,
-      "dimanche":false
+      "dimanche":true
     },
     {
       "id": 10,
@@ -138,7 +138,7 @@
       "lng": -17.3050,
       "partenaire": false,
       "nuit": false,
-      "dimanche": true
+      "dimanche": false
     },
     {
       "id": 11,
@@ -198,7 +198,7 @@
       "lng": -17.3150,
       "partenaire": false,
       "nuit": false,
-      "dimanche": false
+      "dimanche": true
     },
     {
       "id": 15,
@@ -273,7 +273,7 @@
       "lng": -17.3257,
       "partenaire": false,
       "nuit": false,
-      "dimanche": true
+      "dimanche": false
     },
     {
       "id": 20,
@@ -317,7 +317,7 @@
       "lat": 14.7750,
       "lng": -17.3350,
       "partenaire": false,
-      "nuit": false,
+      "nuit": true,
       "dimanche": true
     },
     {
