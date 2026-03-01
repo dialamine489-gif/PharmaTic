@@ -318,7 +318,7 @@
       "lng": -17.3350,
       "partenaire": false,
       "nuit": true,
-      "dimanche": true
+      "dimanche": false
     },
     {
       "id": 23,
