@@ -1,7 +1,7 @@
 {
   "config": {
-    "date_nuit": "Du 21 au 27 Février 2026",
-    "date_dimanche": "Dimanche 22 Février 2026"
+    "date_nuit": "Du 28 fev au 06 Mars 2026",
+    "date_dimanche": "Dimanche 01 Mars 2026"
   },
   "pharmacies": [
     {
@@ -98,7 +98,7 @@
     {
       "id": 8,
       "nom": "Pharmacie Adji Mouhamed",
-      "quartier": "Croisement",
+      "quartier": "AutoPont Keur Massar",
       "adresse": "Rond point Keur Massar",
       "telephone": "338377526",
       "whatsapp": "",
@@ -113,7 +113,7 @@
     {
       "id": 9,
       "nom": "Pharmacie Sankoun Faty",
-      "quartier": "Cité Gendarmerie",
+      "quartier": "Rond point Dibiterie",
       "adresse": "Cité Gendarmerie villa n°959",
       "telephone": "338378786",
       "whatsapp": "",
