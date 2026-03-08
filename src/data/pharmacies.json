@@ -1,7 +1,7 @@
 {
   "config": {
-    "date_nuit": "Du 28 fev au 06 Mars 2026",
-    "date_dimanche": "Dimanche 01 Mars 2026"
+    "date_nuit": "Du 07 Mars au 13 Mars 2026",
+    "date_dimanche": "Dimanche 08 Mars 2026"
   },
   "pharmacies": [
     {
@@ -17,7 +17,7 @@
       "lng": -17.3216,
       "partenaire": true,
       "nuit": false,
-      "dimanche": false
+      "dimanche": true
     },
 
     {
@@ -32,8 +32,8 @@
       "lat": 14.7850,
       "lng": -17.3100,
       "partenaire": false,
-      "nuit": false,
-      "dimanche": false
+      "nuit": true,
+      "dimanche": true
     },
     {
       "id": 4,
@@ -78,7 +78,7 @@
       "lng": -17.3040,
       "partenaire": false,
       "nuit": false,
-      "dimanche": false
+      "dimanche": true
     },
     {
       "id": 7,
@@ -93,7 +93,7 @@
       "lng": -17.3148,
       "partenaire": false,
       "nuit": false,
-      "dimanche": true
+      "dimanche": false
     },
     {
       "id": 8,
@@ -108,7 +108,7 @@
       "lng": -17.3170,
       "partenaire": false,
       "nuit": false,
-      "dimanche": true
+      "dimanche": false
     },
     {
       "id": 9,
@@ -123,7 +123,7 @@
       "lng": -17.3100,
       "partenaire": false,
       "nuit": false,
-      "dimanche":true
+      "dimanche":false
     },
     {
       "id": 10,
@@ -198,7 +198,7 @@
       "lng": -17.3150,
       "partenaire": false,
       "nuit": false,
-      "dimanche": true
+      "dimanche": false
     },
     {
       "id": 15,
@@ -258,7 +258,7 @@
       "lng": -17.3300,
       "partenaire": false,
       "nuit": false,
-      "dimanche": false
+      "dimanche": true
     },
     {
       "id": 19,
@@ -317,7 +317,7 @@
       "lat": 14.7750,
       "lng": -17.3350,
       "partenaire": false,
-      "nuit": true,
+      "nuit": false,
       "dimanche": false
     },
     {
