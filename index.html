@@ -47,45 +47,23 @@
         header { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; padding: 10px 10px 5px; }
         .logo-img { width: 55px; height: 55px; border-radius: 15px; border: 2px solid var(--accent); box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
 
-        /* --- BANDEAU DÉFILANT (FIXÉ) --- */
         .news-ticker { 
-            background: rgba(0,0,0,0.2); 
-            border-bottom: 1px solid var(--accent); 
-            height: 35px;
-            display: flex;
-            align-items: center;
-            overflow: hidden; 
-            white-space: nowrap; 
-            width: 100%;
-            position: relative;
-            z-index: 10;
-            margin-bottom: 10px;
-            flex-shrink: 0;
+            background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--accent); height: 35px;
+            display: flex; align-items: center; overflow: hidden; white-space: nowrap; width: 100%;
+            position: relative; z-index: 10; margin-bottom: 10px; flex-shrink: 0;
         }
         .ticker-wrapper { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; font-size: 0.85rem; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* --- CONTENU --- */
         .content-area { flex: 1; padding: 10px 15px 100px; overflow-y: auto; width: 100%; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
         .card { background: var(--card); border-radius: 20px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
         
-        /* --- STYLE GARDES & BADGES --- */
         #dimancheCard { background: rgba(0, 255, 136, 0.05); border-left: 5px solid var(--accent); margin-bottom: 15px; }
         .pharma-badge-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .pharma-badge {
-            background: rgba(0, 255, 136, 0.1);
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--text);
-        }
+        .pharma-badge { background: rgba(0, 255, 136, 0.1); padding: 6px 12px; border-radius: 10px; font-size: 0.8rem; border: 1px solid rgba(0, 255, 136, 0.2); display: flex; align-items: center; gap: 6px; color: var(--text); }
 
         .pharma-item { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid transparent; }
         .nuit-border { border-left-color: var(--violet-nuit); }
@@ -93,7 +71,6 @@
         
         .section-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 800; margin: 20px 5px 10px; text-transform: uppercase; }
 
-        /* --- BOUTONS & INPUTS --- */
         .theme-switcher { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-top: 10px; padding: 0 10px; }
         .theme-btn { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.7rem; cursor: pointer; font-weight: bold; }
         .btn-dark { background: #1e293b; color: white; }
@@ -104,10 +81,7 @@
         .close-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.1); border: none; color: inherit; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
 
         .broadcast-item { background: rgba(0,0,0,0.05); border-radius: 12px; padding: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,255,136,0.1); }
-        .badge-closing { background: #f59e0b; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.6rem; font-weight: bold; margin-left: 8px; animation: blink 2s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
-        /* --- NAVIGATION --- */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 12px 0 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.7rem; text-decoration: none; cursor: pointer; gap: 4px; }
         .nav-item.active { color: var(--accent); }
@@ -197,7 +171,17 @@
     let config = {};
     let deferredPrompt;
 
-    // --- CHARGEMENT DES DONNÉES ---
+    // --- LOGIQUE AUTOMATISATION DIMANCHE ---
+    function getGroupeDimanche() {
+        const reference = new Date("2026-03-08"); // Dimanche Groupe 0
+        const aujourdhui = new Date();
+        const diff = aujourdhui - reference;
+        const semaines = Math.floor(diff / (7 * 24 * 60 * 60 * 1000));
+        let groupeActuel = semaines % 4;
+        if (groupeActuel < 0) groupeActuel += 4;
+        return groupeActuel;
+    }
+
     async function loadData() {
         try {
             const response = await fetch('src/data/pharmacies.json?t=' + new Date().getTime());
@@ -208,57 +192,34 @@
         } catch (e) { console.error("Erreur de chargement :", e); }
     }
 
-    // --- MISE À JOUR DE L'INTERFACE DES GARDES ---
-// Fonction pour savoir quel groupe est de garde ce dimanche
-function getGroupeDimanche() {
-    const reference = new Date("2026-03-08"); // Dimanche Groupe 0
-    const aujourdhui = new Date();
-    
-    // On calcule la différence en millisecondes, puis en semaines
-    const diff = aujourdhui - reference;
-    const semaines = Math.floor(diff / (7 * 24 * 60 * 60 * 1000));
-    
-    // Le cycle est de 4 groupes (0, 1, 2, 3)
-    let groupeActuel = semaines % 4;
-    if (groupeActuel < 0) groupeActuel += 4; // Pour gérer si on remonte dans le passé
-    
-    return groupeActuel;
-}
+    function updateUI() {
+        const isSunday = (new Date().getDay() === 0);
+        const groupeAuj = getGroupeDimanche();
 
-function updateUI() {
-    const isSunday = (new Date().getDay() === 0);
-    const groupeDuJour = getGroupeDimanche();
+        // NUIT
+        const activeNuit = pharmacies.filter(p => p.nuit);
+        const nuitCard = document.getElementById('nuitCard');
+        if(activeNuit.length > 0) {
+            nuitCard.style.display = 'block';
+            document.getElementById('statusText').innerHTML = `
+                <div style="font-size: 0.6rem; opacity: 0.7; font-weight: normal; margin-bottom: 5px;">${config.date_nuit}</div>
+                <div style="color: var(--text);">📍 ${activeNuit.map(p => p.nom).join(", ")}</div>
+            `;
+        } else { nuitCard.style.display = 'none'; }
 
-    // 1. Filtrer les pharmacies de garde selon le groupe calculé
-    // On ne les affiche que si on est dimanche
-    const activeDimanche = pharmacies.filter(p => isSunday && p.groupe === groupeDuJour);
-    
-    const dimancheCard = document.getElementById('dimancheCard');
-    const badgeList = document.getElementById('dimancheBadgeList');
-    
-    if(isSunday && activeDimanche.length > 0) {
-        dimancheCard.style.display = 'block';
-        badgeList.innerHTML = activeDimanche.map(p => `
-            <div class="pharma-badge">
-                <i class="fas fa-check-circle" style="color:var(--accent)"></i> ${p.nom}
-            </div>
-        `).join('');
-    } else {
-        dimancheCard.style.display = 'none';
+        // DIMANCHE
+        const activeDimanche = pharmacies.filter(p => isSunday && p.groupe === groupeAuj);
+        const dimancheCard = document.getElementById('dimancheCard');
+        const badgeList = document.getElementById('dimancheBadgeList');
+        
+        if(isSunday && activeDimanche.length > 0) {
+            dimancheCard.style.display = 'block';
+            badgeList.innerHTML = activeDimanche.map(p => `
+                <div class="pharma-badge"><i class="fas fa-check-circle" style="color:var(--accent)"></i> ${p.nom}</div>
+            `).join('');
+        } else { dimancheCard.style.display = 'none'; }
     }
 
-    // --- LOGIQUE NUIT (Reste manuelle dans le JSON pour l'instant) ---
-    const activeNuit = pharmacies.filter(p => p.nuit);
-    const nuitCard = document.getElementById('nuitCard');
-    if(activeNuit.length > 0) {
-        nuitCard.style.display = 'block';
-        document.getElementById('statusText').innerText = "📍 " + activeNuit.map(p => p.nom).join(", ");
-    } else {
-        nuitCard.style.display = 'none';
-    }
-}
-
-    // --- RECHERCHE ET WHATSAPP ---
     function handleSearch() {
         const val = document.getElementById('searchInput').value;
         if (val.length > 2) {
@@ -268,186 +229,110 @@ function updateUI() {
         } else { document.getElementById('broadcast-zone').style.display = 'none'; }
     }
 
-  function generateWA(idOpen, idClose, customText) {
-    const now = new Date();
-    const hour = now.getHours();
-    const isSunday = (now.getDay() === 0);
-    let htmlOpen = ""; 
-    let htmlFerme = ""; // Correction de la variable htmlClose/htmlFerme
+    function generateWA(idOpen, idClose, customText) {
+        const now = new Date();
+        const hour = now.getHours();
+        const isSunday = (now.getDay() === 0);
+        const groupeAuj = getGroupeDimanche();
+        let htmlOpen = ""; let htmlFerme = "";
 
-    pharmacies.forEach(p => {
-        // Logique d'ouverture
-        const ouvert = (hour >= 22 || hour < 8 ? p.nuit : (isSunday ? p.dimanche : true));
-        
-        // Nettoyage du numéro et vérification
-        const hasWA = p.whatsapp && p.whatsapp.trim() !== "";
-        const cleanNum = hasWA ? p.whatsapp.replace(/\D/g, '') : null;
-        const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n${customText}`);
-        
-        // Construction du bouton WhatsApp avec la logique de blocage
-        let waButton = "";
-        if (hasWA) {
-            // Bouton actif
-            waButton = `<a href="https://wa.me/${cleanNum}?text=${msg}" target="_blank">
-                            <i class="fab fa-whatsapp" style="color:var(--whatsapp); font-size:1.3rem;"></i>
-                        </a>`;
-        } else {
-            // Bouton grisé avec alerte
-            waButton = `<i class="fab fa-whatsapp" 
-                           style="color:grey; font-size:1.3rem; cursor:pointer; opacity:0.3;" 
-                           onclick="alert('Travaux en cours avec cette pharmacie. Veuillez vous rendre dans l\\\'onglet Pharmacie pour les appeler directement.')">
-                        </i>`;
-        }
+        pharmacies.forEach(p => {
+            const ouvert = (hour >= 22 || hour < 8 ? p.nuit : (isSunday ? (p.groupe === groupeAuj) : true));
+            const hasWA = p.whatsapp && p.whatsapp.trim() !== "";
+            const cleanNum = hasWA ? p.whatsapp.replace(/\D/g, '') : null;
+            const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n${customText}`);
+            
+            let waButton = hasWA ? 
+                `<a href="https://wa.me/${cleanNum}?text=${msg}" target="_blank"><i class="fab fa-whatsapp" style="color:var(--whatsapp); font-size:1.3rem;"></i></a>` :
+                `<i class="fab fa-whatsapp" style="color:grey; font-size:1.3rem; opacity:0.3;" onclick="alert('Contactez-les par téléphone.')"></i>`;
 
-        const card = `
-            <div class="broadcast-item" style="${ouvert ? '' : 'opacity:0.5;'}">
-                <span style="font-weight:bold; font-size:0.85rem;">${p.nom}</span>
-                <div style="display:flex; gap:15px; align-items:center;">
-                    ${waButton}
-                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank">
-                        <i class="fas fa-map-marker-alt" style="color:var(--primary); font-size:1.1rem;"></i>
-                    </a>
-                </div>
-            </div>`;
-
-        if(ouvert) htmlOpen += card; else htmlFerme += card;
-    });
-
-    document.getElementById(idOpen).innerHTML = htmlOpen;
-    const closedContainer = document.getElementById(idClose);
-    if (closedContainer) {
-        closedContainer.innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.5; text-align:center; margin-top:10px;">Indisponibles actuellement :</p>${htmlFerme}` : "";
-    }
-}
-
-    // --- NAVIGATION ---
-function switchTab(id, el) {
-    // 1. On enlève la classe 'active' partout
-    document.querySelectorAll('.tab-content, .nav-item').forEach(x => x.classList.remove('active'));
-    
-    // 2. On l'ajoute sur l'onglet cliqué
-    document.getElementById(id).classList.add('active'); 
-    el.classList.add('active');
-
-    // --- LA NOUVELLE LOGIQUE EST ICI ---
-    const contentArea = document.querySelector('.content-area');
-    if (contentArea) {
-        contentArea.scrollTo({
-            top: 0,
-            behavior: 'smooth' // Pour que ça remonte en douceur
-        });
-    }
-
-    // 3. Si on va sur l'onglet pharmacies, on recharge la liste
-    if(id === 'pharmacies-tab') renderList();
-}
-
-function renderList() {
-    const container = document.getElementById('listContainer');
-    if (!container) return;
-    container.innerHTML = "";
-    
-    // Calcul automatique du groupe pour le dimanche
-    const groupeAuj = getGroupeDimanche();
-    const listDimanche = pharmacies.filter(p => p.groupe === groupeAuj);
-
-    const sections = [
-        { 
-            title: '🌙 Gardes de Nuit', 
-            list: pharmacies.filter(p => p.nuit), 
-            border: 'nuit-border', 
-            color: 'var(--violet-nuit)', 
-            date: config.date_nuit 
-        },
-        { 
-            title: '☀️ Gardes du Dimanche', 
-            list: listDimanche, 
-            border: 'dimanche-border', 
-            color: 'var(--accent)', 
-            date: config.date_dimanche 
-        },
-        { 
-            title: '🏥 Toutes les Pharmacies', 
-            list: pharmacies, 
-            border: '', 
-            color: 'var(--accent)', 
-            date: null 
-        }
-    ];
-
-    sections.forEach(s => {
-        if(s.list.length === 0 && s.title !== '🏥 Toutes les Pharmacies') return;
-        
-        const h = document.createElement('div');
-        h.className = 'section-header';
-        h.style.color = s.color;
-        
-        h.innerHTML = `
-            <div style="display:flex; flex-direction:column;">
-                <span>${s.title}</span>
-                ${s.date ? `<span style="font-size:0.55rem; opacity:0.7; font-weight:normal; text-transform: none;">${s.date}</span>` : ''}
-            </div>
-        `;
-        container.appendChild(h);
-        
-        s.list.forEach(p => {
-            const item = document.createElement('div');
-            item.className = `pharma-item ${s.border}`;
-            const star = p.partenaire ? '<i class="fas fa-star" style="color: #ffca28; font-size: 0.7rem; margin-left: 5px;"></i>' : '';
-
-            item.innerHTML = `
-                <div>
-                    <div style="font-weight:bold; display: flex; align-items: center;">
-                        ${p.nom} ${star}
+            const card = `
+                <div class="broadcast-item" style="${ouvert ? '' : 'opacity:0.5;'}">
+                    <span style="font-weight:bold; font-size:0.85rem;">${p.nom}</span>
+                    <div style="display:flex; gap:15px; align-items:center;">
+                        ${waButton}
+                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank">
+                            <i class="fas fa-map-marker-alt" style="color:var(--primary); font-size:1.1rem;"></i>
+                        </a>
                     </div>
-                    <div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div>
-                </div>
-                <div style="display:flex; gap:20px; font-size:1.2rem;">
-                    <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--accent)"></i></a>
-                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank" style="color:var(--primary);">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </a>
                 </div>`;
-            container.appendChild(item);
+            if(ouvert) htmlOpen += card; else htmlFerme += card;
         });
-    });
-}
 
-    // --- THÈMES & UTILITAIRES ---
+        document.getElementById(idOpen).innerHTML = htmlOpen;
+        const closedContainer = document.getElementById(idClose);
+        if (closedContainer) closedContainer.innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.5; text-align:center; margin-top:10px;">Indisponibles :</p>${htmlFerme}` : "";
+    }
+
+    function switchTab(id, el) {
+        document.querySelectorAll('.tab-content, .nav-item').forEach(x => x.classList.remove('active'));
+        document.getElementById(id).classList.add('active'); 
+        el.classList.add('active');
+        const contentArea = document.querySelector('.content-area');
+        if (contentArea) contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+        if(id === 'pharmacies-tab') renderList();
+    }
+
+    function renderList() {
+        const container = document.getElementById('listContainer');
+        if (!container) return;
+        container.innerHTML = "";
+        
+        const groupeAuj = getGroupeDimanche();
+        const listDimanche = pharmacies.filter(p => p.groupe === groupeAuj);
+
+        const sections = [
+            { title: '🌙 Gardes de Nuit', list: pharmacies.filter(p => p.nuit), border: 'nuit-border', color: 'var(--violet-nuit)', date: config.date_nuit },
+            { title: '☀️ Gardes du Dimanche', list: listDimanche, border: 'dimanche-border', color: 'var(--accent)', date: config.date_dimanche },
+            { title: '🏥 Toutes les Pharmacies', list: pharmacies, border: '', color: 'var(--accent)', date: null }
+        ];
+
+        sections.forEach(s => {
+            if(s.list.length === 0 && s.title !== '🏥 Toutes les Pharmacies') return;
+            const h = document.createElement('div');
+            h.className = 'section-header';
+            h.style.color = s.color;
+            h.innerHTML = `<div style="display:flex; flex-direction:column;"><span>${s.title}</span>${s.date ? `<span style="font-size:0.55rem; opacity:0.7; font-weight:normal; text-transform: none;">${s.date}</span>` : ''}</div>`;
+            container.appendChild(h);
+            
+            s.list.forEach(p => {
+                const item = document.createElement('div');
+                item.className = `pharma-item ${s.border}`;
+                const star = p.partenaire ? '<i class="fas fa-star" style="color: #ffca28; font-size: 0.7rem; margin-left: 5px;"></i>' : '';
+                item.innerHTML = `
+                    <div><div style="font-weight:bold; display: flex; align-items: center;">${p.nom} ${star}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
+                    <div style="display:flex; gap:20px; font-size:1.2rem;">
+                        <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--accent)"></i></a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank" style="color:var(--primary);"><i class="fas fa-map-marker-alt"></i></a>
+                    </div>`;
+                container.appendChild(item);
+            });
+        });
+    }
+
     function setTheme(t) { document.body.className = t + '-theme'; localStorage.setItem('theme', t); }
     function resetSearch() { document.getElementById('searchInput').value = ""; document.getElementById('broadcast-zone').style.display = 'none'; }
     function resetOrdo() { document.getElementById('ordo-zone').style.display = 'none'; }
     function handleFileSelected() { document.getElementById('ordo-zone').style.display = 'block'; generateWA('pharmaciesOuvertesOrdo', 'pharmaciesFermeesOrdo', "Avez-vous les produits de cette ordonnance ?"); }
 
-    // --- SERVICE WORKER & PWA ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.36').then(reg => {
-                console.log('SW enregistré !');
+            navigator.serviceWorker.register('sw.js?v=1.37').then(reg => {
                 reg.onupdatefound = () => {
                     const worker = reg.installing;
-                    worker.onstatechange = () => {
-                        if (worker.state === 'installed' && navigator.serviceWorker.controller) {
-                            window.location.reload();
-                        }
-                    };
+                    worker.onstatechange = () => { if (worker.state === 'installed' && navigator.serviceWorker.controller) window.location.reload(); };
                 };
             });
         });
     }
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault(); deferredPrompt = e;
-    });
-
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
     document.getElementById('pwaBtn').onclick = async () => {
         if (deferredPrompt) {
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
             if (outcome === 'accepted') deferredPrompt = null;
-        } else {
-            alert("Pour installer : sur iPhone (Partager > Écran d'accueil) ou Android (Menu Chrome > Installer).");
-        }
+        } else { alert("Pour installer : Partager > Écran d'accueil."); }
     };
 
     window.onload = loadData;
