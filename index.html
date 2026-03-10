@@ -347,7 +347,11 @@ function renderList() {
     if (!container) return;
     container.innerHTML = "";
     
- const sections = [
+    // Calcul automatique du groupe pour le dimanche
+    const groupeAuj = getGroupeDimanche();
+    const listDimanche = pharmacies.filter(p => p.groupe === groupeAuj);
+
+    const sections = [
         { 
             title: '🌙 Gardes de Nuit', 
             list: pharmacies.filter(p => p.nuit), 
@@ -369,7 +373,8 @@ function renderList() {
             color: 'var(--accent)', 
             date: null 
         }
-    ]; // <--- C'est ce point-virgule ici qui doit fermer tout le tableau
+    ];
+
     sections.forEach(s => {
         if(s.list.length === 0 && s.title !== '🏥 Toutes les Pharmacies') return;
         
@@ -388,8 +393,6 @@ function renderList() {
         s.list.forEach(p => {
             const item = document.createElement('div');
             item.className = `pharma-item ${s.border}`;
-
-            // LOGIQUE DE L'ÉTOILE (Placée au bon endroit, dans la boucle)
             const star = p.partenaire ? '<i class="fas fa-star" style="color: #ffca28; font-size: 0.7rem; margin-left: 5px;"></i>' : '';
 
             item.innerHTML = `
@@ -401,7 +404,7 @@ function renderList() {
                 </div>
                 <div style="display:flex; gap:20px; font-size:1.2rem;">
                     <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--accent)"></i></a>
-                    <a href="https://www.google.com/maps/search/${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank" style="color:var(--primary);">
+                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank" style="color:var(--primary);">
                         <i class="fas fa-map-marker-alt"></i>
                     </a>
                 </div>`;
@@ -419,7 +422,7 @@ function renderList() {
     // --- SERVICE WORKER & PWA ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.35').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.36').then(reg => {
                 console.log('SW enregistré !');
                 reg.onupdatefound = () => {
                     const worker = reg.installing;
