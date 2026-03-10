@@ -124,6 +124,29 @@
     50% { opacity: 0.6; }
     100% { opacity: 1; }
 }
+/* Style pour les badges de garde dimanche */
+.pharma-badge-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.pharma-badge {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    border: 1px solid rgba(255, 77, 77, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#dimancheCard {
+    background: linear-gradient(135deg, rgba(255, 77, 77, 0.2) 0%, rgba(255, 77, 77, 0.05) 100%);
+    border: 1px solid rgba(255, 77, 77, 0.2);
+}
     </style>
 </head>
 <body class="dark-theme">
@@ -162,16 +185,23 @@
         <div id="listContainer"></div>
     </div>
 
- <div id="recherche" class="tab-content active">
+<div id="recherche" class="tab-content active">
+    
     <div id="gardeContainer">
-        <div class="card" style="border-left: 5px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1); margin-bottom: 12px;">
+        <div id="nuitCard" class="card" style="display:none; border-left: 5px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1); margin-bottom: 12px;">
             <h3 style="margin:0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-moon"></i> Garde de nuit</h3>
-            <div id="statusText" style="font-weight: bold; margin-top: 5px; font-size: 1.1rem;">Vérification...</div>
+            <div id="statusText" style="font-weight: bold; margin-top: 8px; font-size: 1.1rem;"></div>
         </div>
 
-        <div id="dimancheCard" class="card" style="display:none; border-left: 5px solid var(--rouge-dimanche); background: rgba(255, 77, 77, 0.1); margin-bottom: 12px;">
-            <h3 style="margin:0; font-size: 0.85rem; color: var(--rouge-dimanche);"><i class="fas fa-sun"></i> Garde du Dimanche</h3>
-            <div id="dimancheText" style="font-weight: bold; margin-top: 5px; font-size: 1rem; line-height: 1.4;">Chargement...</div>
+        <div id="dimancheCard" class="card" style="display:none; border-left: 5px solid var(--rouge-dimanche); margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin:0; font-size: 0.85rem; color: var(--rouge-dimanche); text-transform: uppercase; letter-spacing: 1px;">
+                    <i class="fas fa-sun"></i> Gardes du Dimanche
+                </h3>
+                <span style="font-size: 0.6rem; background: var(--rouge-dimanche); color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold;">OUVERT</span>
+            </div>
+            <div id="dimancheBadgeList" class="pharma-badge-container">
+                </div>
         </div>
     </div>
 
@@ -229,34 +259,36 @@ async function loadData() {
         }
     }
 
-  function updateUI() {
+ function updateUI() {
     // 1. Gestion Garde de Nuit
     const activeGardeNuit = pharmacies.filter(p => p.nuit);
+    const nuitCard = document.getElementById('nuitCard');
     const statusText = document.getElementById('statusText');
+
     if(activeGardeNuit.length > 0) {
-        statusText.innerText = "📍 " + activeGardeNuit[0].nom;
+        nuitCard.style.display = 'block';
+        statusText.innerHTML = `<i class="fas fa-map-marker-alt" style="font-size: 0.9rem; color: var(--accent);"></i> ${activeGardeNuit.map(p => p.nom).join(", ")}`;
     } else {
-        statusText.innerText = "Aucune garde de nuit listée";
+        nuitCard.style.display = 'none';
     }
 
-    // 2. Gestion Garde du Dimanche
+    // 2. Gestion Garde du Dimanche (Mode Badges)
     const activeGardeDimanche = pharmacies.filter(p => p.dimanche);
     const dimancheCard = document.getElementById('dimancheCard');
-    const dimancheText = document.getElementById('dimancheText');
+    const badgeContainer = document.getElementById('dimancheBadgeList');
     
-    const now = new Date();
-    const isSunday = (now.getDay() === 0);
-
-    // On affiche le bloc si on est dimanche OU s'il y a des pharmacies de garde dimanche
     if(activeGardeDimanche.length > 0) {
         dimancheCard.style.display = 'block';
-        // On affiche les noms séparés par une virgule s'il y en a plusieurs
-        dimancheText.innerText = "☀️ " + activeGardeDimanche.map(p => p.nom).join(", ");
+        badgeContainer.innerHTML = activeGardeDimanche.map(p => `
+            <div class="pharma-badge">
+                <i class="fas fa-hospital-symbol" style="color:var(--rouge-dimanche); font-size:0.7rem;"></i>
+                ${p.nom}
+            </div>
+        `).join('');
     } else {
         dimancheCard.style.display = 'none';
     }
 }
-
     function handleSearch() {
         const val = document.getElementById('searchInput').value;
         if (val.length > 2) {
@@ -398,7 +430,7 @@ function generateWA(idOpen, idClose, customText) {
 
         window.addEventListener('load', () => {
             // ON UTILISE LA VERSION 1.6 PARTOUT
-            navigator.serviceWorker.register('sw.js?v=1.23').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.24').then(reg => {
                 
                 // Si une mise à jour attend déjà
                 if (reg.waiting) {
