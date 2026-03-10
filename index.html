@@ -162,29 +162,41 @@
         <div id="listContainer"></div>
     </div>
 
-    <div id="installer" class="tab-content">
-        <div class="help-section">
-            <div class="card" style="text-align:center; padding: 25px 15px;">
-                 <i class="fas fa-mobile-alt" style="font-size: 3rem; color: var(--accent); margin-bottom: 10px;"></i>
-                 <h3>Installer l'application</h3>
-                 <button id="pwaBtn" class="download-btn"><i class="fas fa-download"></i> INSTALLER MAINTENANT</button>
-                 <p style="font-size: 0.7rem; opacity: 0.7; margin-top: 15px;">Si le bouton ne fonctionne pas, suivez ces guides :</p>
-            </div>
+ <div id="recherche" class="tab-content active">
+    <div id="gardeContainer">
+        <div class="card" style="border-left: 5px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1); margin-bottom: 12px;">
+            <h3 style="margin:0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-moon"></i> Garde de nuit</h3>
+            <div id="statusText" style="font-weight: bold; margin-top: 5px; font-size: 1.1rem;">Vérification...</div>
+        </div>
 
-            <div class="help-card">
-                <h4><i class="fab fa-apple"></i> Sur iPhone (Safari)</h4>
-                <div class="step"><span class="step-num">1</span> <span>Appuyez sur <b>Partager</b> <i class="fas fa-share-square"></i> (en bas).</span></div>
-                <div class="step"><span class="step-num">2</span> <span>Cliquez sur <b>"Sur l'écran d'accueil"</b>.</span></div>
-                <div class="step"><span class="step-num">3</span> <span>Appuyez sur <b>Ajouter</b>.</span></div>
-            </div>
-
-            <div class="help-card">
-                <h4><i class="fab fa-android"></i> Sur Android (Chrome)</h4>
-                <div class="step"><span class="step-num">1</span> <span>Appuyez sur les <b>3 points</b> <i class="fas fa-ellipsis-v"></i> en haut.</span></div>
-                <div class="step"><span class="step-num">2</span> <span>Sélectionnez <b>"Installer l'application"</b>.</span></div>
-            </div>
+        <div id="dimancheCard" class="card" style="display:none; border-left: 5px solid var(--rouge-dimanche); background: rgba(255, 77, 77, 0.1); margin-bottom: 12px;">
+            <h3 style="margin:0; font-size: 0.85rem; color: var(--rouge-dimanche);"><i class="fas fa-sun"></i> Garde du Dimanche</h3>
+            <div id="dimancheText" style="font-weight: bold; margin-top: 5px; font-size: 1rem; line-height: 1.4;">Chargement...</div>
         </div>
     </div>
+
+    <div class="card">
+        <h3 style="margin-top:0; font-size: 0.9rem;">Chercher un médicament</h3>
+        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Doliprane, Spasfon..." style="width:100%; padding:14px; border-radius:12px; border:none; background:var(--input-bg); color:inherit; outline:none; border: 1px solid rgba(0,255,136,0.2);">
+        <div id="broadcast-zone" style="display:none; margin-top:15px;">
+            <button class="close-btn" onclick="resetSearch()"><i class="fas fa-times"></i></button>
+            <div id="medLabel" style="color: var(--accent); font-weight: bold; text-align:center; font-size: 1.2rem; margin-bottom: 10px;"></div>
+            <div id="pharmaciesOuvertesMed"></div>
+            <div id="pharmaciesFermeesMed" style="margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0; font-size: 0.9rem;">Par ordonnance</h3>
+        <button onclick="document.getElementById('fileInput').click()" style="width:100%; padding:18px; background:none; border:1.5px dashed var(--accent); border-radius:12px; color:inherit; cursor:pointer;"><i class="fas fa-camera"></i> PRENDRE PHOTO ORDONNANCE</button>
+        <div id="ordo-zone" style="display:none; margin-top:15px;">
+            <button class="close-btn" onclick="resetOrdo()"><i class="fas fa-times"></i></button>
+            <p style="font-size: 0.8rem; color: var(--accent); font-weight: bold; text-align:center;">📸 PHOTO PRÊTE</p>
+            <div id="pharmaciesOuvertesOrdo"></div>
+            <div id="pharmaciesFermeesOrdo" style="margin-top: 15px;"></div>
+        </div>
+    </div>
+</div>
 </div>
 
 <nav class="bottom-nav">
@@ -386,7 +398,7 @@ function generateWA(idOpen, idClose, customText) {
 
         window.addEventListener('load', () => {
             // ON UTILISE LA VERSION 1.6 PARTOUT
-            navigator.serviceWorker.register('sw.js?v=1.22').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.23').then(reg => {
                 
                 // Si une mise à jour attend déjà
                 if (reg.waiting) {
