@@ -312,14 +312,41 @@
 }
 
     // --- NAVIGATION ---
-    function switchTab(id, el) {
-        document.querySelectorAll('.tab-content, .nav-item').forEach(x => x.classList.remove('active'));
-        document.getElementById(id).classList.add('active'); el.classList.add('active');
-        if(id === 'pharmacies-tab') renderList();
+function switchTab(id, el) {
+    // 1. On enlève la classe 'active' partout
+    document.querySelectorAll('.tab-content, .nav-item').forEach(x => x.classList.remove('active'));
+    
+    // 2. On l'ajoute sur l'onglet cliqué
+    document.getElementById(id).classList.add('active'); 
+    el.classList.add('active');
+
+    // --- LA NOUVELLE LOGIQUE EST ICI ---
+    const contentArea = document.querySelector('.content-area');
+    if (contentArea) {
+        contentArea.scrollTo({
+            top: 0,
+            behavior: 'smooth' // Pour que ça remonte en douceur
+        });
     }
+
+    // 3. Si on va sur l'onglet pharmacies, on recharge la liste
+    if(id === 'pharmacies-tab') renderList();
+}
 
 function renderList() {
     const container = document.getElementById('listContainer');
+    // À mettre juste avant le "item.innerHTML"
+const star = p.partenaire ? '<i class="fas fa-star" style="color: #ffca28; font-size: 0.7rem; margin-left: 5px;"></i>' : '';
+
+item.innerHTML = `
+    <div>
+        <div style="font-weight:bold; display: flex; align-items: center;">
+            ${p.nom} ${star} 
+        </div>
+        <div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div>
+    </div>
+    ... reste du code ...
+`;
     container.innerHTML = "";
     
     const sections = [
@@ -371,7 +398,7 @@ function renderList() {
     // --- SERVICE WORKER & PWA ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.32').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.33').then(reg => {
                 console.log('SW enregistré !');
                 reg.onupdatefound = () => {
                     const worker = reg.installing;
