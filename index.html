@@ -29,10 +29,17 @@
     }
 
     /* FIX DU BANDEAU DÉFILANT */
-    .news-ticker {
-        width: 450px;
-        margin: 0 auto;
-    }
+   .news-ticker { 
+    background: rgba(0,0,0,0.2); 
+    border-bottom: 1px solid var(--accent); 
+    padding: 10px 0; /* Un peu plus d'espace vertical */
+    overflow: hidden; 
+    white-space: nowrap; 
+    width: 100%;
+    position: relative;
+    z-index: 10;
+    margin-bottom: 10px; /* Crée l'espace avec les blocs de garde */
+}
 }
 
         :root {
@@ -410,7 +417,7 @@ function generateWA(idOpen, idClose, customText) {
 
         window.addEventListener('load', () => {
             // ON UTILISE LA VERSION 1.6 PARTOUT
-            navigator.serviceWorker.register('sw.js?v=1.25').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.26').then(reg => {
                 
                 // Si une mise à jour attend déjà
                 if (reg.waiting) {
