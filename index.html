@@ -209,26 +209,45 @@
     }
 
     // --- MISE À JOUR DE L'INTERFACE DES GARDES ---
-    function updateUI() {
-        const activeNuit = pharmacies.filter(p => p.nuit);
-        const nuitCard = document.getElementById('nuitCard');
-        if(activeNuit.length > 0) {
-            nuitCard.style.display = 'block';
-            document.getElementById('statusText').innerHTML = `📍 ${activeNuit.map(p => p.nom).join(", ")}`;
-        } else { nuitCard.style.display = 'none'; }
+ function updateUI() {
+    // --- GESTION DE LA NUIT ---
+    const activeNuit = pharmacies.filter(p => p.nuit);
+    const nuitCard = document.getElementById('nuitCard');
+    if(activeNuit.length > 0) {
+        nuitCard.style.display = 'block';
+        // Injection de la date_nuit du JSON
+        const statusText = document.getElementById('statusText');
+        statusText.innerHTML = `
+            <div style="font-size: 0.6rem; opacity: 0.7; font-weight: normal; margin-bottom: 5px;">
+                ${config.date_nuit}
+            </div>
+            <div style="color: var(--text);">📍 ${activeNuit.map(p => p.nom).join(", ")}</div>
+        `;
+    } else { nuitCard.style.display = 'none'; }
 
-        const activeDimanche = pharmacies.filter(p => p.dimanche);
-        const dimancheCard = document.getElementById('dimancheCard');
-        const badgeList = document.getElementById('dimancheBadgeList');
-        if(activeDimanche.length > 0) {
-            dimancheCard.style.display = 'block';
-            badgeList.innerHTML = activeDimanche.map(p => `
-                <div class="pharma-badge">
-                    <i class="fas fa-check-circle" style="color:var(--accent)"></i> ${p.nom}
-                </div>
-            `).join('');
-        } else { dimancheCard.style.display = 'none'; }
-    }
+    // --- GESTION DU DIMANCHE ---
+    const activeDimanche = pharmacies.filter(p => p.dimanche);
+    const dimancheCard = document.getElementById('dimancheCard');
+    const badgeList = document.getElementById('dimancheBadgeList');
+    
+    if(activeDimanche.length > 0) {
+        dimancheCard.style.display = 'block';
+        // Injection de la date_dimanche du JSON dans le titre
+        const titreDimanche = dimancheCard.querySelector('h3');
+        titreDimanche.innerHTML = `
+            <i class="fas fa-sun"></i> Gardes du Dimanche
+            <div style="font-size: 0.65rem; opacity: 0.8; font-weight: normal; margin-top: 2px;">
+                ${config.date_dimanche}
+            </div>
+        `;
+        
+        badgeList.innerHTML = activeDimanche.map(p => `
+            <div class="pharma-badge">
+                <i class="fas fa-check-circle" style="color:var(--accent)"></i> ${p.nom}
+            </div>
+        `).join('');
+    } else { dimancheCard.style.display = 'none'; }
+}
 
     // --- RECHERCHE ET WHATSAPP ---
     function handleSearch() {
@@ -272,33 +291,49 @@
         if(id === 'pharmacies-tab') renderList();
     }
 
-    function renderList() {
-        const container = document.getElementById('listContainer');
-        container.innerHTML = "";
-        const sections = [
-            { title: '🌙 Gardes de Nuit', list: pharmacies.filter(p => p.nuit), border: 'nuit-border', color: 'var(--violet-nuit)' },
-            { title: '☀️ Gardes du Dimanche', list: pharmacies.filter(p => p.dimanche), border: 'dimanche-border', color: 'var(--accent)' },
-            { title: '🏥 Toutes les Pharmacies', list: pharmacies, border: '', color: 'var(--accent)' }
-        ];
-        sections.forEach(s => {
-            if(s.list.length === 0 && s.title !== '🏥 Toutes les Pharmacies') return;
-            const h = document.createElement('div');
-            h.className = 'section-header'; h.style.color = s.color;
-            h.innerHTML = `<span>${s.title}</span>`;
-            container.appendChild(h);
-            s.list.forEach(p => {
-                const item = document.createElement('div');
-                item.className = `pharma-item ${s.border}`;
-                item.innerHTML = `
-                    <div><div style="font-weight:bold;">${p.nom}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
-                    <div style="display:flex; gap:20px; font-size:1.2rem;">
-                        <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--accent)"></i></a>
-                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom)}" target="_blank" style="color:var(--primary);"><i class="fas fa-map-marker-alt"></i></a>
-                    </div>`;
-                container.appendChild(item);
-            });
+function renderList() {
+    const container = document.getElementById('listContainer');
+    container.innerHTML = "";
+    
+    const sections = [
+        { title: '🌙 Gardes de Nuit', list: pharmacies.filter(p => p.nuit), border: 'nuit-border', color: 'var(--violet-nuit)', date: config.date_nuit },
+        { title: '☀️ Gardes du Dimanche', list: pharmacies.filter(p => p.dimanche), border: 'dimanche-border', color: 'var(--accent)', date: config.date_dimanche },
+        { title: '🏥 Toutes les Pharmacies', list: pharmacies, border: '', color: 'var(--accent)', date: null }
+    ];
+
+    sections.forEach(s => {
+        if(s.list.length === 0 && s.title !== '🏥 Toutes les Pharmacies') return;
+        
+        const h = document.createElement('div');
+        h.className = 'section-header';
+        h.style.color = s.color;
+        
+        // Affichage du titre + la date correspondante du JSON
+        h.innerHTML = `
+            <div style="display:flex; flex-direction:column;">
+                <span>${s.title}</span>
+                ${s.date ? `<span style="font-size:0.55rem; opacity:0.7; font-weight:normal; text-transform: none;">${s.date}</span>` : ''}
+            </div>
+        `;
+        
+        container.appendChild(h);
+        
+        s.list.forEach(p => {
+            const item = document.createElement('div');
+            item.className = `pharma-item ${s.border}`;
+            item.innerHTML = `
+                <div>
+                    <div style="font-weight:bold;">${p.nom}</div>
+                    <div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div>
+                </div>
+                <div style="display:flex; gap:20px; font-size:1.2rem;">
+                    <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--accent)"></i></a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank" style="color:var(--primary);"><i class="fas fa-map-marker-alt"></i></a>
+                </div>`;
+            container.appendChild(item);
         });
-    }
+    });
+}
 
     // --- THÈMES & UTILITAIRES ---
     function setTheme(t) { document.body.className = t + '-theme'; localStorage.setItem('theme', t); }
@@ -309,7 +344,7 @@
     // --- SERVICE WORKER & PWA ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.30').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.31').then(reg => {
                 console.log('SW enregistré !');
                 reg.onupdatefound = () => {
                     const worker = reg.installing;
