@@ -259,30 +259,57 @@
         } else { document.getElementById('broadcast-zone').style.display = 'none'; }
     }
 
-    function generateWA(idOpen, idClose, customText) {
-        const now = new Date();
-        const hour = now.getHours();
-        const isSunday = (now.getDay() === 0);
-        let htmlOpen = ""; let htmlClose = "";
+  function generateWA(idOpen, idClose, customText) {
+    const now = new Date();
+    const hour = now.getHours();
+    const isSunday = (now.getDay() === 0);
+    let htmlOpen = ""; 
+    let htmlFerme = ""; // Correction de la variable htmlClose/htmlFerme
 
-        pharmacies.forEach(p => {
-            const ouvert = (hour >= 22 || hour < 8 ? p.nuit : (isSunday ? p.dimanche : true));
-            const cleanNum = p.whatsapp ? p.whatsapp.replace(/\D/g, '') : "";
-            const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n${customText}`);
-            
-            const card = `
-                <div class="broadcast-item" style="${ouvert ? '' : 'opacity:0.5;'}">
-                    <span style="font-weight:bold; font-size:0.85rem;">${p.nom}</span>
-                    <div style="display:flex; gap:15px;">
-                        ${cleanNum ? `<a href="https://wa.me/${cleanNum}?text=${msg}" target="_blank"><i class="fab fa-whatsapp" style="color:var(--whatsapp); font-size:1.3rem;"></i></a>` : ''}
-                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank"><i class="fas fa-map-marker-alt" style="color:var(--primary); font-size:1.1rem;"></i></a>
-                    </div>
-                </div>`;
-            if(ouvert) htmlOpen += card; else htmlFerme += card;
-        });
-        document.getElementById(idOpen).innerHTML = htmlOpen;
-        document.getElementById(idClose).innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.5; text-align:center; margin-top:10px;">Indisponibles :</p>${htmlFerme}` : "";
+    pharmacies.forEach(p => {
+        // Logique d'ouverture
+        const ouvert = (hour >= 22 || hour < 8 ? p.nuit : (isSunday ? p.dimanche : true));
+        
+        // Nettoyage du numéro et vérification
+        const hasWA = p.whatsapp && p.whatsapp.trim() !== "";
+        const cleanNum = hasWA ? p.whatsapp.replace(/\D/g, '') : null;
+        const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n${customText}`);
+        
+        // Construction du bouton WhatsApp avec la logique de blocage
+        let waButton = "";
+        if (hasWA) {
+            // Bouton actif
+            waButton = `<a href="https://wa.me/${cleanNum}?text=${msg}" target="_blank">
+                            <i class="fab fa-whatsapp" style="color:var(--whatsapp); font-size:1.3rem;"></i>
+                        </a>`;
+        } else {
+            // Bouton grisé avec alerte
+            waButton = `<i class="fab fa-whatsapp" 
+                           style="color:grey; font-size:1.3rem; cursor:pointer; opacity:0.3;" 
+                           onclick="alert('Travaux en cours avec cette pharmacie. Veuillez vous rendre dans l\\\'onglet Pharmacie pour les appeler directement.')">
+                        </i>`;
+        }
+
+        const card = `
+            <div class="broadcast-item" style="${ouvert ? '' : 'opacity:0.5;'}">
+                <span style="font-weight:bold; font-size:0.85rem;">${p.nom}</span>
+                <div style="display:flex; gap:15px; align-items:center;">
+                    ${waButton}
+                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank">
+                        <i class="fas fa-map-marker-alt" style="color:var(--primary); font-size:1.1rem;"></i>
+                    </a>
+                </div>
+            </div>`;
+
+        if(ouvert) htmlOpen += card; else htmlFerme += card;
+    });
+
+    document.getElementById(idOpen).innerHTML = htmlOpen;
+    const closedContainer = document.getElementById(idClose);
+    if (closedContainer) {
+        closedContainer.innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.5; text-align:center; margin-top:10px;">Indisponibles actuellement :</p>${htmlFerme}` : "";
     }
+}
 
     // --- NAVIGATION ---
     function switchTab(id, el) {
@@ -344,7 +371,7 @@ function renderList() {
     // --- SERVICE WORKER & PWA ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.31').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.32').then(reg => {
                 console.log('SW enregistré !');
                 reg.onupdatefound = () => {
                     const worker = reg.installing;
