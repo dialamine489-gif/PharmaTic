@@ -207,7 +207,7 @@
             `;
         } else { nuitCard.style.display = 'none'; }
 
-        // DIMANCHE
+        // DIMANCHE - Affichage automatique sur l'onglet Recherche
         const activeDimanche = pharmacies.filter(p => isSunday && p.groupe === groupeAuj);
         const dimancheCard = document.getElementById('dimancheCard');
         const badgeList = document.getElementById('dimancheBadgeList');
@@ -237,6 +237,7 @@
         let htmlOpen = ""; let htmlFerme = "";
 
         pharmacies.forEach(p => {
+            // Logique d'ouverture dynamique
             const ouvert = (hour >= 22 || hour < 8 ? p.nuit : (isSunday ? (p.groupe === groupeAuj) : true));
             const hasWA = p.whatsapp && p.whatsapp.trim() !== "";
             const cleanNum = hasWA ? p.whatsapp.replace(/\D/g, '') : null;
@@ -317,7 +318,7 @@
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.37').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.38').then(reg => {
                 reg.onupdatefound = () => {
                     const worker = reg.installing;
                     worker.onstatechange = () => { if (worker.state === 'installed' && navigator.serviceWorker.controller) window.location.reload(); };
