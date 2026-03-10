@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pharmatic-v1.26';
+const CACHE_NAME = 'pharmatic-v1.27';
 const ASSETS = [
   './',
   './index.html',
