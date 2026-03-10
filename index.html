@@ -165,26 +165,6 @@
     <div class="ticker-wrapper" id="tickerText">✨ PharmaTic : Votre santé, notre priorité à Keur Massar ! ✨</div>
 </div>
 
-<div class="content-area">
-<div id="recherche" class="tab-content active">
-    <div id="gardeContainer">
-        <div class="card" style="border-left: 5px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1); margin-bottom: 10px;">
-            <h3 style="margin:0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-moon"></i> Garde de nuit</h3>
-            <div id="statusText" style="font-weight: bold; margin-top: 5px; font-size: 1.1rem;">Vérification...</div>
-        </div>
-
-        <div id="dimancheCard" class="card" style="display:none; border-left: 5px solid var(--rouge-dimanche); background: rgba(255, 77, 77, 0.1);">
-            <h3 style="margin:0; font-size: 0.85rem; color: var(--rouge-dimanche);"><i class="fas fa-sun"></i> Garde du Dimanche</h3>
-            <div id="dimancheText" style="font-weight: bold; margin-top: 5px; font-size: 1.1rem;"></div>
-        </div>
-    </div>
-    
-    </div>
-
-    <div id="pharmacies-tab" class="tab-content">
-        <div id="listContainer"></div>
-    </div>
-
 <div id="recherche" class="tab-content active">
     
     <div id="gardeContainer">
@@ -430,7 +410,7 @@ function generateWA(idOpen, idClose, customText) {
 
         window.addEventListener('load', () => {
             // ON UTILISE LA VERSION 1.6 PARTOUT
-            navigator.serviceWorker.register('sw.js?v=1.24').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.25').then(reg => {
                 
                 // Si une mise à jour attend déjà
                 if (reg.waiting) {
