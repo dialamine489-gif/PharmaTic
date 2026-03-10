@@ -85,6 +85,17 @@
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 12px 0 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: grey; font-size: 0.7rem; text-decoration: none; cursor: pointer; gap: 4px; }
         .nav-item.active { color: var(--accent); }
+        .pharma-badge-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Crée deux colonnes égales */
+    gap: 10px;
+    margin-top: 10px;
+}
+.pharma-badge {
+    justify-content: flex-start; /* Aligne l'icône et le texte au début */
+    padding: 10px;
+    width: 100%; /* Prend toute la place de la colonne */
+}
     </style>
 </head>
 <body class="dark-theme">
@@ -318,7 +329,7 @@
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.38').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.39').then(reg => {
                 reg.onupdatefound = () => {
                     const worker = reg.installing;
                     worker.onstatechange = () => { if (worker.state === 'installed' && navigator.serviceWorker.controller) window.location.reload(); };
