@@ -143,33 +143,19 @@
 </div>
 
 <div class="content-area">
-    <div id="recherche" class="tab-content active">
-        <div class="card" style="border-left: 5px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1);">
+<div id="recherche" class="tab-content active">
+    <div id="gardeContainer">
+        <div class="card" style="border-left: 5px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.1); margin-bottom: 10px;">
             <h3 style="margin:0; font-size: 0.85rem; color: var(--violet-nuit);"><i class="fas fa-moon"></i> Garde de nuit</h3>
             <div id="statusText" style="font-weight: bold; margin-top: 5px; font-size: 1.1rem;">Vérification...</div>
         </div>
 
-        <div class="card">
-            <h3 style="margin-top:0; font-size: 0.9rem;">Chercher un médicament</h3>
-            <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Doliprane, Spasfon..." style="width:100%; padding:14px; border-radius:12px; border:none; background:var(--input-bg); color:inherit; outline:none; border: 1px solid rgba(0,255,136,0.2);">
-            <div id="broadcast-zone" style="display:none; margin-top:15px;">
-                <button class="close-btn" onclick="resetSearch()"><i class="fas fa-times"></i></button>
-                <div id="medLabel" style="color: var(--accent); font-weight: bold; text-align:center; font-size: 1.2rem; margin-bottom: 10px;"></div>
-                <div id="pharmaciesOuvertesMed"></div>
-                <div id="pharmaciesFermeesMed" style="margin-top: 15px;"></div>
-            </div>
+        <div id="dimancheCard" class="card" style="display:none; border-left: 5px solid var(--rouge-dimanche); background: rgba(255, 77, 77, 0.1);">
+            <h3 style="margin:0; font-size: 0.85rem; color: var(--rouge-dimanche);"><i class="fas fa-sun"></i> Garde du Dimanche</h3>
+            <div id="dimancheText" style="font-weight: bold; margin-top: 5px; font-size: 1.1rem;"></div>
         </div>
-
-        <div class="card">
-            <h3 style="margin-top:0; font-size: 0.9rem;">Par ordonnance</h3>
-            <button onclick="document.getElementById('fileInput').click()" style="width:100%; padding:18px; background:none; border:1.5px dashed var(--accent); border-radius:12px; color:inherit; cursor:pointer;"><i class="fas fa-camera"></i> PRENDRE PHOTO ORDONNANCE</button>
-            <div id="ordo-zone" style="display:none; margin-top:15px;">
-                <button class="close-btn" onclick="resetOrdo()"><i class="fas fa-times"></i></button>
-                <p style="font-size: 0.8rem; color: var(--accent); font-weight: bold; text-align:center;">📸 PHOTO PRÊTE</p>
-                <div id="pharmaciesOuvertesOrdo"></div>
-                <div id="pharmaciesFermeesOrdo" style="margin-top: 15px;"></div>
-            </div>
-        </div>
+    </div>
+    
     </div>
 
     <div id="pharmacies-tab" class="tab-content">
@@ -231,12 +217,33 @@ async function loadData() {
         }
     }
 
-    function updateUI() {
-        const activeGarde = pharmacies.filter(p => p.nuit);
-        if(activeGarde.length > 0) {
-            document.getElementById('statusText').innerText = "📍 " + activeGarde[0].nom;
-        }
+  function updateUI() {
+    // 1. Gestion Garde de Nuit
+    const activeGardeNuit = pharmacies.filter(p => p.nuit);
+    const statusText = document.getElementById('statusText');
+    if(activeGardeNuit.length > 0) {
+        statusText.innerText = "📍 " + activeGardeNuit[0].nom;
+    } else {
+        statusText.innerText = "Aucune garde de nuit listée";
     }
+
+    // 2. Gestion Garde du Dimanche
+    const activeGardeDimanche = pharmacies.filter(p => p.dimanche);
+    const dimancheCard = document.getElementById('dimancheCard');
+    const dimancheText = document.getElementById('dimancheText');
+    
+    const now = new Date();
+    const isSunday = (now.getDay() === 0);
+
+    // On affiche le bloc si on est dimanche OU s'il y a des pharmacies de garde dimanche
+    if(activeGardeDimanche.length > 0) {
+        dimancheCard.style.display = 'block';
+        // On affiche les noms séparés par une virgule s'il y en a plusieurs
+        dimancheText.innerText = "☀️ " + activeGardeDimanche.map(p => p.nom).join(", ");
+    } else {
+        dimancheCard.style.display = 'none';
+    }
+}
 
     function handleSearch() {
         const val = document.getElementById('searchInput').value;
@@ -379,7 +386,7 @@ function generateWA(idOpen, idClose, customText) {
 
         window.addEventListener('load', () => {
             // ON UTILISE LA VERSION 1.6 PARTOUT
-            navigator.serviceWorker.register('sw.js?v=1.21').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.22').then(reg => {
                 
                 // Si une mise à jour attend déjà
                 if (reg.waiting) {
