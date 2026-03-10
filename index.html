@@ -335,18 +335,7 @@ function switchTab(id, el) {
 
 function renderList() {
     const container = document.getElementById('listContainer');
-    // À mettre juste avant le "item.innerHTML"
-const star = p.partenaire ? '<i class="fas fa-star" style="color: #ffca28; font-size: 0.7rem; margin-left: 5px;"></i>' : '';
-
-item.innerHTML = `
-    <div>
-        <div style="font-weight:bold; display: flex; align-items: center;">
-            ${p.nom} ${star} 
-        </div>
-        <div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div>
-    </div>
-    ... reste du code ...
-`;
+    if (!container) return;
     container.innerHTML = "";
     
     const sections = [
@@ -362,27 +351,33 @@ item.innerHTML = `
         h.className = 'section-header';
         h.style.color = s.color;
         
-        // Affichage du titre + la date correspondante du JSON
         h.innerHTML = `
             <div style="display:flex; flex-direction:column;">
                 <span>${s.title}</span>
                 ${s.date ? `<span style="font-size:0.55rem; opacity:0.7; font-weight:normal; text-transform: none;">${s.date}</span>` : ''}
             </div>
         `;
-        
         container.appendChild(h);
         
         s.list.forEach(p => {
             const item = document.createElement('div');
             item.className = `pharma-item ${s.border}`;
+
+            // LOGIQUE DE L'ÉTOILE (Placée au bon endroit, dans la boucle)
+            const star = p.partenaire ? '<i class="fas fa-star" style="color: #ffca28; font-size: 0.7rem; margin-left: 5px;"></i>' : '';
+
             item.innerHTML = `
                 <div>
-                    <div style="font-weight:bold;">${p.nom}</div>
+                    <div style="font-weight:bold; display: flex; align-items: center;">
+                        ${p.nom} ${star}
+                    </div>
                     <div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div>
                 </div>
                 <div style="display:flex; gap:20px; font-size:1.2rem;">
                     <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--accent)"></i></a>
-                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank" style="color:var(--primary);"><i class="fas fa-map-marker-alt"></i></a>
+                    <a href="https://www.google.com/maps/search/${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank" style="color:var(--primary);">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </a>
                 </div>`;
             container.appendChild(item);
         });
@@ -398,7 +393,7 @@ item.innerHTML = `
     // --- SERVICE WORKER & PWA ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.33').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.34').then(reg => {
                 console.log('SW enregistré !');
                 reg.onupdatefound = () => {
                     const worker = reg.installing;
