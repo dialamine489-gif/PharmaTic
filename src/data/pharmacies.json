@@ -365,6 +365,34 @@
       "lng": -17.2950,
       "partenaire": false,
       "nuit": false
+    },
+     {
+      "id": 27,
+      "nom": "Pharmacie Ya Aïda Prefecture",
+      "quartier": "Unité 05",
+      "adresse": "Keur massar Unité 05, en face prefecture",
+      "telephone": "330000000",
+      "whatsapp": "",
+      "ouverture": "08:00",
+      "fermeture": "22:00",
+      "lat": 14.7780123,
+      "lng": -17.3198355,
+      "partenaire": false,
+      "nuit": false
+    },
+     {
+      "id": 28,
+      "nom": "Pharmacie Djimby",
+      "quartier": "Mairie keur massar",
+      "adresse": "Keur massar village",
+      "telephone": "338232204",
+      "whatsapp": "",
+      "ouverture": "08:00",
+      "fermeture": "22:00",
+      "lat": 14.7817777,
+      "lng": -17.3142767,
+      "partenaire": false,
+      "nuit": false
     }
   ]
 }
