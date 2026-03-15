@@ -31,7 +31,7 @@
       "lat": 14.7850,
       "lng": -17.3100,
       "partenaire": false,
-      "nuit": true,
+      "nuit": false,
       "groupe": 0
     },
     {
@@ -91,7 +91,7 @@
       "lat": 14.7726,
       "lng": -17.3257,
       "partenaire": false,
-      "nuit": false,
+      "nuit": true,
       "groupe": 1
     },
     {
