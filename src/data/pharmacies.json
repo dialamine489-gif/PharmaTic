@@ -1,6 +1,6 @@
 {
   "config": {
-    "date_nuit": "Du 14 Mars au 20 Mars 2026",
+    "date_nuit": "Du 21 Mars au 27 Mars 2026",
     "date_dimanche": "Automatique"
   },
   "pharmacies": [
@@ -91,7 +91,7 @@
       "lat": 14.7726,
       "lng": -17.3257,
       "partenaire": false,
-      "nuit": true,
+      "nuit": false,
       "groupe": 1
     },
     {
@@ -151,7 +151,7 @@
       "lat": 14.7726,
       "lng": -17.3170,
       "partenaire": false,
-      "nuit": false,
+      "nuit": true,
       "groupe": 2
     },
     {
