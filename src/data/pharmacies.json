@@ -1,75 +1,15 @@
 {
   "config": {
-    "date_nuit": "Du 28 Mars au 03 Avril 2026",
+    "date_nuit": "Semaine du 04 au 10 Avril 2026",
     "date_dimanche": "Automatique"
   },
   "pharmacies": [
-    {
-      "id": 1,
-      "nom": "Pharmacie Dial Diop",
-      "quartier": "Unité 5",
-      "adresse": "Unité 5, Parcelles Assaainies De Malika",
-      "telephone": "+221338711136",
-      "whatsapp": "221776779440",
-      "ouverture": "08:00",
-      "fermeture": "23:00",
-      "lat": 14.7792,
-      "lng": -17.3216,
-      "partenaire": true,
-      "nuit": false,
-      "groupe": 2
-    },
-    {
-      "id": 3,
-      "nom": "Pharmacie Mingue",
-      "quartier": "Fass",
-      "adresse": "Keur Massar village quartier Fass",
-      "telephone": "338780358",
-      "whatsapp": "",
-      "ouverture": "08:00",
-      "fermeture": "23:00",
-      "lat": 14.7850,
-      "lng": -17.3100,
-      "partenaire": false,
-      "nuit": false,
-      "groupe": 4
-    },
-    {
-      "id": 6,
-      "nom": "Pharmacie DIOMA",
-      "quartier": "Aïnoumadi",
-      "adresse": "Cité Aïnoumadi près Marché",
-      "telephone": "338377575",
-      "whatsapp": "",
-      "ouverture": "08:00",
-      "fermeture": "22:00",
-      "lat": 14.7870,
-      "lng": -17.3040,
-      "partenaire": false,
-      "nuit": false,
-      "groupe": 1
-    },
-    {
-      "id": 18,
-      "nom": "Pharmacie Pascale",
-      "quartier": "Unité 15",
-      "adresse": "Unité 15, Arret 54",
-      "telephone": "338377713",
-      "whatsapp": "221776052813",
-      "ouverture": "08:00",
-      "fermeture": "22:00",
-      "lat": 14.7800,
-      "lng": -17.3300,
-      "partenaire": false,
-      "nuit": false,
-      "groupe": 3
-    },
     {
       "id": 5,
       "nom": "Pharmacie Birane LY",
       "quartier": "Aïnoumady",
       "adresse": "Cité Aïnoumady lot n°4",
-      "telephone": "221788087878",
+      "telephone": "788087878",
       "whatsapp": "221788087878",
       "ouverture": "08:30",
       "fermeture": "22:30",
@@ -92,14 +32,14 @@
       "lng": -17.3257,
       "partenaire": false,
       "nuit": false,
-      "groupe": 2
+      "groupe": 1
     },
     {
       "id": 22,
       "nom": "YAYE FATOUMA",
       "quartier": "Unité 17",
       "adresse": "Parcelles assainies, Unité 17 Villa 76",
-      "telephone": "330000000",
+      "telephone": "338370000",
       "whatsapp": "",
       "ouverture": "08:00",
       "fermeture": "22:00",
@@ -107,14 +47,14 @@
       "lng": -17.3350,
       "partenaire": false,
       "nuit": false,
-      "groupe": 3
+      "groupe": 1
     },
     {
       "id": 10,
-      "nom": "Pharmacie Elimane Aly Dramane (PA)",
+      "nom": "Pharmacie Elimane Aly Dramane",
       "quartier": "Unité 3",
       "adresse": "Unité 3, n°156, Parcelles Assainies de Malika",
-      "telephone": "330000000",
+      "telephone": "338000000",
       "whatsapp": "",
       "ouverture": "08:00",
       "fermeture": "22:30",
@@ -122,7 +62,67 @@
       "lng": -17.3050,
       "partenaire": false,
       "nuit": false,
-      "groupe": 4
+      "groupe": 1
+    },
+    {
+      "id": 6,
+      "nom": "Pharmacie DIOMA",
+      "quartier": "Aïnoumadi",
+      "adresse": "Cité Aïnoumadi près Marché",
+      "telephone": "338377575",
+      "whatsapp": "",
+      "ouverture": "08:00",
+      "fermeture": "22:00",
+      "lat": 14.7870,
+      "lng": -17.3040,
+      "partenaire": false,
+      "nuit": false,
+      "groupe": 2
+    },
+    {
+      "id": 1,
+      "nom": "Pharmacie Dial Diop",
+      "quartier": "Unité 5",
+      "adresse": "Unité 5, Parcelles Assaainies De Malika",
+      "telephone": "338711136",
+      "whatsapp": "221776779440",
+      "ouverture": "08:00",
+      "fermeture": "23:00",
+      "lat": 14.7792,
+      "lng": -17.3216,
+      "partenaire": true,
+      "nuit": false,
+      "groupe": 2
+    },
+    {
+      "id": 18,
+      "nom": "Pharmacie Pascale",
+      "quartier": "Unité 15",
+      "adresse": "Unité 15, Arret 54",
+      "telephone": "338377713",
+      "whatsapp": "221776052813",
+      "ouverture": "08:00",
+      "fermeture": "22:00",
+      "lat": 14.7800,
+      "lng": -17.3300,
+      "partenaire": false,
+      "nuit": true,
+      "groupe": 2
+    },
+    {
+      "id": 3,
+      "nom": "Pharmacie Mingue",
+      "quartier": "Fass",
+      "adresse": "Keur Massar village quartier Fass",
+      "telephone": "338780358",
+      "whatsapp": "",
+      "ouverture": "08:00",
+      "fermeture": "23:00",
+      "lat": 14.7850,
+      "lng": -17.3100,
+      "partenaire": false,
+      "nuit": false,
+      "groupe": 2
     },
     {
       "id": 9,
@@ -137,7 +137,7 @@
       "lng": -17.3100,
       "partenaire": false,
       "nuit": false,
-      "groupe": 1
+      "groupe": 3
     },
     {
       "id": 8,
@@ -152,14 +152,14 @@
       "lng": -17.3170,
       "partenaire": false,
       "nuit": false,
-      "groupe": 2
+      "groupe": 3
     },
     {
       "id": 14,
       "nom": "Pharmacie Seydi M. Moustapha SY",
       "quartier": "Unité 14",
       "adresse": "Parcelles Assainies, Unité 14",
-      "telephone": "221764484869",
+      "telephone": "764484869",
       "whatsapp": "221764484869",
       "ouverture": "08:00",
       "fermeture": "23:00",
@@ -182,66 +182,6 @@
       "lng": -17.3148,
       "partenaire": false,
       "nuit": false,
-      "groupe": 4
-    },
-    {
-      "id": 4,
-      "nom": "Pharmacie Pape Djibril",
-      "quartier": "Mame Dior",
-      "adresse": "Cité Mame Dior, à coté de la maternité",
-      "telephone": "338000000",
-      "whatsapp": "",
-      "ouverture": "08:00",
-      "fermeture": "23:00",
-      "lat": 14.7880,
-      "lng": -17.3120,
-      "partenaire": false,
-      "nuit": false,
-      "groupe": 3
-    },
-    {
-      "id": 11,
-      "nom": "Pharmacie Ainoumadi",
-      "quartier": "Cité Ainoumadi",
-      "adresse": "1048 Cité Ainoumadi",
-      "telephone": "338785108",
-      "whatsapp": "",
-      "ouverture": "08:00",
-      "fermeture": "22:00",
-      "lat": 14.7878,
-      "lng": -17.3058,
-      "partenaire": false,
-      "nuit": true,
-      "groupe": 3
-    },
-    {
-      "id": 12,
-      "nom": "Pharmacie Camille basse",
-      "quartier": "Camille Basse",
-      "adresse": "Cité Edouard Camille Basse, villa n°204",
-      "telephone": "330000000",
-      "whatsapp": "",
-      "ouverture": "08:00",
-      "fermeture": "22:00",
-      "lat": 14.7900,
-      "lng": -17.3150,
-      "partenaire": false,
-      "nuit": false,
-      "groupe": 3
-    },
-    {
-      "id": 13,
-      "nom": "Pharmacie EL abdoul Boutou Kane",
-      "quartier": "Arafat II",
-      "adresse": "Arafat II, quartier n°427",
-      "telephone": "330000000",
-      "whatsapp": "",
-      "ouverture": "08:00",
-      "fermeture": "22:00",
-      "lat": 14.7700,
-      "lng": -17.3000,
-      "partenaire": false,
-      "nuit": false,
       "groupe": 3
     },
     {
@@ -257,52 +197,23 @@
       "lng": -17.3260,
       "partenaire": false,
       "nuit": false,
-      "groupe": 1
+      "groupe": 0
     },
     {
       "id": 16,
       "nom": "Pharmacie Marie Essenteine Manga",
       "quartier": "Unité 20",
-      "adresse": "Parcelles assainies, Unité 20, parcelle n548",
+      "adresse": "Parcelles assainies, Unité 20",
       "telephone": "330000000",
       "whatsapp": "",
-      "ouverture": "00:00",
-      "fermeture": "23:59",
+      "ouverture": "08:00",
+      "fermeture": "22:00",
       "lat": 14.7650,
       "lng": -17.3080,
       "partenaire": false,
       "nuit": false,
-      "groupe": 1
-    },
-    {
-      "id": 26,
-      "nom": "Pharmacie NA SAGAR NIANDING",
-      "quartier": "Jaxaay 2",
-      "adresse": "jaxaay 2, unite 17A Parcelle 511",
-      "telephone": "330000000",
-      "whatsapp": "",
-      "ouverture": "08:00",
-      "fermeture": "22:00",
-      "lat": 14.7580,
-      "lng": -17.2950,
-      "partenaire": false,
-      "nuit": false,
-      "groupe": 2
-    },
-    {
-      "id": 28,
-      "nom": "Pharmacie Djimby",
-      "quartier": "Mairie keur massar",
-      "adresse": "Keur massar village",
-      "telephone": "338232204",
-      "whatsapp": "",
-      "ouverture": "08:00",
-      "fermeture": "22:00",
-      "lat": 14.7817,
-      "lng": -17.3142,
-      "partenaire": false,
-      "nuit": false,
-      "groupe": 2
+      "groupe": 0
     }
   ]
 }
+
