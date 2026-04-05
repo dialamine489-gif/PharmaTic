@@ -17,7 +17,7 @@
       "lng": -17.3216,
       "partenaire": true,
       "nuit": false,
-      "groupe": 0
+      "groupe": 2
     },
     {
       "id": 3,
@@ -32,7 +32,7 @@
       "lng": -17.3100,
       "partenaire": false,
       "nuit": false,
-      "groupe": 0
+      "groupe": 4
     },
     {
       "id": 6,
@@ -47,7 +47,7 @@
       "lng": -17.3040,
       "partenaire": false,
       "nuit": false,
-      "groupe": 0
+      "groupe": 1
     },
     {
       "id": 18,
@@ -62,7 +62,7 @@
       "lng": -17.3300,
       "partenaire": false,
       "nuit": false,
-      "groupe": 0
+      "groupe": 3
     },
     {
       "id": 5,
@@ -92,7 +92,7 @@
       "lng": -17.3257,
       "partenaire": false,
       "nuit": false,
-      "groupe": 1
+      "groupe": 2
     },
     {
       "id": 22,
@@ -107,7 +107,7 @@
       "lng": -17.3350,
       "partenaire": false,
       "nuit": false,
-      "groupe": 1
+      "groupe": 3
     },
     {
       "id": 10,
@@ -122,7 +122,7 @@
       "lng": -17.3050,
       "partenaire": false,
       "nuit": false,
-      "groupe": 1
+      "groupe": 4
     },
     {
       "id": 9,
@@ -137,7 +137,7 @@
       "lng": -17.3100,
       "partenaire": false,
       "nuit": false,
-      "groupe": 2
+      "groupe": 1
     },
     {
       "id": 8,
@@ -167,7 +167,7 @@
       "lng": -17.3150,
       "partenaire": false,
       "nuit": false,
-      "groupe": 2
+      "groupe": 3
     },
     {
       "id": 7,
@@ -182,7 +182,7 @@
       "lng": -17.3148,
       "partenaire": false,
       "nuit": false,
-      "groupe": 2
+      "groupe": 4
     },
     {
       "id": 4,
