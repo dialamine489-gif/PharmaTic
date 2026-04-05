@@ -184,25 +184,23 @@
 
     // --- LOGIQUE AUTOMATISATION DIMANCHE ---
     function getGroupeDimanche() {
-    // On définit aujourd'hui (29 Mars 2026) comme le point de départ du Groupe 0
-    const reference = new Date(2026, 2, 29, 12, 0, 0); 
+    // Référence fixée au Dimanche 05 Avril 2026 (Groupe 1)
+    const reference = new Date("2026-04-05"); 
     const aujourdhui = new Date();
     
-    // On normalise les dates pour ignorer les heures/minutes
-    const aujourdhuiMidi = new Date(aujourdhui.getFullYear(), aujourdhui.getMonth(), aujourdhui.getDate(), 12, 0, 0);
+    aujourdhui.setHours(0,0,0,0);
+    reference.setHours(0,0,0,0);
+
+    const diff = aujourdhui - reference;
+    const semaines = Math.floor(diff / (7 * 24 * 60 * 60 * 1000));
     
-    const diff = aujourdhuiMidi - reference;
-    const uneSemaine = 7 * 24 * 60 * 60 * 1000;
-    
-    // Calcul du nombre de semaines d'écart
-    const semaines = Math.round(diff / uneSemaine);
-    
-    // On force le résultat sur un cycle de 4 groupes (0, 1, 2, 3)
-    let groupeActuel = semaines % 4;
-    if (groupeActuel < 0) groupeActuel += 4;
+    // On tourne sur 3 groupes d'après l'affiche
+    let groupeActuel = (semaines % 3) + 1;
+    if (groupeActuel <= 0) groupeActuel += 3; 
     
     return groupeActuel;
 }
+
 
 
 
