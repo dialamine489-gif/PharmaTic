@@ -1,6 +1,6 @@
 {
   "config": {
-    "date_nuit": "Semaine du 04 au 10 Avril 2026",
+    "date_nuit": "Semaine du 11 au 17 Avril 2026",
     "date_dimanche": "Automatique"
   },
   "pharmacies": [
@@ -76,7 +76,7 @@
       "lat": 14.7870,
       "lng": -17.3040,
       "partenaire": false,
-      "nuit": false,
+      "nuit": true,
       "groupe": 2
     },
     {
@@ -106,7 +106,7 @@
       "lat": 14.7800,
       "lng": -17.3300,
       "partenaire": false,
-      "nuit": true,
+      "nuit": false,
       "groupe": 2
     },
     {
