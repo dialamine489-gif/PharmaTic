@@ -340,7 +340,7 @@
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.52').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.53').then(reg => {
                 reg.onupdatefound = () => {
                     const worker = reg.installing;
                     worker.onstatechange = () => { if (worker.state === 'installed' && navigator.serviceWorker.controller) window.location.reload(); };
