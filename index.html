@@ -184,27 +184,27 @@
 
     // --- LOGIQUE AUTOMATISATION DIMANCHE ---
     function getGroupeDimanche() {
-    // Référence fixe : Dimanche 05 Avril 2026 = Groupe 2
+    // Référence : Dimanche 05 Avril 2026
     const reference = new Date("2026-04-05T00:00:00"); 
     const aujourdhui = new Date();
-    aujourdhui.setHours(0, 0, 0, 0);
+    
+    // On force l'heure à minuit pour éviter les bugs de calcul en journée
+    aujourdhui.setHours(0,0,0,0);
+    reference.setHours(0,0,0,0);
 
-    // Calcul précis du nombre de semaines écoulées
     const msParSemaine = 7 * 24 * 60 * 60 * 1000;
     const diff = aujourdhui.getTime() - reference.getTime();
-    
-    // On utilise Math.floor pour être sûr de rester sur le même groupe toute la journée
     const semaines = Math.floor(diff / msParSemaine);
     
-    let groupeBase = 2; // Groupe au 05 Avril
-    // Formule de rotation : (Index de départ + semaines écoulées) % Nombre de groupes
+    // AJUSTEMENT ICI : 
+    // Si tu veux passer au groupe suivant (celui de la Pharmacie DIOMA par ex),
+    // on change la base. Teste avec groupeBase = 3 :
+    let groupeBase = 3; 
     let groupeActuel = ((groupeBase - 1 + semaines) % 3) + 1;
-    
-    // Sécurité pour les nombres négatifs (si consultation avant la date de référence)
-    if (groupeActuel <= 0) groupeActuel += 3; 
     
     return groupeActuel;
 }
+
 
 
 
