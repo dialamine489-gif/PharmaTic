@@ -184,11 +184,10 @@
 
     // --- LOGIQUE AUTOMATISATION DIMANCHE ---
     function getGroupeDimanche() {
-    // Référence : Dimanche 05 Avril 2026
-    const reference = new Date("2026-04-05T00:00:00"); 
+    // Nouvelle référence basée sur ton document : 19 Avril 2026 = Groupe 2
+    const reference = new Date("2026-04-19T00:00:00"); 
     const aujourdhui = new Date();
     
-    // On force l'heure à minuit pour éviter les bugs de calcul en journée
     aujourdhui.setHours(0,0,0,0);
     reference.setHours(0,0,0,0);
 
@@ -196,15 +195,16 @@
     const diff = aujourdhui.getTime() - reference.getTime();
     const semaines = Math.floor(diff / msParSemaine);
     
-    // AJUSTEMENT ICI : 
-    // Si tu veux passer au groupe suivant (celui de la Pharmacie DIOMA par ex),
-    // on change la base. Teste avec groupeBase = 3 :
-    let groupeBase = 3; 
+    // Au 19 Avril (semaines = 0), on veut le Groupe 2.
+    // Formule : ((2 - 1 + semaines) % 3) + 1
+    let groupeBase = 2; 
     let groupeActuel = ((groupeBase - 1 + semaines) % 3) + 1;
+    
+    // Gestion des semaines passées ou futures
+    if (groupeActuel <= 0) groupeActuel += 3;
     
     return groupeActuel;
 }
-
 
 
 
@@ -346,7 +346,7 @@
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.57').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.58').then(reg => {
                 reg.onupdatefound = () => {
                     const worker = reg.installing;
                     worker.onstatechange = () => { if (worker.state === 'installed' && navigator.serviceWorker.controller) window.location.reload(); };
