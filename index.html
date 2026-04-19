@@ -184,23 +184,23 @@
 
     // --- LOGIQUE AUTOMATISATION DIMANCHE ---
     function getGroupeDimanche() {
-    // Référence : Dimanche 05 Avril 2026 = Groupe 2 (selon ton ancienne config)
-    // Donc Dimanche 12 Avril 2026 doit être = Groupe 3 (ou 1 selon ton souhait)
-    const reference = new Date("2026-04-05"); 
+    // Référence fixe : Dimanche 05 Avril 2026 = Groupe 2
+    const reference = new Date("2026-04-05T00:00:00"); 
     const aujourdhui = new Date();
-    
-    // On remet les compteurs à zéro pour comparer uniquement les jours
-    aujourdhui.setHours(0,0,0,0);
-    reference.setHours(0,0,0,0);
+    aujourdhui.setHours(0, 0, 0, 0);
 
-    const diff = aujourdhui - reference;
-    const semaines = Math.round(diff / (7 * 24 * 60 * 60 * 1000));
+    // Calcul précis du nombre de semaines écoulées
+    const msParSemaine = 7 * 24 * 60 * 60 * 1000;
+    const diff = aujourdhui.getTime() - reference.getTime();
     
-    // Rotation sur 3 groupes (1, 2, 3)
-    // Si le 5 Avril était Groupe 2, on ajoute 'semaines' à l'index du groupe
-    let groupeBase = 2; // Le groupe qui était de garde à la date de référence
+    // On utilise Math.floor pour être sûr de rester sur le même groupe toute la journée
+    const semaines = Math.floor(diff / msParSemaine);
+    
+    let groupeBase = 2; // Groupe au 05 Avril
+    // Formule de rotation : (Index de départ + semaines écoulées) % Nombre de groupes
     let groupeActuel = ((groupeBase - 1 + semaines) % 3) + 1;
     
+    // Sécurité pour les nombres négatifs (si consultation avant la date de référence)
     if (groupeActuel <= 0) groupeActuel += 3; 
     
     return groupeActuel;
@@ -346,7 +346,7 @@
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.55').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=1.56').then(reg => {
                 reg.onupdatefound = () => {
                     const worker = reg.installing;
                     worker.onstatechange = () => { if (worker.state === 'installed' && navigator.serviceWorker.controller) window.location.reload(); };
