@@ -102,6 +102,14 @@ body {
     overflow: hidden;
     height: 100vh;
 }
+#search-menu {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
     </style>
 </head>
@@ -122,11 +130,28 @@ body {
 </div>
 
 <div class="content-area">
-    <div id="recherche" class="tab-content active">
-        <div id="nuitCard" class="card" style="display:none;">
-            <h3 style="margin:0; font-size: 0.8rem; color: var(--violet-nuit); text-transform: uppercase;"><i class="fas fa-moon"></i> Garde de nuit</h3>
-            <div id="statusText" style="font-weight: bold; margin-top: 10px; font-size: 1.1rem;"></div>
-        </div>
+ <div class="section-header">Services</div>
+
+<div class="card" id="search-trigger" onclick="toggleSearchMenu()" style="display: flex; align-items: center; justify-content: center; gap: 15px; cursor: pointer; border: 2px solid var(--accent); padding: 15px;">
+    <i class="fas fa-plus-circle" style="font-size: 1.5rem; color: var(--accent);"></i>
+    <span style="font-weight: bold; letter-spacing: 1px;">BESOIN D'UN MÉDICAMENT ?</span>
+</div>
+
+<div id="search-menu" class="card" style="display: none; margin-top: 10px; border-top: 3px solid var(--accent);">
+    <p style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 10px; text-align: center;">Choisissez une méthode :</p>
+    
+    <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Tapez le nom ici...">
+    
+    <button class="btn-main-action" onclick="document.getElementById('fileInput').click()" style="margin-top: 10px;">
+        <i class="fas fa-camera"></i> SCANNER UNE ORDONNANCE
+    </button>
+    
+    <div id="broadcast-zone" style="display:none; margin-top:15px;">
+        <div id="medLabel" style="color: var(--accent); font-weight: bold; text-align:center; margin-bottom: 10px;"></div>
+        <div id="pharmaciesOuvertesMed"></div>
+    </div>
+</div>
+
 
         <div id="dimancheCard" class="card" style="display:none;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -300,6 +325,23 @@ body {
     window.onload = () => { loadData(); setTheme(localStorage.getItem('pharma-theme') || 'dark'); };
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
     document.getElementById('pwaBtn').onclick = async () => { if (deferredPrompt) deferredPrompt.prompt(); else alert("Utilisez 'Ajouter à l'écran d'accueil' dans votre navigateur."); };
+function toggleSearchMenu() {
+    const menu = document.getElementById('search-menu');
+    const trigger = document.getElementById('search-trigger');
+    
+    if (menu.style.display === 'none' || menu.style.display === '') {
+        menu.style.display = 'block';
+        // On change l'icône en "moins" quand c'est ouvert
+        trigger.querySelector('i').className = 'fas fa-minus-circle';
+        // On fait défiler doucement pour bien voir le menu ouvert
+        menu.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+        menu.style.display = 'none';
+        // On remet l'icône "plus"
+        trigger.querySelector('i').className = 'fas fa-plus-circle';
+    }
+}
+
 </script>
 </body>
 </html>
