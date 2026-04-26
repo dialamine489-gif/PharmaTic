@@ -184,27 +184,39 @@
 
     // --- LOGIQUE AUTOMATISATION DIMANCHE ---
     function getGroupeDimanche() {
-    // Nouvelle référence basée sur ton document : 19 Avril 2026 = Groupe 2
-    const reference = new Date("2026-04-19T00:00:00"); 
     const aujourdhui = new Date();
-    
-    aujourdhui.setHours(0,0,0,0);
-    reference.setHours(0,0,0,0);
+    // Formatage rigoureux JJ/MM/AA
+    const jour = String(aujourdhui.getDate()).padStart(2, '0');
+    const mois = String(aujourdhui.getMonth() + 1).padStart(2, '0');
+    const annee = aujourdhui.getFullYear().toString().slice(-2);
+    const dateCle = `${jour}/${mois}/${annee}`;
 
-    const msParSemaine = 7 * 24 * 60 * 60 * 1000;
-    const diff = aujourdhui.getTime() - reference.getTime();
-    const semaines = Math.floor(diff / msParSemaine);
-    
-    // Au 19 Avril (semaines = 0), on veut le Groupe 2.
-    // Formule : ((2 - 1 + semaines) % 3) + 1
-    let groupeBase = 2; 
-    let groupeActuel = ((groupeBase - 1 + semaines) % 3) + 1;
-    
-    // Gestion des semaines passées ou futures
-    if (groupeActuel <= 0) groupeActuel += 3;
-    
-    return groupeActuel;
+    // CALENDRIER COMPLET 2026 (Basé sur ton tableau secteur Keur Massar)
+    const planning = {
+        // AVRIL
+        "05/04/26": 2, "12/04/26": 3, "19/04/26": 2, "26/04/26": 1,
+        // MAI
+        "03/05/26": 3, "10/05/26": 2, "17/05/26": 1, "24/05/26": 3, "31/05/26": 2,
+        // JUIN
+        "07/06/26": 1, "14/06/26": 3, "21/06/26": 2, "28/06/26": 1,
+        // JUILLET
+        "05/07/26": 3, "12/07/26": 2, "19/07/26": 1, "26/07/26": 3,
+        // AOÛT
+        "02/08/26": 2, "09/08/26": 1, "16/08/26": 3, "23/08/26": 2, "30/08/26": 1,
+        // SEPTEMBRE
+        "06/09/26": 3, "13/09/26": 2, "20/09/26": 1, "27/09/26": 3,
+        // OCTOBRE
+        "04/10/26": 2, "11/10/26": 1, "18/10/26": 3, "25/10/26": 2,
+        // NOVEMBRE
+        "01/11/26": 1, "08/11/26": 3, "15/11/26": 2, "22/11/26": 1, "29/11/26": 3,
+        // DÉCEMBRE
+        "06/12/26": 2, "13/12/26": 1, "20/12/26": 3, "27/12/26": 2
+    };
+
+    // Renvoie le groupe correspondant ou 0 si ce n'est pas un dimanche listé
+    return planning[dateCle] || 0;
 }
+
 
 
 
