@@ -7,14 +7,14 @@
     <title>PharmaTic - Keur Massar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* --- CONFIGURATION DES ÉCRANS LARGES (PC/TABLETTE) --- */
+        /* --- CONFIGURATION ÉCRANS LARGES --- */
         @media (min-width: 768px) {
             body {
                 max-width: 450px;
                 margin: 0 auto;
                 border-left: 1px solid rgba(0,0,0,0.1);
                 border-right: 1px solid rgba(0,0,0,0.1);
-                box-shadow: 0 0 50px rgba(0,0,0,0.2);
+                box-shadow: 0 0 50px rgba(0,0,0,0.1);
                 position: relative;
             }
             .bottom-nav {
@@ -26,168 +26,71 @@
         }
 
         :root {
-            --primary: #00f2fe; 
-            --accent: #10b981;
-            --rouge-dimanche: #ff4d4d; 
-            --violet-nuit: #a855f7;
-            --whatsapp: #25D366;
-            --radius-lg: 24px;
-            --radius-md: 16px;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --primary: #00f2fe; --accent: #10b981;
+            --rouge-dimanche: #ff4d4d; --violet-nuit: #a855f7;
+            --whatsapp: #25D366; --radius-lg: 24px;
+            --radius-md: 16px; --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        /* --- NOUVEAUX THÈMES MODERNISÉS --- */
-        body.dark-theme { 
-            --bg: #0f172a; 
-            --text: #f8fafc; 
-            --card: rgba(255, 255, 255, 0.08); 
-            --nav: #0f172a; 
-            --input-bg: rgba(255,255,255,0.05);
-            --card-border: rgba(255,255,255,0.1);
-        }
-        body.light-theme { 
-            --bg: #f1f5f9; 
-            --text: #1e293b; 
-            --card: #ffffff; 
-            --nav: #ffffff; 
-            --input-bg: #e2e8f0;
-            --card-border: rgba(0,0,0,0.05);
-        }
-        body.rose-theme { 
-            --bg: #fff1f2; 
-            --text: #881337; 
-            --card: #ffffff; 
-            --nav: #fff1f2; 
-            --input-bg: #ffe4e6;
-            --card-border: #fecdd3;
-            --accent: #fb7185;
-        }
+        /* --- THÈMES --- */
+        body.dark-theme { --bg: #0f172a; --text: #f8fafc; --card: rgba(255, 255, 255, 0.08); --nav: #0f172a; --input-bg: rgba(255,255,255,0.05); --card-border: rgba(255,255,255,0.1); }
+        body.light-theme { --bg: #f1f5f9; --text: #1e293b; --card: #ffffff; --nav: #ffffff; --input-bg: #e2e8f0; --card-border: rgba(0,0,0,0.05); }
+        body.rose-theme { --bg: #fff1f2; --text: #881337; --card: #ffffff; --nav: #fff1f2; --input-bg: #ffe4e6; --card-border: #fecdd3; --accent: #fb7185; }
 
         body {
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            background: var(--bg); 
-            color: var(--text);
-            margin: 0; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column;
-            overflow: hidden; 
-            transition: background 0.3s, color 0.3s;
+            font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text);
+            margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: 0.3s;
         }
 
         header { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; padding: 15px 10px 5px; }
-        .logo-img { width: 60px; height: 60px; border-radius: 18px; border: 2px solid var(--accent); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+        .logo-img { width: 55px; height: 55px; border-radius: 15px; border: 2px solid var(--accent); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
 
-        .theme-switcher { display: flex; justify-content: center; gap: 12px; width: 100%; margin-top: 15px; padding: 0 20px; }
-        .theme-circle { width: 35px; height: 35px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
-        .theme-circle:active { transform: scale(0.9); }
-        .circle-dark { background: #1e293b; }
-        .circle-light { background: #ffffff; }
-        .circle-rose { background: #fb7185; }
+        .theme-switcher { display: flex; justify-content: center; gap: 12px; width: 100%; margin-top: 15px; }
+        .theme-circle { width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.1); cursor: pointer; transition: 0.2s; }
+        .circle-dark { background: #1e293b; } .circle-light { background: #ffffff; } .circle-rose { background: #fb7185; }
 
-        .news-ticker { 
-            background: rgba(0,0,0,0.05); border-bottom: 1px solid var(--accent); height: 35px;
-            display: flex; align-items: center; overflow: hidden; white-space: nowrap; width: 100%;
-            position: relative; z-index: 10; margin-top: 10px; flex-shrink: 0;
-        }
-        .ticker-wrapper { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; font-size: 0.8rem; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; }
+        .news-ticker { background: rgba(0,0,0,0.05); border-bottom: 1px solid var(--accent); height: 35px; display: flex; align-items: center; overflow: hidden; white-space: nowrap; width: 100%; margin-top: 10px; flex-shrink: 0; }
+        .ticker-wrapper { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; font-size: 0.8rem; font-weight: bold; color: var(--accent); text-transform: uppercase; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
         .content-area { flex: 1; padding: 10px 15px 100px; overflow-y: auto; width: 100%; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .tab-content { display: none; } .tab-content.active { display: block; }
 
-        /* Style des Cartes Modernes */
-        .card { 
-            background: var(--card); 
-            border-radius: var(--radius-lg); 
-            padding: 20px; 
-            margin-bottom: 15px; 
-            border: 1px solid var(--card-border); 
-            box-shadow: var(--shadow);
-            transition: transform 0.2s;
-        }
-        
+        .card { background: var(--card); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 15px; border: 1px solid var(--card-border); box-shadow: var(--shadow); position: relative; }
         #dimancheCard { background: rgba(16, 185, 129, 0.05); border-left: 6px solid var(--accent); }
-        #nuitCard { border-left: 6px solid var(--violet-nuit); }
+        #nuitCard { border-left: 6px solid var(--violet-nuit); background: rgba(168, 85, 247, 0.05); }
 
         .pharma-badge-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .pharma-badge { 
-            background: var(--bg); 
-            padding: 12px; 
-            border-radius: var(--radius-md); 
-            font-size: 0.8rem; 
-            border: 1px solid var(--card-border); 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            color: var(--text); 
-            font-weight: 600;
-        }
+        .pharma-badge { background: var(--bg); padding: 12px; border-radius: var(--radius-md); font-size: 0.8rem; border: 1px solid var(--card-border); display: flex; align-items: center; gap: 8px; font-weight: 600; }
 
-        .pharma-item { 
-            background: var(--card); 
-            border-radius: var(--radius-md); 
-            padding: 18px; 
-            margin-bottom: 12px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: var(--shadow);
-            border-left: 5px solid transparent;
-        }
-        .nuit-border { border-left-color: var(--violet-nuit); }
-        .dimanche-border { border-left-color: var(--accent); }
+        .pharma-item { background: var(--card); border-radius: var(--radius-md); padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); border-left: 5px solid transparent; }
+        .nuit-border { border-left-color: var(--violet-nuit); } .dimanche-border { border-left-color: var(--accent); }
         
-        .section-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 800; margin: 25px 5px 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 800; margin: 25px 5px 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
 
-        input[type="text"] { 
-            width: 100%; padding: 16px; border-radius: var(--radius-md); 
-            border: 1px solid var(--card-border); background: var(--input-bg); 
-            color: var(--text); outline: none; font-size: 1rem;
-            transition: border 0.3s;
-        }
-        input[type="text"]:focus { border-color: var(--accent); }
+        input[type="text"] { width: 100%; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text); outline: none; font-size: 1rem; }
+        
+        .btn-main-action { width: 100%; padding: 15px; background: none; border: 2px dashed var(--accent); border-radius: var(--radius-md); color: var(--text); cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
 
-        .close-btn { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.1); border: none; color: inherit; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
-
-        .broadcast-item { 
-            background: var(--bg); border-radius: var(--radius-md); padding: 15px; 
-            margin-top: 10px; display: flex; justify-content: space-between; align-items: center; 
-            border: 1px solid var(--card-border); 
-        }
-
-        .bottom-nav { 
-            position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); 
-            display: flex; justify-content: space-around; padding: 12px 0 30px; 
-            border-top: 1px solid var(--card-border); z-index: 1000;
-            backdrop-filter: blur(10px);
-        }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 12px 0 30px; border-top: 1px solid var(--card-border); z-index: 1000; backdrop-filter: blur(10px); }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: #94a3b8; font-size: 0.75rem; text-decoration: none; cursor: pointer; gap: 5px; font-weight: 600; }
         .nav-item.active { color: var(--accent); }
-        
-        .btn-main-action {
-            width: 100%; padding: 16px; background: none; 
-            border: 2px dashed var(--accent); border-radius: var(--radius-md); 
-            color: var(--text); cursor: pointer; font-weight: bold; font-size: 0.9rem;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
 
-        .btn-call { color: var(--accent); font-size: 1.3rem; }
-        .btn-map { color: var(--primary); font-size: 1.3rem; }
+        .broadcast-item { background: var(--bg); border-radius: var(--radius-md); padding: 15px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--card-border); }
+        .close-btn { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.1); border: none; color: inherit; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     </style>
 </head>
 <body class="dark-theme">
 
 <header>
     <img src="icon.jpeg" alt="Logo" class="logo-img">
-    <h1 style="margin: 8px 0 0; font-size: 1.8rem; font-weight: 900; background: linear-gradient(to right, var(--accent), #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px;">PHARMATIC</h1>
+    <h1 style="margin: 8px 0 0; font-size: 1.7rem; font-weight: 900; background: linear-gradient(to right, var(--accent), #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px;">PHARMATIC</h1>
     <div class="theme-switcher">
-        <div class="theme-circle circle-dark" onclick="setTheme('dark')" title="Sombre"></div>
-        <div class="theme-circle circle-light" onclick="setTheme('light')" title="Clair"></div>
-        <div class="theme-circle circle-rose" onclick="setTheme('rose')" title="Rose"></div>
+        <div class="theme-circle circle-dark" onclick="setTheme('dark')"></div>
+        <div class="theme-circle circle-light" onclick="setTheme('light')"></div>
+        <div class="theme-circle circle-rose" onclick="setTheme('rose')"></div>
     </div>
 </header>
 
@@ -197,41 +100,31 @@
 
 <div class="content-area">
     <div id="recherche" class="tab-content active">
-        <div id="nuitCard" class="card" style="display:none; background: rgba(168, 85, 247, 0.05);">
-            <h3 style="margin:0; font-size: 0.85rem; color: var(--violet-nuit); text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-moon"></i> Garde de nuit</h3>
-            <div id="statusText" style="font-weight: bold; margin-top: 12px; font-size: 1.1rem;"></div>
+        <div id="nuitCard" class="card" style="display:none;">
+            <h3 style="margin:0; font-size: 0.8rem; color: var(--violet-nuit); text-transform: uppercase;"><i class="fas fa-moon"></i> Garde de nuit</h3>
+            <div id="statusText" style="font-weight: bold; margin-top: 10px; font-size: 1.1rem;"></div>
         </div>
 
         <div id="dimancheCard" class="card" style="display:none;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="margin:0; font-size: 0.85rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-sun"></i> Gardes du Dimanche</h3>
-                <span style="font-size: 0.65rem; background: var(--accent); color: white; padding: 4px 8px; border-radius: 6px; font-weight: bold;">OUVERT</span>
+                <h3 style="margin:0; font-size: 0.8rem; color: var(--accent); text-transform: uppercase;"><i class="fas fa-sun"></i> Dimanche</h3>
+                <span style="font-size: 0.6rem; background: var(--accent); color: white; padding: 3px 7px; border-radius: 5px; font-weight: bold;">OUVERT</span>
             </div>
             <div id="dimancheBadgeList" class="pharma-badge-container"></div>
         </div>
 
+        <div class="section-header">Rechercher un produit</div>
         <div class="card">
-            <h3 style="margin-top:0; font-size: 1rem; margin-bottom: 15px;">Chercher un médicament</h3>
-            <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Ex: Doliprane, Spasfon...">
-            
-            <div id="broadcast-zone" style="display:none; margin-top:20px; position: relative;">
-                <button class="close-btn" onclick="resetSearch()"><i class="fas fa-times"></i></button>
-                <div id="medLabel" style="color: var(--accent); font-weight: 800; text-align:center; font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px;"></div>
-                <div id="pharmaciesOuvertesMed"></div>
-                <div id="pharmaciesFermeesMed" style="margin-top: 20px;"></div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h3 style="margin-top:0; font-size: 1rem; margin-bottom: 15px;">Par ordonnance</h3>
+            <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Doliprane, Sirop, Masque...">
             <button class="btn-main-action" onclick="document.getElementById('fileInput').click()">
-                <i class="fas fa-camera" style="font-size: 1.2rem;"></i> PRENDRE PHOTO ORDONNANCE
+                <i class="fas fa-camera"></i> SCANNER ORDONNANCE
             </button>
-            <div id="ordo-zone" style="display:none; margin-top:20px; position: relative;">
-                <button class="close-btn" onclick="resetOrdo()"><i class="fas fa-times"></i></button>
-                <p style="font-size: 0.9rem; color: var(--accent); font-weight: bold; text-align:center; margin-bottom: 15px;">📸 PHOTO ANALYSÉE</p>
-                <div id="pharmaciesOuvertesOrdo"></div>
-                <div id="pharmaciesFermeesOrdo" style="margin-top: 20px;"></div>
+            
+            <div id="broadcast-zone" style="display:none; margin-top:20px;">
+                <button class="close-btn" onclick="resetSearch()"><i class="fas fa-times"></i></button>
+                <div id="medLabel" style="color: var(--accent); font-weight: 800; text-align:center; font-size: 1.1rem; margin-bottom: 15px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px;"></div>
+                <div id="pharmaciesOuvertesMed"></div>
+                <div id="pharmaciesFermeesMed" style="margin-top: 15px;"></div>
             </div>
         </div>
     </div>
@@ -240,21 +133,33 @@
         <div id="listContainer"></div>
     </div>
 
-    <div id="installer-tab" class="tab-content">
-        <div class="card" style="text-align:center; padding: 40px 20px;">
-            <i class="fas fa-cloud-download-alt" style="font-size: 4rem; color: var(--accent); margin-bottom: 20px;"></i>
-            <h3 style="font-size: 1.4rem;">Installer l'App</h3>
-            <p style="font-size: 1rem; opacity: 0.7; line-height: 1.5; margin-bottom: 25px;">Ajoutez PharmaTic sur votre écran d'accueil pour un accès ultra-rapide en cas d'urgence.</p>
-            <button id="pwaBtn" style="width:100%; padding:18px; background:var(--accent); color:white; border:none; border-radius:var(--radius-md); font-weight:900; font-size: 1rem; cursor:pointer; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">INSTALLER MAINTENANT</button>
+    <div id="plus-tab" class="tab-content">
+        <div class="section-header">Application</div>
+        <div class="card" style="text-align:center;">
+            <i class="fas fa-mobile-alt" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 15px;"></i>
+            <h3>Installer PharmaTic</h3>
+            <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 15px;">Accédez aux gardes plus rapidement depuis votre écran d'accueil.</p>
+            <button id="pwaBtn" style="width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">INSTALLER MAINTENANT</button>
         </div>
+
+        <div class="section-header">Besoin d'aide ?</div>
+        <a href="https://wa.me/221776779440" target="_blank" style="text-decoration:none; color:inherit;">
+            <div class="card" style="display:flex; align-items:center; gap:15px; border-left: 5px solid var(--whatsapp);">
+                <i class="fab fa-whatsapp" style="font-size: 2rem; color: var(--whatsapp);"></i>
+                <div>
+                    <h3 style="margin:0; font-size: 1rem;">Contactez-nous</h3>
+                    <p style="margin:0; font-size: 0.8rem; opacity: 0.7;">Signaler une erreur ou demander assistance.</p>
+                </div>
+            </div>
+        </a>
+        <p style="text-align:center; font-size: 0.7rem; opacity: 0.5; margin-top: 20px;">PharmaTic v1.60 - Keur Massar, Sénégal</p>
     </div>
 </div>
 
 <nav class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('recherche', this)"><i class="fas fa-search-plus" style="font-size: 1.3rem;"></i><span>Recherche</span></div>
-    <div class="nav-item" onclick="switchTab('pharmacies-tab', this)"><i class="fas fa-clinic-medical" style="font-size: 1.3rem;"></i><span>Pharmacies</span></div>
-    <div class="nav-item" onclick="switchTab('installer-tab', this)"><i class="fas fa-mobile-alt" style="font-size: 1.3rem;"></i><span>Installer</span></div>
-    <a href="https://wa.me/221776779440" target="_blank" class="nav-item"><i class="fas fa-headset" style="font-size: 1.3rem;"></i><span>Aide</span></a>
+    <div class="nav-item active" onclick="switchTab('recherche', this)"><i class="fas fa-home"></i><span>Accueil</span></div>
+    <div class="nav-item" onclick="switchTab('pharmacies-tab', this)"><i class="fas fa-hospital"></i><span>Pharmacies</span></div>
+    <div class="nav-item" onclick="switchTab('plus-tab', this)"><i class="fas fa-ellipsis-h"></i><span>Plus</span></div>
 </nav>
 
 <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelected()">
@@ -264,14 +169,13 @@
     let config = {};
     let deferredPrompt;
 
-    // --- LOGIQUE AUTOMATISATION DIMANCHE ---
+    // --- AUTOMATISATION 2026 ---
     function getGroupeDimanche() {
         const aujourdhui = new Date();
         const jour = String(aujourdhui.getDate()).padStart(2, '0');
         const mois = String(aujourdhui.getMonth() + 1).padStart(2, '0');
         const annee = aujourdhui.getFullYear().toString().slice(-2);
         const dateCle = `${jour}/${mois}/${annee}`;
-
         const planning = {
             "05/04/26": 2, "12/04/26": 3, "19/04/26": 2, "26/04/26": 1,
             "03/05/26": 3, "10/05/26": 2, "17/05/26": 1, "24/05/26": 3, "31/05/26": 2,
@@ -288,40 +192,27 @@
 
     async function loadData() {
         try {
-            const response = await fetch('src/data/pharmacies.json?v=1.60');
+            const response = await fetch('src/data/pharmacies.json?v=' + new Date().getTime());
             const data = await response.json();
             config = data.config;
             pharmacies = data.pharmacies;
             updateUI();
-        } catch (e) { console.error("Erreur de chargement :", e); }
+        } catch (e) { console.error(e); }
     }
 
     function updateUI() {
         const isSunday = (new Date().getDay() === 0);
         const groupeAuj = getGroupeDimanche();
-
-        // NUIT
         const activeNuit = pharmacies.filter(p => p.nuit);
-        const nuitCard = document.getElementById('nuitCard');
         if(activeNuit.length > 0) {
-            nuitCard.style.display = 'block';
-            document.getElementById('statusText').innerHTML = `
-                <div style="font-size: 0.7rem; opacity: 0.6; font-weight: normal; margin-bottom: 8px;">${config.date_nuit}</div>
-                <div style="color: var(--text);">📍 ${activeNuit.map(p => p.nom).join(", ")}</div>
-            `;
-        } else { nuitCard.style.display = 'none'; }
-
-        // DIMANCHE
+            document.getElementById('nuitCard').style.display = 'block';
+            document.getElementById('statusText').innerHTML = `<span style="font-size:0.7rem; opacity:0.6; font-weight:normal;">${config.date_nuit}</span><br>📍 ${activeNuit.map(p => p.nom).join(", ")}`;
+        }
         const activeDimanche = pharmacies.filter(p => isSunday && p.groupe === groupeAuj);
-        const dimancheCard = document.getElementById('dimancheCard');
-        const badgeList = document.getElementById('dimancheBadgeList');
-        
         if(isSunday && activeDimanche.length > 0) {
-            dimancheCard.style.display = 'block';
-            badgeList.innerHTML = activeDimanche.map(p => `
-                <div class="pharma-badge"><i class="fas fa-check-circle" style="color:var(--accent)"></i> ${p.nom}</div>
-            `).join('');
-        } else { dimancheCard.style.display = 'none'; }
+            document.getElementById('dimancheCard').style.display = 'block';
+            document.getElementById('dimancheBadgeList').innerHTML = activeDimanche.map(p => `<div class="pharma-badge"><i class="fas fa-check-circle" style="color:var(--accent)"></i> ${p.nom}</div>`).join('');
+        }
     }
 
     function handleSearch() {
@@ -329,125 +220,64 @@
         if (val.length > 2) {
             document.getElementById('broadcast-zone').style.display = 'block';
             document.getElementById('medLabel').innerText = "📦 " + val;
-            generateWA('pharmaciesOuvertesMed', 'pharmaciesFermeesMed', `Auriez-vous le médicament : *${val}* ?`);
+            generateWA('pharmaciesOuvertesMed', 'pharmaciesFermeesMed', `Bonjour, auriez-vous : *${val}* ?`);
         } else { document.getElementById('broadcast-zone').style.display = 'none'; }
     }
 
     function generateWA(idOpen, idClose, customText) {
-        const now = new Date();
-        const hour = now.getHours();
-        const isSunday = (now.getDay() === 0);
-        const groupeAuj = getGroupeDimanche();
-        let htmlOpen = ""; let htmlFerme = "";
-
+        const now = new Date(); const hour = now.getHours(); const isSunday = (now.getDay() === 0);
+        const groupeAuj = getGroupeDimanche(); let htmlOpen = ""; let htmlFerme = "";
         pharmacies.forEach(p => {
             const ouvert = (hour >= 22 || hour < 8 ? p.nuit : (isSunday ? (p.groupe === groupeAuj) : true));
             const hasWA = p.whatsapp && p.whatsapp.trim() !== "";
-            const cleanNum = hasWA ? p.whatsapp.replace(/\D/g, '') : null;
-            const msg = encodeURIComponent(`🌟 *PharmaTic* 🌟\n${customText}`);
-            
-            let waButton = hasWA ? 
-                `<a href="https://wa.me/${cleanNum}?text=${msg}" target="_blank"><i class="fab fa-whatsapp" style="color:var(--whatsapp); font-size:1.5rem;"></i></a>` :
-                `<i class="fab fa-whatsapp" style="color:grey; font-size:1.5rem; opacity:0.2;"></i>`;
-
+            const msg = encodeURIComponent(`🌟 *PharmaTic*\n${customText}`);
             const card = `
-                <div class="broadcast-item" style="${ouvert ? '' : 'opacity:0.4; filter:grayscale(1);'}">
-                    <span style="font-weight:700; font-size:0.9rem;">${p.nom}</span>
-                    <div style="display:flex; gap:20px; align-items:center;">
-                        ${waButton}
-                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank">
-                            <i class="fas fa-directions btn-map"></i>
-                        </a>
+                <div class="broadcast-item" style="${ouvert ? '' : 'opacity:0.4;'}">
+                    <span style="font-weight:700; font-size:0.85rem;">${p.nom}</span>
+                    <div style="display:flex; gap:15px; align-items:center;">
+                        ${hasWA ? `<a href="https://wa.me/${p.whatsapp.replace(/\D/g,'')}?text=${msg}" target="_blank"><i class="fab fa-whatsapp" style="color:var(--whatsapp); font-size:1.3rem;"></i></a>` : ''}
+                        <a href="https://www.google.com/maps/search/${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank"><i class="fas fa-location-arrow" style="color:var(--primary); font-size:1.1rem;"></i></a>
                     </div>
                 </div>`;
             if(ouvert) htmlOpen += card; else htmlFerme += card;
         });
-
         document.getElementById(idOpen).innerHTML = htmlOpen;
-        const closedContainer = document.getElementById(idClose);
-        if (closedContainer) closedContainer.innerHTML = htmlFerme ? `<p style="font-size:0.75rem; opacity:0.5; text-align:center; margin-top:20px; font-weight:bold;">PHARMACIES FERMÉES :</p>${htmlFerme}` : "";
+        document.getElementById(idClose).innerHTML = htmlFerme ? `<p style="font-size:0.7rem; opacity:0.5; text-align:center; margin-top:15px;">Fermées actuellement :</p>${htmlFerme}` : "";
     }
 
     function switchTab(id, el) {
         document.querySelectorAll('.tab-content, .nav-item').forEach(x => x.classList.remove('active'));
-        document.getElementById(id).classList.add('active'); 
-        el.classList.add('active');
-        const contentArea = document.querySelector('.content-area');
-        if (contentArea) contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+        document.getElementById(id).classList.add('active'); el.classList.add('active');
         if(id === 'pharmacies-tab') renderList();
     }
 
     function renderList() {
-        const container = document.getElementById('listContainer');
-        if (!container) return;
-        container.innerHTML = "";
-        
-        const groupeAuj = getGroupeDimanche();
-        const listDimanche = pharmacies.filter(p => p.groupe === groupeAuj);
-
+        const container = document.getElementById('listContainer'); container.innerHTML = "";
         const sections = [
-            { title: '🌙 Gardes de Nuit', list: pharmacies.filter(p => p.nuit), border: 'nuit-border', color: 'var(--violet-nuit)', date: config.date_nuit },
-            { title: '☀️ Gardes du Dimanche', list: listDimanche, border: 'dimanche-border', color: 'var(--accent)', date: "Aujourd'hui" },
-            { title: '🏥 Toutes les Pharmacies', list: pharmacies, border: '', color: 'var(--accent)', date: null }
+            { title: '🌙 Gardes de Nuit', list: pharmacies.filter(p => p.nuit), color: 'var(--violet-nuit)' },
+            { title: '🏥 Toutes les Pharmacies', list: pharmacies, color: 'var(--accent)' }
         ];
-
         sections.forEach(s => {
-            if(s.list.length === 0 && s.title !== '🏥 Toutes les Pharmacies') return;
-            const h = document.createElement('div');
-            h.className = 'section-header';
-            h.style.color = s.color;
-            h.innerHTML = `<div style="display:flex; flex-direction:column;"><span>${s.title}</span>${s.date ? `<span style="font-size:0.6rem; opacity:0.7; font-weight:normal; text-transform: none; margin-top:2px;">${s.date}</span>` : ''}</div>`;
-            container.appendChild(h);
-            
+            if(s.list.length === 0) return;
+            const h = document.createElement('div'); h.className = 'section-header'; h.style.color = s.color; h.innerText = s.title; container.appendChild(h);
             s.list.forEach(p => {
-                const item = document.createElement('div');
-                item.className = `pharma-item ${s.border}`;
-                const star = p.partenaire ? '<i class="fas fa-star" style="color: #ffca28; font-size: 0.75rem; margin-left: 5px;"></i>' : '';
-                item.innerHTML = `
-                    <div><div style="font-weight:bold; display: flex; align-items: center; font-size: 0.95rem;">${p.nom} ${star}</div><div style="font-size:0.75rem; opacity:0.6; margin-top:2px;">${p.quartier}</div></div>
-                    <div style="display:flex; gap:22px; align-items: center;">
-                        <a href="tel:${p.telephone}" class="btn-call"><i class="fas fa-phone-alt"></i></a>
-                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank" class="btn-map"><i class="fas fa-location-arrow"></i></a>
-                    </div>`;
+                const item = document.createElement('div'); item.className = `pharma-item ${p.nuit ? 'nuit-border' : ''}`;
+                item.innerHTML = `<div><div style="font-weight:bold;">${p.nom}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
+                    <div style="display:flex; gap:18px;"><a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--accent)"></i></a>
+                    <a href="https://www.google.com/maps/search/${encodeURIComponent(p.nom + ' ' + p.quartier)}" target="_blank" style="color:var(--primary);"><i class="fas fa-map-marker-alt"></i></a></div>`;
                 container.appendChild(item);
             });
         });
     }
 
-    function setTheme(t) { 
-        document.body.className = t + '-theme'; 
-        localStorage.setItem('pharma-theme', t); 
-    }
-
+    function setTheme(t) { document.body.className = t + '-theme'; localStorage.setItem('pharma-theme', t); }
     function resetSearch() { document.getElementById('searchInput').value = ""; document.getElementById('broadcast-zone').style.display = 'none'; }
-    function resetOrdo() { document.getElementById('ordo-zone').style.display = 'none'; }
-    function handleFileSelected() { document.getElementById('ordo-zone').style.display = 'block'; generateWA('pharmaciesOuvertesOrdo', 'pharmaciesFermeesOrdo', "Avez-vous les produits de cette ordonnance ? (Voir photo jointe)"); }
+    function handleFileSelected() { document.getElementById('broadcast-zone').style.display = 'block'; generateWA('pharmaciesOuvertesMed', 'pharmaciesFermeesMed', "Bonjour, avez-vous les produits de cette ordonnance ? (Voir photo)"); }
 
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=1.60').then(reg => {
-                reg.onupdatefound = () => {
-                    const worker = reg.installing;
-                    worker.onstatechange = () => { if (worker.state === 'installed' && navigator.serviceWorker.controller) window.location.reload(); };
-                };
-            });
-        });
-    }
-
+    window.onload = () => { loadData(); setTheme(localStorage.getItem('pharma-theme') || 'dark'); };
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
-    document.getElementById('pwaBtn').onclick = async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') deferredPrompt = null;
-        } else { alert("Appuyez sur le bouton 'Partager' de votre navigateur, puis 'Sur l'écran d'accueil'."); }
-    };
-
-    window.onload = () => {
-        loadData();
-        const savedTheme = localStorage.getItem('pharma-theme') || 'dark';
-        setTheme(savedTheme);
-    };
+    document.getElementById('pwaBtn').onclick = async () => { if (deferredPrompt) deferredPrompt.prompt(); else alert("Utilisez 'Ajouter à l'écran d'accueil' dans votre navigateur."); };
 </script>
 </body>
 </html>
+
