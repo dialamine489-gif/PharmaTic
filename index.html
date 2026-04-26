@@ -43,7 +43,6 @@
         .ticker-wrapper { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; font-size: 0.8rem; font-weight: bold; color: var(--accent); text-transform: uppercase; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* --- SUPPRESSION BARRE SCROLL --- */
         .content-area { flex: 1; padding: 10px 15px 100px; overflow-y: auto; width: 100%; scrollbar-width: none; -ms-overflow-style: none; }
         .content-area::-webkit-scrollbar { display: none; }
 
@@ -58,13 +57,18 @@
 
         .section-header { font-size: 0.8rem; font-weight: 800; margin: 25px 5px 12px; text-transform: uppercase; color: var(--accent); letter-spacing: 1px; }
 
-        input[type="text"] { width: 100%; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text); outline: none; font-size: 1rem; }
+        .search-container { position: relative; width: 100%; }
+        input[type="text"] { width: 100%; padding: 16px 45px 16px 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text); outline: none; font-size: 1rem; }
         
+        .clear-btn { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text); opacity: 0.5; cursor: pointer; display: none; }
+
         .btn-main-action { width: 100%; padding: 15px; background: none; border: 2px dashed var(--accent); border-radius: var(--radius-md); color: var(--text); cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); display: flex; justify-content: space-around; padding: 12px 0 30px; border-top: 1px solid var(--card-border); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: #94a3b8; font-size: 0.75rem; cursor: pointer; gap: 5px; font-weight: 600; }
         .nav-item.active { color: var(--accent); }
+
+        .broadcast-item { background: var(--bg); border-radius: var(--radius-md); padding: 15px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--card-border); }
 
         #search-menu { animation: slideDown 0.3s ease-out; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
@@ -107,10 +111,16 @@
 
         <div id="search-menu" class="card" style="display: none; margin-top: 10px; border-top: 3px solid var(--accent);">
             <p style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 10px; text-align: center;">Choisissez une méthode :</p>
-            <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Tapez le nom ici...">
+            
+            <div class="search-container">
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Tapez le nom ici...">
+                <button id="clearSearch" class="clear-btn" onclick="resetSearch()"><i class="fas fa-times-circle"></i></button>
+            </div>
+
             <button class="btn-main-action" onclick="document.getElementById('fileInput').click()">
                 <i class="fas fa-camera"></i> SCANNER UNE ORDONNANCE
             </button>
+            
             <div id="broadcast-zone" style="display:none; margin-top:15px;">
                 <div id="medLabel" style="color: var(--accent); font-weight: bold; text-align:center; margin-bottom: 10px;"></div>
                 <div id="pharmaciesOuvertesMed"></div>
@@ -151,7 +161,6 @@
 <script>
     let pharmacies = [];
     let config = {};
-    let deferredPrompt;
 
     function toggleSearchMenu() {
         const menu = document.getElementById('search-menu');
@@ -198,7 +207,12 @@
     }
 
     function handleSearch() {
-        const val = document.getElementById('searchInput').value;
+        const input = document.getElementById('searchInput');
+        const val = input.value;
+        const clearBtn = document.getElementById('clearSearch');
+        
+        clearBtn.style.display = val.length > 0 ? "block" : "none";
+
         if (val.length > 2) {
             document.getElementById('broadcast-zone').style.display = 'block';
             document.getElementById('medLabel').innerText = "📦 " + val;
@@ -212,10 +226,23 @@
         pharmacies.forEach(p => {
             const ouvert = (h >= 22 || h < 8 ? p.nuit : (isSun ? (p.groupe === grp) : true));
             if(ouvert && p.whatsapp) {
-                html += `<div class="card" style="padding:10px; margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;"><span>${p.nom}</span><a href="https://wa.me/${p.whatsapp.replace(/\D/g,'')}?text=${encodeURIComponent(txt)}" target="_blank"><i class="fab fa-whatsapp" style="color:var(--whatsapp); font-size:1.5rem;"></i></a></div>`;
+                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier)}`;
+                html += `<div class="broadcast-item">
+                            <span>${p.nom}</span>
+                            <div style="display:flex; gap:15px;">
+                                <a href="${mapsUrl}" target="_blank"><i class="fas fa-location-arrow" style="color:var(--primary); font-size:1.2rem;"></i></a>
+                                <a href="https://wa.me/${p.whatsapp.replace(/\D/g,'')}?text=${encodeURIComponent(txt)}" target="_blank"><i class="fab fa-whatsapp" style="color:var(--whatsapp); font-size:1.4rem;"></i></a>
+                            </div>
+                         </div>`;
             }
         });
         document.getElementById(id).innerHTML = html;
+    }
+
+    function resetSearch() {
+        document.getElementById('searchInput').value = "";
+        document.getElementById('clearSearch').style.display = "none";
+        document.getElementById('broadcast-zone').style.display = "none";
     }
 
     function switchTab(id, el) {
@@ -224,10 +251,9 @@
     }
 
     function setTheme(t) { document.body.className = t + '-theme'; localStorage.setItem('pharma-theme', t); }
-    function handleFileSelected() { document.getElementById('broadcast-zone').style.display = 'block'; generateWA('pharmaciesOuvertesMed', "Avez-vous ce produit sur ordonnance ? (Photo jointe)"); }
+    function handleFileSelected() { document.getElementById('broadcast-zone').style.display = 'block'; generateWA('pharmaciesOuvertesMed', "Bonjour, avez-vous ce produit ? (Photo jointe)"); }
 
     window.onload = () => { loadData(); setTheme(localStorage.getItem('pharma-theme') || 'dark'); };
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
 </script>
 </body>
 </html>
