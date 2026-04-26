@@ -80,6 +80,29 @@
 
         .broadcast-item { background: var(--bg); border-radius: var(--radius-md); padding: 15px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--card-border); }
         .close-btn { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.1); border: none; color: inherit; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    /* 1. On cache la barre de défilement sur tous les navigateurs */
+.content-area::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.content-area {
+    -ms-overflow-style: none;  /* IE et Edge */
+    scrollbar-width: none;  /* Firefox */
+    
+    /* 2. On s'assure que le contenu ne dépasse pas du bas à cause du menu */
+    height: calc(100vh - 180px); 
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch; /* Pour un défilement fluide sur iPhone */
+}
+
+/* 3. On bloque le corps de la page pour éviter le double scroll */
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100vh;
+}
+
     </style>
 </head>
 <body class="dark-theme">
