@@ -35,7 +35,7 @@
         header { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; padding: 15px 10px 5px; }
         .logo-img { width: 55px; height: 55px; border-radius: 15px; border: 2px solid var(--accent); }
 
-        .theme-switcher { display: flex; justify-content: center; gap: 12px; width: 100%; margin-top: 15px; }
+        .theme-switcher { display: flex; justify(center); gap: 12px; width: 100%; margin-top: 15px; }
         .theme-circle { width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.1); cursor: pointer; }
         .circle-dark { background: #1e293b; } .circle-light { background: #ffffff; } .circle-rose { background: #fb7185; }
 
@@ -54,6 +54,9 @@
 
         .pharma-badge-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
         .pharma-badge { background: var(--bg); padding: 12px; border-radius: var(--radius-md); font-size: 0.8rem; border: 1px solid var(--card-border); display: flex; align-items: center; gap: 8px; font-weight: 600; }
+
+        .pharma-item { background: var(--card); border-radius: var(--radius-md); padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); border-left: 5px solid transparent; }
+        .nuit-border { border-left-color: var(--violet-nuit); }
 
         .section-header { font-size: 0.8rem; font-weight: 800; margin: 25px 5px 12px; text-transform: uppercase; color: var(--accent); letter-spacing: 1px; }
 
@@ -92,7 +95,6 @@
 
 <div class="content-area">
     <div id="recherche" class="tab-content active">
-        
         <div id="nuitCard" class="card" style="display:none;">
             <h3 style="margin:0; font-size: 0.8rem; color: var(--violet-nuit); text-transform: uppercase;"><i class="fas fa-moon"></i> Garde de nuit</h3>
             <div id="statusText" style="font-weight: bold; margin-top: 10px; font-size: 1rem;"></div>
@@ -111,16 +113,13 @@
 
         <div id="search-menu" class="card" style="display: none; margin-top: 10px; border-top: 3px solid var(--accent);">
             <p style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 10px; text-align: center;">Choisissez une méthode :</p>
-            
             <div class="search-container">
                 <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Tapez le nom ici...">
                 <button id="clearSearch" class="clear-btn" onclick="resetSearch()"><i class="fas fa-times-circle"></i></button>
             </div>
-
             <button class="btn-main-action" onclick="document.getElementById('fileInput').click()">
                 <i class="fas fa-camera"></i> SCANNER UNE ORDONNANCE
             </button>
-            
             <div id="broadcast-zone" style="display:none; margin-top:15px;">
                 <div id="medLabel" style="color: var(--accent); font-weight: bold; text-align:center; margin-bottom: 10px;"></div>
                 <div id="pharmaciesOuvertesMed"></div>
@@ -138,15 +137,6 @@
             <h3>Installer PharmaTic</h3>
             <button id="pwaBtn" style="width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">INSTALLER MAINTENANT</button>
         </div>
-        <a href="https://wa.me/221776779440" target="_blank" style="text-decoration:none; color:inherit;">
-            <div class="card" style="display:flex; align-items:center; gap:15px; border-left: 5px solid var(--whatsapp);">
-                <i class="fab fa-whatsapp" style="font-size: 2rem; color: var(--whatsapp);"></i>
-                <div>
-                    <h3 style="margin:0; font-size: 1rem;">Contactez-nous</h3>
-                    <p style="margin:0; font-size: 0.8rem; opacity: 0.7;">Assistance Keur Massar</p>
-                </div>
-            </div>
-        </a>
     </div>
 </div>
 
@@ -168,7 +158,6 @@
         if (menu.style.display === 'none' || menu.style.display === '') {
             menu.style.display = 'block';
             trigger.querySelector('i').className = 'fas fa-minus-circle';
-            menu.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         } else {
             menu.style.display = 'none';
             trigger.querySelector('i').className = 'fas fa-plus-circle';
@@ -178,7 +167,7 @@
     function getGroupeDimanche() {
         const d = new Date();
         const dateCle = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear().toString().slice(-2)}`;
-        const planning = {"05/04/26": 2, "12/04/26": 3, "19/04/26": 2, "26/04/26": 1, "03/05/26": 3, "10/05/26": 2, "17/05/26": 1, "24/05/26": 3, "31/05/26": 2, "07/06/26": 1, "14/06/26": 3, "21/06/26": 2, "28/06/26": 1, "05/07/26": 3, "12/07/26": 2, "19/07/26": 1, "26/07/26": 3, "02/08/26": 2, "09/08/26": 1, "16/08/26": 3, "23/08/26": 2, "30/08/26": 1, "06/09/26": 3, "13/09/26": 2, "20/09/26": 1, "27/09/26": 3, "04/10/26": 2, "11/10/26": 1, "18/10/26": 3, "25/10/26": 2, "01/11/26": 1, "08/11/26": 3, "15/11/26": 2, "22/11/26": 1, "29/11/26": 3, "06/12/26": 2, "13/12/26": 1, "20/12/26": 3, "27/12/26": 2};
+        const planning = {"26/04/26": 1, "03/05/26": 3, "10/05/26": 2, "17/05/26": 1, "24/05/26": 3, "31/05/26": 2};
         return planning[dateCle] || 0;
     }
 
@@ -207,12 +196,8 @@
     }
 
     function handleSearch() {
-        const input = document.getElementById('searchInput');
-        const val = input.value;
-        const clearBtn = document.getElementById('clearSearch');
-        
-        clearBtn.style.display = val.length > 0 ? "block" : "none";
-
+        const val = document.getElementById('searchInput').value;
+        document.getElementById('clearSearch').style.display = val.length > 0 ? "block" : "none";
         if (val.length > 2) {
             document.getElementById('broadcast-zone').style.display = 'block';
             document.getElementById('medLabel').innerText = "📦 " + val;
@@ -229,9 +214,9 @@
                 const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier)}`;
                 html += `<div class="broadcast-item">
                             <span>${p.nom}</span>
-                            <div style="display:flex; gap:15px;">
-                                <a href="${mapsUrl}" target="_blank"><i class="fas fa-location-arrow" style="color:var(--primary); font-size:1.2rem;"></i></a>
+                            <div style="display:flex; gap:15px; align-items:center;">
                                 <a href="https://wa.me/${p.whatsapp.replace(/\D/g,'')}?text=${encodeURIComponent(txt)}" target="_blank"><i class="fab fa-whatsapp" style="color:var(--whatsapp); font-size:1.4rem;"></i></a>
+                                <a href="${mapsUrl}" target="_blank"><i class="fas fa-location-arrow" style="color:var(--primary); font-size:1.2rem;"></i></a>
                             </div>
                          </div>`;
             }
@@ -239,17 +224,35 @@
         document.getElementById(id).innerHTML = html;
     }
 
-    function resetSearch() {
-        document.getElementById('searchInput').value = "";
-        document.getElementById('clearSearch').style.display = "none";
-        document.getElementById('broadcast-zone').style.display = "none";
+    function renderList() {
+        const container = document.getElementById('listContainer'); container.innerHTML = "";
+        const sections = [
+            { title: '🌙 Gardes de Nuit', list: pharmacies.filter(p => p.nuit), color: 'var(--violet-nuit)' },
+            { title: '🏥 Toutes les Pharmacies', list: pharmacies, color: 'var(--accent)' }
+        ];
+        sections.forEach(s => {
+            if(s.list.length === 0) return;
+            const h = document.createElement('div'); h.className = 'section-header'; h.style.color = s.color; h.innerText = s.title; container.appendChild(h);
+            s.list.forEach(p => {
+                const item = document.createElement('div'); item.className = `pharma-item ${p.nuit ? 'nuit-border' : ''}`;
+                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier)}`;
+                item.innerHTML = `<div><div style="font-weight:bold;">${p.nom}</div><div style="font-size:0.7rem; opacity:0.6;">${p.quartier}</div></div>
+                    <div style="display:flex; gap:18px; align-items:center;">
+                        <a href="tel:${p.telephone}"><i class="fas fa-phone-alt" style="color:var(--accent)"></i></a>
+                        <a href="${mapsUrl}" target="_blank" style="color:var(--primary);"><i class="fas fa-map-marker-alt"></i></a>
+                    </div>`;
+                container.appendChild(item);
+            });
+        });
     }
 
     function switchTab(id, el) {
         document.querySelectorAll('.tab-content, .nav-item').forEach(x => x.classList.remove('active'));
         document.getElementById(id).classList.add('active'); el.classList.add('active');
+        if(id === 'pharmacies-tab') renderList();
     }
 
+    function resetSearch() { document.getElementById('searchInput').value = ""; handleSearch(); }
     function setTheme(t) { document.body.className = t + '-theme'; localStorage.setItem('pharma-theme', t); }
     function handleFileSelected() { document.getElementById('broadcast-zone').style.display = 'block'; generateWA('pharmaciesOuvertesMed', "Bonjour, avez-vous ce produit ? (Photo jointe)"); }
 
@@ -257,4 +260,5 @@
 </script>
 </body>
 </html>
+
 
