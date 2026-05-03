@@ -215,7 +215,8 @@
       "groupe": 0
       
       
-    }
+    },
+    {
       "id": 17,
       "nom": "PAPE DJIBRIL",
       "quartier": "Ainoumady",
@@ -229,6 +230,7 @@
       "partenaire": false,
       "nuit": true,
       "groupe": 0
+      },
   ]
 }
 
