@@ -226,7 +226,7 @@
       "lat": 14.7677662,
       "lng": -17.3088592,
       "partenaire": false,
-      "nuit": false,
+      "nuit": true,
       "groupe": 0
     }
   ]
