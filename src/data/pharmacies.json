@@ -214,21 +214,6 @@
       "nuit": false,
       "groupe": 0
     },
-    {
-      "id": 17,
-      "nom": "PAPE DJIBRIL",
-      "quartier": "Ainoumady",
-      "adresse": "cité mame dior",
-      "telephone": "330000000",
-      "whatsapp": "",
-      "ouverture": "08:00",
-      "fermeture": "22:00",
-      "lat": 14.7677662,
-      "lng": -17.3088592,
-      "partenaire": false,
-      "nuit": true,
-      "groupe": 0
-      },
   ]
 }
 
