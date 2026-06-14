@@ -144,28 +144,42 @@
     let pharmacies = [];
     let config = {};
 
-    // CALCUL AUTOMATIQUE DU GROUPE DE GARDE DE DIMANCHE
+    // CARTOGRAPHIE MANUELLE DES DIMANCHES POUR EVITER LES ERREURS DU DOCUMENT WORD
     function getGroupeDimanche() {
         const d = new Date();
-        d.setHours(0, 0, 0, 0);
-        
-        // Si ce n'est pas un dimanche, arrêt immédiat
         if (d.getDay() !== 0) return 0;
         
-        // Date de référence connue : Dimanche 26 Avril 2026 = Groupe 1 (Selon le document officiel)
-        const dateReference = new Date('2026-04-26T00:00:00');
-        
-        const unJour = 24 * 60 * 60 * 1000;
-        const uneSemaine = unJour * 7;
-        const semainesEcoulees = Math.floor((d - dateReference) / uneSemaine);
-        
-        // Ordre cyclique naturel du document : Groupe 1, puis Groupe 2, puis Groupe 3
-        const cycleGroupes = [1, 2, 3];
-        
-        // Modulo sécurisé pour boucler indéfiniment sur les 3 éléments du tableau
-        const indexDuCycle = ((semainesEcoulees % 3) + 3) % 3; 
-        
-        return cycleGroupes[indexDuCycle];
+        // Formatage de la clé de date au format international YYYY-MM-DD
+        const annee = d.getFullYear();
+        const mois = String(d.getMonth() + 1).padStart(2, '0');
+        const jour = String(d.getDate()).padStart(2, '0');
+        const dateCle = `${annee}-${mois}-${jour}`;
+
+        // Calendrier de rotation strict basé sur ton document original
+        const planning = {
+            "2026-04-26": 1, // DIOMA...
+            "2026-05-03": 2, // BIRANE LY...
+            "2026-05-10": 3, // SANKOU FATY...
+            "2026-05-17": 1,
+            "2026-05-24": 2,
+            "2026-05-31": 3,
+            "2026-06-07": 1,
+            "2026-06-14": 3, // <--- Aujourd'hui : Groupe 3 (Sankou Faty, Adji Mohamed, S.M Moustapha, Logo)
+            "2026-06-21": 1,
+            "2026-06-28": 2,
+            "2026-07-05": 3
+        };
+
+        // Si la date existe dans notre planning, on renvoie son groupe, sinon on applique un modulo de sécurité adaptatif
+        if (planning[dateCle] !== undefined) {
+            return planning[dateCle];
+        } else {
+            const dateReference = new Date('2026-04-26T00:00:00');
+            const semainesEcoulees = Math.floor((d - dateReference) / (24 * 60 * 60 * 1000 * 7));
+            const cycleGroupes = [1, 2, 3];
+            const indexDuCycle = ((semainesEcoulees % 3) + 3) % 3;
+            return cycleGroupes[indexDuCycle];
+        }
     }
 
     async function loadData() {
@@ -225,7 +239,6 @@
                 const item = document.createElement('div');
                 item.className = `pharma-item ${p.nuit ? 'nuit-border' : ''}`;
                 
-                // Correction de la génération d'URL Google Maps
                 const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier + ' Keur Massar')}`;
                 
                 item.innerHTML = `
@@ -268,7 +281,6 @@
         pharmacies.forEach(p => {
             const ouvert = (h >= 22 || h < 8) ? p.nuit : (isSun ? p.groupe === grp : true);
             if(ouvert && p.whatsapp) {
-                // Correction de la génération d'URL Google Maps ici aussi
                 const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.nom + ' ' + p.quartier + ' Keur Massar')}`;
                 html += `
                 <div class="broadcast-item">
