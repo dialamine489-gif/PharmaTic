@@ -5,66 +5,6 @@
   },
   "pharmacies": [
     {
-      "id": 5,
-      "nom": "Pharmacie Birane LY",
-      "quartier": "Aïnoumady",
-      "adresse": "Cité Aïnoumady lot n°4",
-      "telephone": "788087878",
-      "whatsapp": "221788087878",
-      "ouverture": "08:30",
-      "fermeture": "22:30",
-      "lat": 14.7695,
-      "lng": -17.3138,
-      "partenaire": false,
-      "nuit": true,
-      "groupe": 1
-    },
-    {
-      "id": 19,
-      "nom": "Pharmacie Al Amine Mouhammed",
-      "quartier": "Unité 6",
-      "adresse": "Unité 6, Parcelles Assainies de Malika",
-      "telephone": "338788929",
-      "whatsapp": "",
-      "ouverture": "08:00",
-      "fermeture": "23:00",
-      "lat": 14.7726,
-      "lng": -17.3257,
-      "partenaire": false,
-      "nuit": false,
-      "groupe": 1
-    },
-    {
-      "id": 22,
-      "nom": "YAYE FATOUMA",
-      "quartier": "Unité 17",
-      "adresse": "Parcelles assainies, Unité 17 Villa 76",
-      "telephone": "338370000",
-      "whatsapp": "",
-      "ouverture": "08:00",
-      "fermeture": "22:00",
-      "lat": 14.7750,
-      "lng": -17.3350,
-      "partenaire": false,
-      "nuit": false,
-      "groupe": 1
-    },
-    {
-      "id": 10,
-      "nom": "Pharmacie Elimane Aly Dramane",
-      "quartier": "Unité 3",
-      "adresse": "Unité 3, n°156, Parcelles Assainies de Malika",
-      "telephone": "338000000",
-      "whatsapp": "",
-      "ouverture": "08:00",
-      "fermeture": "22:30",
-      "lat": 14.7825,
-      "lng": -17.3050,
-      "partenaire": false,
-      "nuit": false,
-      "groupe": 1
-    },
-    {
       "id": 6,
       "nom": "Pharmacie DIOMA",
       "quartier": "Aïnoumadi",
@@ -77,7 +17,7 @@
       "lng": -17.3040,
       "partenaire": false,
       "nuit": false,
-      "groupe": 2
+      "groupe": 1
     },
     {
       "id": 1,
@@ -92,7 +32,7 @@
       "lng": -17.3216,
       "partenaire": true,
       "nuit": false,
-      "groupe": 2
+      "groupe": 1
     },
     {
       "id": 18,
@@ -107,7 +47,7 @@
       "lng": -17.3300,
       "partenaire": false,
       "nuit": false,
-      "groupe": 2
+      "groupe": 1
     },
     {
       "id": 3,
@@ -120,6 +60,66 @@
       "fermeture": "23:00",
       "lat": 14.7850,
       "lng": -17.3100,
+      "partenaire": false,
+      "nuit": false,
+      "groupe": 1
+    },
+    {
+      "id": 5,
+      "nom": "Pharmacie Birane LY",
+      "quartier": "Aïnoumady",
+      "adresse": "Cité Aïnoumady lot n°4",
+      "telephone": "788087878",
+      "whatsapp": "221788087878",
+      "ouverture": "08:30",
+      "fermeture": "22:30",
+      "lat": 14.7695,
+      "lng": -17.3138,
+      "partenaire": false,
+      "nuit": true,
+      "groupe": 2
+    },
+    {
+      "id": 19,
+      "nom": "Pharmacie Al Amine Mouhammed",
+      "quartier": "Unité 6",
+      "adresse": "Unité 6, Parcelles Assainies de Malika",
+      "telephone": "338788929",
+      "whatsapp": "",
+      "ouverture": "08:00",
+      "fermeture": "23:00",
+      "lat": 14.7726,
+      "lng": -17.3257,
+      "partenaire": false,
+      "nuit": false,
+      "groupe": 2
+    },
+    {
+      "id": 22,
+      "nom": "YAYE FATOUMA",
+      "quartier": "Unité 17",
+      "adresse": "Parcelles assainies, Unité 17 Villa 76",
+      "telephone": "338370000",
+      "whatsapp": "",
+      "ouverture": "08:00",
+      "fermeture": "22:00",
+      "lat": 14.7750,
+      "lng": -17.3350,
+      "partenaire": false,
+      "nuit": false,
+      "groupe": 2
+    },
+    {
+      "id": 10,
+      "nom": "Pharmacie Elimane Aly Dramane",
+      "quartier": "Unité 3",
+      "adresse": "Unité 3, n°156, Parcelles Assainies de Malika",
+      "telephone": "338000000",
+      "whatsapp": "",
+      "ouverture": "08:00",
+      "fermeture": "22:30",
+      "lat": 14.7825,
+      "lng": -17.3050,
       "partenaire": false,
       "nuit": false,
       "groupe": 2
@@ -231,4 +231,5 @@
     }
   ]
 }
+
 
